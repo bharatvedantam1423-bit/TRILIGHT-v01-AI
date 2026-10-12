@@ -30,16 +30,12 @@ export const site = {
 };
 
 export const hero = {
-  kicker: 'For NIAT students · Physical AI & Robotics',
-  lead: 'TRL8, Tri-Light.',
-  headline: 'Take your Physical AI idea from a sketch to a product customers pay for.',
-  sub: 'A funded, mentored ladder from first idea to paying customers. Open to every NIAT student, no fee.',
+  // Display line is the brand campaign "[Build what's] NEXT" from the guidelines.
+  bracket: 'Build what’s',
+  display: 'NEXT',
+  headline: 'TRL8, Tri-Light. Take your Physical AI idea from a sketch to a product customers pay for.',
   // SIGN-OFF: ₹5L per team (PRD §12.8)
-  stats: [
-    { value: '₹0', label: 'to join, no fee' },
-    { value: '₹5L', label: 'max grant per team' },
-    { value: 'TRL 1→8', label: 'reviewed stages' },
-  ],
+  facts: ['Open to every NIAT student', 'No fee', 'Grants up to ₹5L per team'],
 };
 
 export const whatIs = {

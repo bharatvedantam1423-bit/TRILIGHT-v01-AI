@@ -93,28 +93,31 @@ ScrollTrigger.create({
 
 /* ------------------------------------------------------------ motion scenes */
 
-if (!reduceMotion) {
-  introScene();
-  whatScene();
-  lightsScene();
-  ladderScene();
-  closingScene();
-  reveals();
-  hudTicker();
-  if (finePointer) pointerParallax();
-}
+
+/** Where each frame layer exits to as the camera pushes through. */
+const exits: Record<string, gsap.TweenVars> = {
+  'back-l': { xPercent: -90, scale: 1.15 },
+  'back-r': { xPercent: 90, scale: 1.15 },
+  'vine-l': { yPercent: -110 },
+  'vine-r': { yPercent: -110 },
+  l: { xPercent: -115, scale: 1.25 },
+  r: { xPercent: 115, scale: 1.25 },
+  pile: { yPercent: 80, scale: 1.15 },
+};
 
 function introScene() {
   const q = gsap.utils.selector(intro);
-  const paths = $$<SVGPathElement>('.xmark path', intro);
-  const [rightBracket, leftBracket, cross] = paths;
+  const [rightBracket, leftBracket, cross] = $$<SVGPathElement>('.xmark path', intro);
 
-  // Entrance: objects power on from the edges, HUD tags snap in.
-  gsap.from(q('.obj picture'), {
-    autoAlpha: 0, scale: 0.92, duration: 1.4, ease: 'power3.out', stagger: 0.08, delay: 0.1,
-  });
-  gsap.from(q('.hud-tag'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.1, delay: 0.9, ease: 'power2.out' });
-  gsap.from(q('[data-hero] > *'), { autoAlpha: 0, y: 24, duration: 0.9, stagger: 0.08, ease: 'power3.out' });
+  // Entrance: the frame assembles inward from the edges, then the copy.
+  const pics = (k: string) => q(`[data-layer="${k}"] picture`);
+  gsap.timeline({ defaults: { duration: 1.6, ease: 'power3.out' } })
+    .from([...pics('back-l'), ...pics('back-r')], { autoAlpha: 0, scale: 0.94 }, 0)
+    .from(pics('l'), { autoAlpha: 0, xPercent: -18 }, 0.1)
+    .from(pics('r'), { autoAlpha: 0, xPercent: 18 }, 0.1)
+    .from([...pics('vine-l'), ...pics('vine-r')], { autoAlpha: 0, yPercent: -14 }, 0.25)
+    .from(pics('pile'), { autoAlpha: 0, yPercent: 16 }, 0.2)
+    .from(q('.bracket, .hero__display, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.45);
 
   gsap.set(q('.lens'), { autoAlpha: 0, scale: 0.55 });
   gsap.set(q('.xmark'), { autoAlpha: 0 });
@@ -126,23 +129,16 @@ function introScene() {
 
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.7 },
+    scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
   });
 
-  // 1 · the frame parts: every layer flies past the camera at its own depth.
-  tl.to(q('[data-hero]'), { autoAlpha: 0, y: -70, scale: 0.95, duration: 1.8 }, 0)
-    .to(q('.hud, .scrollcue'), { autoAlpha: 0, duration: 0.8 }, 0)
-    .to(q('.obj--drone'), { xPercent: -40, yPercent: -140, scale: 1.6, duration: 3.4 }, 0)
-    .to(q('.obj--pcb'), { xPercent: 70, yPercent: -120, scale: 1.7, rotate: 18, duration: 3.4 }, 0)
-    .to(q('.obj--head'), { xPercent: 120, scale: 1.5, duration: 3.4 }, 0)
-    .to(q('.obj--arm'), { xPercent: -120, yPercent: 20, scale: 1.5, duration: 3.4 }, 0)
-    .to(q('.obj--rover'), { xPercent: 80, yPercent: 110, scale: 1.7, duration: 3.4 }, 0)
-    .to(q('.obj'), { autoAlpha: 0, duration: 1 }, 2.5)
-    .to(q('.bp-grid'), { scale: 1.6, autoAlpha: 0.35, duration: 4 }, 0)
-    .to(q('.glow--blue'), { xPercent: -30, duration: 4 }, 0)
-    .to(q('.glow--teal'), { xPercent: 30, duration: 4 }, 0)
+  // 1 · the frame parts like a camera pushing through it.
+  tl.to(q('[data-hero]'), { autoAlpha: 0, y: -60, scale: 0.94, duration: 1.6 }, 0)
+    .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.6 }, 0);
+  Object.entries(exits).forEach(([k, v]) => tl.to(q(`.frame--hero [data-layer="${k}"]`), { ...v, duration: 3.2 }, 0));
+  tl.to(q('.frame--hero'), { autoAlpha: 0, duration: 0.8 }, 2.6)
 
-    // 2 · two beams cross and lock into the Trilight X.
+    // 2 · two beams lock into the Trilight X.
     .to(q('.xmark'), { autoAlpha: 1, duration: 0.3 }, 1.6)
     .to(leftBracket, { x: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.7)
     .to(rightBracket, { x: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.7)
@@ -153,94 +149,51 @@ function introScene() {
     .to(q('.lens'), { autoAlpha: 1, scale: 1, duration: 2 }, 4.4)
     .to(q('.lens-caption'), { autoAlpha: 1, y: 0, duration: 0.9 }, 5.2)
     .to(q('.lens-caption'), { autoAlpha: 0, y: -16, duration: 0.7 }, 7)
-    .to(q('.reticle, .lens__det'), { autoAlpha: 0, duration: 0.6 }, 7)
+    .to(q('.reticle'), { autoAlpha: 0, duration: 0.6 }, 7)
     .to(q('.lens picture'), { scale: 8, duration: 2.6, ease: 'power2.in' }, 7)
-    .to(q('.blackout'), { autoAlpha: 1, duration: 0.9 }, 8.9);
+    .to(q('.blackout'), { autoAlpha: 1, duration: 0.6 }, 9.0);
 }
 
 function whatScene() {
   const scene = $('.scene--what')!;
   const q = gsap.utils.selector(scene);
-
   gsap.set(q('[data-step="2"]'), { autoAlpha: 0, y: 30 });
 
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: scene, start: 'top top', end: 'bottom bottom', scrub: 0.7 },
+    scrollTrigger: { trigger: scene, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
   });
 
-  tl.fromTo(q('.what__bg'), { scale: 1.18, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 2 }, 0)
-    .fromTo(q('.what__floor'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.5 }, 0.5)
-    .fromTo(q('.what__figure'), { yPercent: 35, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 2, ease: 'power2.out' }, 0.7)
-    .fromTo(q('[data-step="1"]'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 1.3)
-    .fromTo(q('.det'), { autoAlpha: 0, scale: 1.25 }, { autoAlpha: 1, scale: 1, duration: 0.6, stagger: 0.35 }, 2.4)
+  // The stage is built like a set: room, foreground, then the builder walks in.
+  tl.fromTo(q('.what__bg'), { scale: 1.18, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.2 }, 0)
+    .fromTo(q('.what__shade'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2 }, 0)
+    .fromTo(q('.what__fore'), { yPercent: 70 }, { yPercent: 0, duration: 2, ease: 'power2.out' }, 0.4)
+    .fromTo(q('.what__figure'), { yPercent: 30, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 2, ease: 'power2.out' }, 0.9)
+    .fromTo(q('[data-step="1"]'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 1.4)
+    .fromTo(q('.det'), { autoAlpha: 0, scale: 1.2 }, { autoAlpha: 1, scale: 1, duration: 0.6 }, 2.6)
     .to(q('[data-step="1"]'), { autoAlpha: 0, y: -30, duration: 0.9 }, 4.4)
     .to(q('[data-step="2"]'), { autoAlpha: 1, y: 0, duration: 0.9 }, 4.9)
-    .fromTo(q('.trl-scale li:not(.is-market) .bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5, stagger: 0.16 }, 5.1)
-    .fromTo(q('.trl-scale .is-market .bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 6.5)
-    // The builder and robot roll out of frame, like a scene change.
+    .fromTo(q('.trl li:not(.is-market) .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5, stagger: 0.16 }, 5.1)
+    .fromTo(q('.trl .is-market .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 6.5)
+    // Scene change: the builder exits frame, the set falls away.
     .to(q('.what__figure'), { xPercent: 110, autoAlpha: 0, duration: 1.6, ease: 'power2.in' }, 7.6)
-    .to(q('[data-step="2"]'), { autoAlpha: 0, y: -20, duration: 0.9 }, 8.2)
-    .to(q('.what__bg'), { autoAlpha: 0.2, duration: 1 }, 8.2);
+    .to(q('.what__fore'), { yPercent: 80, duration: 1.4, ease: 'power2.in' }, 7.9)
+    .to(q('[data-step="2"]'), { autoAlpha: 0, y: -20, duration: 0.9 }, 8.2);
 }
 
-function lightsScene() {
-  $$('[data-light]').forEach((el) => {
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 72%',
-      onEnter: () => el.classList.add('is-on'),
-      onLeaveBack: () => el.classList.remove('is-on'),
-    });
-  });
-  const list = $('.lights__list');
-  const beam = $('.lights__beam');
-  if (list && beam) {
-    gsap.fromTo(beam, { scaleX: 0 }, {
-      scaleX: 1, ease: 'none',
-      scrollTrigger: { trigger: list, start: 'top 75%', end: 'bottom 55%', scrub: 0.5 },
-    });
-  }
-}
-
-function ladderScene() {
-  const section = $('#ladder')!;
-  const viewport = $('[data-ladder-viewport]', section)!;
-  const trackEl = $('[data-ladder-track]', section)!;
-  const stages = $$('[data-stage]', section);
-  const light = (upTo: number) => stages.forEach((s, i) => s.classList.toggle('is-lit', i <= upTo));
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
-    const distance = () => Math.max(0, trackEl.scrollWidth - viewport.clientWidth);
-    light(0);
-    const tween = gsap.to(trackEl, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${distance() + window.innerHeight * 0.35}`,
-        pin: true,
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => light(Math.round(self.progress * (stages.length - 1))),
-      },
-    });
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-      gsap.set(trackEl, { clearProps: 'transform' });
-    };
-  });
-  mm.add('(max-width: 899px)', () => {
-    // Native sideways swipe on phones; light the gates as cards scroll in.
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((en) => en.isIntersecting && en.target.classList.add('is-lit')),
-      { root: viewport, threshold: 0.55 },
-    );
-    stages.forEach((s) => io.observe(s));
-    return () => io.disconnect();
+function lampsScene() {
+  const list = $('[data-lamps]');
+  if (!list) return;
+  const lamps = $$('[data-lamp]', list);
+  ScrollTrigger.create({
+    trigger: list,
+    start: 'top 75%',
+    end: 'bottom 45%',
+    onUpdate: (self) => {
+      const on = self.progress > 0.72 ? 3 : self.progress > 0.38 ? 2 : self.progress > 0.04 ? 1 : 0;
+      lamps.forEach((l, i) => l.classList.toggle('is-on', i < on));
+    },
+    onLeave: () => lamps.forEach((l) => l.classList.add('is-on')),
   });
 }
 
@@ -248,62 +201,49 @@ function closingScene() {
   const sec = $('.closing');
   if (!sec) return;
   const q = gsap.utils.selector(sec);
+  // The frame closes back in around the final call to action.
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: sec, start: 'top 85%', end: 'center 55%', scrub: 0.6 },
+    scrollTrigger: { trigger: sec, start: 'top bottom', end: 'center center', scrub: 0.8 },
   });
-  tl.fromTo(q('.beam--a'), { rotate: 0, xPercent: -40, autoAlpha: 0 }, { rotate: 45, xPercent: 0, autoAlpha: 1 }, 0)
-    .fromTo(q('.beam--b'), { rotate: 0, xPercent: 40, autoAlpha: 0 }, { rotate: -45, xPercent: 0, autoAlpha: 1 }, 0)
-    .fromTo(q('.closing__mark'), { scale: 0.6, autoAlpha: 0 }, { scale: 1, autoAlpha: 0.14 }, 0.3);
+  Object.entries(exits).forEach(([k, v]) => tl.from(q(`[data-layer="${k}"]`), { ...v, duration: 1 }, 0));
+  tl.from(q('.closing__inner'), { autoAlpha: 0, y: 40, duration: 0.6 }, 0.4);
 }
 
 function reveals() {
   const items = $$('[data-reveal]');
-  gsap.set(items, { autoAlpha: 0, y: 36 });
+  gsap.set(items, { autoAlpha: 0, y: 32 });
   ScrollTrigger.batch(items, {
-    start: 'top 88%',
+    start: 'top 90%',
     once: true,
-    onEnter: (batch) =>
-      gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08, overwrite: true }),
+    onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, overwrite: true }),
   });
-}
-
-function hudTicker() {
-  const coords = $('[data-coords]');
-  const trl = $('[data-trl]');
-  if (coords) {
-    let t = 0;
-    window.setInterval(() => {
-      if (document.hidden) return;
-      t += 1;
-      const lat = (17.385 + Math.sin(t / 7) * 0.0004).toFixed(4);
-      const lon = (78.4867 + Math.cos(t / 9) * 0.0004).toFixed(4);
-      coords.textContent = `${lat}° N · ${lon}° E`;
-    }, 900);
-  }
-  if (trl) {
-    ScrollTrigger.create({
-      start: 0,
-      end: 'max',
-      onUpdate: (self) => { trl.textContent = String(Math.min(8, Math.round(self.progress * 8))); },
-    });
-  }
 }
 
 function pointerParallax() {
-  const objs = $$('.obj picture', intro).map((el, i) => ({
-    x: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' }),
-    y: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3.out' }),
-    depth: [22, 34, 28, 40, 16][i] ?? 24,
-  }));
-  const heroInner = $('[data-hero]', intro);
-  const hx = heroInner ? gsap.quickTo(heroInner, 'x', { duration: 1.2, ease: 'power3.out' }) : null;
+  const depth: Record<string, number> = { 'back-l': 10, 'back-r': 10, 'vine-l': 16, 'vine-r': 16, l: 26, r: 26, pile: 34 };
+  const layers = $$('.frame--hero [data-layer]').map((el) => {
+    const p = $('picture', el)!;
+    return {
+      x: gsap.quickTo(p, 'x', { duration: 1, ease: 'power3.out' }),
+      y: gsap.quickTo(p, 'y', { duration: 1, ease: 'power3.out' }),
+      d: depth[el.dataset.layer ?? ''] ?? 16,
+    };
+  });
   intro.addEventListener('pointermove', (e) => {
     const nx = e.clientX / window.innerWidth - 0.5;
     const ny = e.clientY / window.innerHeight - 0.5;
-    objs.forEach((o) => { o.x(-nx * o.depth); o.y(-ny * o.depth); });
-    hx?.(nx * 6);
+    layers.forEach((l) => { l.x(-nx * l.d); l.y(-ny * l.d * 0.6); });
   });
+}
+
+if (!reduceMotion) {
+  introScene();
+  whatScene();
+  lampsScene();
+  closingScene();
+  reveals();
+  if (finePointer) pointerParallax();
 }
 
 // Fonts and lazy images change layout; re-measure scroll scenes once settled.

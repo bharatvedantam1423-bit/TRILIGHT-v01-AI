@@ -63,17 +63,31 @@ Student project media (Makers Conclave): add entries to `projects` in
 
 ## Motion and performance
 
-- GSAP ScrollTrigger + Lenis drive two sticky scroll scenes (hero frame parts →
-  the Trilight X forms → zoom through a robot's lens → lab stage with the
-  builder), lights that switch on, a pinned sideways ladder (native swipe on
-  phones) and the closing beams that form the X.
+The motion follows the reference recording's grammar, in Trilight's brand:
+
+1. **Hero frame.** Dense cut-out hardware clusters (robot arm, robot head,
+   electronics pile, hanging cables) frame an empty centre and the brand
+   campaign line "[Build what's] NEXT". They assemble on load and follow the
+   mouse at different depths.
+2. **The frame parts.** On scroll each layer flies past the camera at its own
+   depth, two beams lock into the Trilight X, and the camera zooms through a
+   robot's lens.
+3. **The lab stage.** The room fades up, the electronics pile slides in as
+   foreground, the builder and robot rise in, the NASA TRL scale fills (stopping
+   at 8), then the builder exits frame.
+4. **Content sections** stay quiet: one grid, hairline rules, brand labels.
+   The ladder reads like a menu (stage, what you build, grant), flanked by
+   hardware on wide screens.
+5. **Closing.** The frame closes back in around "Ready to build what's NEXT?".
+
 - `prefers-reduced-motion` and no-JS get a static, fully readable page.
-- Phones get smaller image variants and fewer layers; ~50 KB gzipped JS; images ~1 MB total.
+- Phones get smaller image variants and fewer layers. JS is ~50 KB gzipped.
 
 ## Assets
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `public/img/`: hardware renders, lens, lab stage and problem photos generated
-  for this page with Magnific (Seedream), with backgrounds removed for the
-  layered cut-outs. They're illustrative, not photos of real NIAT projects.
+- `public/img/fr-*`: frame clusters, `lens`, `stage`, `student`, `evo-*` and
+  the problem photos were generated for this page with Magnific (Seedream),
+  with backgrounds removed for the layered cut-outs. They're illustrative, not
+  photos of real NIAT projects.
