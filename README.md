@@ -16,6 +16,16 @@ npm run preview    # serve the production build
 
 `dist/` is plain static files (HTML, CSS, JS, WebP). Host it on any static host or CDN.
 
+## Deploy on Vercel
+
+1. In Vercel: **Add New… → Project → Import** `TRILIGHT-v01-AI` from GitHub.
+2. Vercel reads `vercel.json` (Vite, `npm run build`, output `dist`), so leave
+   the build settings as detected.
+3. Under **Environment Variables**, add the `VITE_*` values below (they're
+   baked in at build time, so redeploy after changing them).
+4. **Deploy.** Every push to the production branch redeploys; other branches get
+   preview URLs.
+
 ## Configure before launch (`.env`, see `.env.example`)
 
 | Variable | What it does |
@@ -23,6 +33,7 @@ npm run preview    # serve the production build
 | `VITE_PORTAL_LOGIN_URL` | Learning portal SSO/OAuth login URL. The page adds `redirect_uri=<site>/registered.html?registered=1`. **While empty, every Register button opens a "Registration opens soon" message**; the page never fakes a registration. |
 | `VITE_PLATFORM_URL` | TRL8 platform on Replit. After login, students are sent here. While empty, `registered.html` shows the holding screen ("You're registered, we'll notify you…"). |
 | `VITE_HELP_EMAIL` | Optional help address shown by the FAQ and the final CTA. |
+| `VITE_SITE_URL` | Only for a custom domain: used for share-preview images. On Vercel it defaults to the project's production domain. |
 
 The portal team needs to send students back to `/registered.html?registered=1`
 after a successful login. The website stores no student data (PRD §15).

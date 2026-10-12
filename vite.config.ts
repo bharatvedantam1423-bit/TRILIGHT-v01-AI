@@ -9,6 +9,12 @@ const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
+  // Share previews (WhatsApp, LinkedIn, X) need an absolute image URL.
+  // VITE_SITE_URL wins; on Vercel the production domain is used automatically.
+  const siteUrl = (
+    env.VITE_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '')
+  ).replace(/\/$/, '');
   return {
     plugins: [
       {
@@ -20,7 +26,9 @@ export default defineConfig(({ mode }) => {
             return html
               .replace('<!--@body-->', renderBody({ markSvg, helpEmail: env.VITE_HELP_EMAIL ?? '' }))
               .replaceAll('%TRL8_TITLE%', meta.title)
-              .replaceAll('%TRL8_DESC%', meta.description);
+              .replaceAll('%TRL8_DESC%', meta.description)
+              .replaceAll('%TRL8_OG_IMAGE%', `${siteUrl}/og.jpg`)
+              .replaceAll('%TRL8_URL%', `${siteUrl}/`);
           },
         },
       },
