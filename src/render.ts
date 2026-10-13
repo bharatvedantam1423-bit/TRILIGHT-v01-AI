@@ -28,18 +28,32 @@ const pic = (name: string, w: number, h: number, alt = '', priority = false) => 
         <img src="/img/${name}.webp" width="${w}" height="${h}" alt="${esc(alt)}" decoding="async"${priority ? ' fetchpriority="high"' : ' loading="lazy"'}>
       </picture>`;
 
-/** The hardware frame: dense cut-out clusters around an empty centre. */
-function frame(where: 'hero' | 'closing') {
+/**
+ * The lab: one corridor photo used three times (room + two masked wall
+ * slices) so the walls can part at their own depth, plus clean hardware
+ * cut-outs, a code-drawn bench and, in the hero, a robot-camera viewfinder.
+ */
+function lab(where: 'hero' | 'closing') {
   const eager = where === 'hero';
+  const room = pic('lab', 2200, 1238, '', eager);
   return `
-    <div class="frame frame--${where}" aria-hidden="true" data-frame>
-      <div class="layer layer--back-l" data-layer="back-l">${pic('fr-left2', 806, 1500, '', eager)}</div>
-      <div class="layer layer--back-r" data-layer="back-r">${pic('fr-left2', 806, 1500, '', eager)}</div>
-      <div class="layer layer--vine-l" data-layer="vine-l">${pic('fr-vine1', 276, 1500, '', eager)}</div>
-      <div class="layer layer--vine-r" data-layer="vine-r">${pic('fr-vine1', 276, 1500, '', eager)}</div>
-      <div class="layer layer--l" data-layer="l">${pic('fr-left1', 700, 1500, '', eager)}</div>
-      <div class="layer layer--r" data-layer="r">${pic('fr-right2', 509, 1500, '', eager)}</div>
-      <div class="layer layer--pile" data-layer="pile">${pic('fr-pile', 2400, 716, '', eager)}</div>
+    <div class="lab lab--${where}" aria-hidden="true" data-lab>
+      <div class="lab__room" data-l="room">${room}</div>
+      <div class="lab__wall lab__wall--l" data-l="wall-l">${room}</div>
+      <div class="lab__wall lab__wall--r" data-l="wall-r">${room}</div>
+      <div class="lab__obj lab__obj--drone" data-l="drone"><div class="bob">${pic('drone', 1100, 551, '', eager)}</div></div>
+      <div class="lab__obj lab__obj--arm" data-l="arm">${pic('arm', 1016, 1300, '', eager)}</div>
+      <div class="lab__obj lab__obj--bot" data-l="bot">${pic('humanoid', 966, 1500, '', eager)}</div>
+      <div class="lab__bench" data-l="bench"><span class="lab__edge"></span>${pic('tools', 2000, 394, '', eager)}</div>
+      ${where === 'hero'
+        ? `<div class="vf" data-l="vf">
+        <i class="vf__c vf__c--tl"></i><i class="vf__c vf__c--tr"></i><i class="vf__c vf__c--bl"></i><i class="vf__c vf__c--br"></i>
+        <span class="vf__rec"><i></i>Rec</span>
+        <span class="vf__tc" data-timecode>00:00:00</span>
+        <span class="vf__cam">Cam 01 · TRL8 Lab</span>
+        <span class="vf__lvl">TRL <b data-trl>0</b>/8</span>
+      </div>`
+        : ''}
     </div>`;
 }
 
@@ -67,14 +81,14 @@ function intro(markSvg: string) {
 
     <div class="lens only-motion" aria-hidden="true">
       <picture>
-        <source media="(max-width: 760px)" srcset="/img/lens-sm.webp">
-        <img src="/img/lens.webp" width="1920" height="1080" alt="" fetchpriority="low" decoding="async">
+        <source media="(max-width: 760px)" srcset="/img/eye-sm.webp">
+        <img src="/img/eye.webp" width="1920" height="1080" alt="" fetchpriority="low" decoding="async">
       </picture>
       <div class="reticle"><i></i><i></i></div>
     </div>
     <div class="xmark only-motion" aria-hidden="true">${markSvg}</div>
 
-    ${frame('hero')}
+    ${lab('hero')}
 
     <div class="hero" data-hero>
       <h1 id="hero-title" class="hero__title">
@@ -110,7 +124,7 @@ function what() {
       </picture>
       <span class="det" aria-hidden="true"><span>Robot</span><b>Sense → Decide → Act</b></span>
     </figure>
-    <div class="what__fore" aria-hidden="true">${pic('fr-pile', 2400, 716)}</div>
+    <div class="what__floor" aria-hidden="true"><i></i><i></i></div>
     <div class="what__copy">
       <div class="what__step" data-step="1">
         ${label(whatIs.kicker, '01')}
@@ -142,9 +156,11 @@ function sectionHead(n: string, kicker: string, title: string, id: string, body?
 function lightsSection() {
   return `
 <section class="section lights" id="lights" aria-labelledby="lights-title">
+  <div class="lights__bg" aria-hidden="true">${pic('lab-2', 1920, 1080)}</div>
   <div class="wrap">
     ${sectionHead('03', lights.kicker, lights.headline, 'lights-title', lights.body, true)}
     <ol class="lamps" data-lamps>
+      <li class="lamps__rail" aria-hidden="true"><span data-lamp-beam></span></li>
       ${lights.items
         .map(
           (l, i) => `
@@ -157,6 +173,7 @@ function lightsSection() {
         )
         .join('')}
     </ol>
+    <p class="lights__done" aria-hidden="true"><span>All three green</span><b>= TRL 8</b></p>
   </div>
 </section>`;
 }
@@ -178,11 +195,15 @@ function projectsSection() {
       </div>`
     : `<div class="reel">
         <div class="reel__screen" aria-hidden="true">
-          ${pic('fr-left2', 806, 1500)}
+          ${pic('lab-2', 1920, 1080)}
+          <span class="reel__scan"></span>
           <span class="reel__rec"><i></i>Makers Conclave</span>
+          <span class="reel__tc" data-timecode>00:00:00</span>
           <span class="reel__play"></span>
+          <span class="reel__bar"><i></i></span>
         </div>
         <div class="reel__copy">
+          <p class="label"><span>Coming soon</span></p>
           <h3 class="h3">Project films from Makers Conclave are on their way.</h3>
           <p class="muted">Working hardware, demoed live by NIAT students. This space fills up as the first teams clear their reviews.</p>
         </div>
@@ -196,6 +217,15 @@ function projectsSection() {
 </section>`;
 }
 
+const icons = [
+  // sense → decide → act loop
+  '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="9" r="3.2"/><circle cx="37" cy="31.5" r="3.2"/><circle cx="11" cy="31.5" r="3.2"/><path d="M30 12.5l3 1.5-.6 3.3"/></svg>',
+  // evidence gate (brand octagon + check)
+  '<svg viewBox="0 0 48 48"><path d="M17 6h14l11 11v14L31 42H17L6 31V17z"/><path d="M16.5 24.5l5 5 10-11"/></svg>',
+  // real customer: location pin + field
+  '<svg viewBox="0 0 48 48"><path d="M24 41s-12-11-12-20a12 12 0 0 1 24 0c0 9-12 20-12 20z"/><circle cx="24" cy="21" r="4.5"/><path d="M8 44h32"/></svg>',
+];
+
 function commitmentsSection() {
   return `
 <section class="section commit" id="commitments" aria-labelledby="commit-title">
@@ -204,9 +234,10 @@ function commitmentsSection() {
     <ol class="rows">
       ${commitments.items
         .map(
-          (c) => `
+          (c, i) => `
       <li class="row" data-reveal>
         <span class="row__n">${c.n}</span>
+        <span class="row__icon" aria-hidden="true" data-draw>${icons[i]}</span>
         <h3 class="h3">${esc(c.name)}</h3>
         <p class="muted">${esc(c.text)}</p>
       </li>`,
@@ -214,62 +245,70 @@ function commitmentsSection() {
         .join('')}
     </ol>
 
-    <div class="problems">
-      <h3 class="h3 problems__title">${esc(commitments.problemsHeadline)}</h3>
-      <ul class="problems__grid">
-        ${commitments.problems
-          .map(
-            (p) => `
-        <li class="problem" data-reveal>
-          <div class="problem__img">
-            <img src="${p.image}" alt="${esc(p.alt)}" width="1200" height="900" loading="lazy" decoding="async">
-          </div>
+    <h3 class="h2 h2--sm problems__title">${esc(commitments.problemsHeadline)}</h3>
+    <ul class="problems">
+      ${commitments.problems
+        .map(
+          (p) => `
+      <li class="problem" data-reveal>
+        <img src="${p.image}" alt="${esc(p.alt)}" width="1200" height="900" loading="lazy" decoding="async">
+        <span class="problem__det" aria-hidden="true"><span>${esc(p.label)}</span><b>${esc(p.reading)}</b></span>
+        <div class="problem__copy">
           <p class="problem__p">${esc(p.problem)}</p>
-          <p class="problem__i">${esc(p.idea)}</p>
-        </li>`,
-          )
-          .join('')}
-      </ul>
-    </div>
+          <p class="problem__i"><span aria-hidden="true">→</span> ${esc(p.idea)}</p>
+        </div>
+      </li>`,
+        )
+        .join('')}
+    </ul>
   </div>
 </section>`;
 }
 
 function ladderSection() {
   const phases = ['Pre-program', 'Foundation', 'Execution'] as const;
+  const cls = (p: string) => (p === 'Execution' ? 'exec' : p === 'Foundation' ? 'found' : 'pre');
   return `
-<section class="section ladder" id="ladder" aria-labelledby="ladder-title">
-  <div class="ladder__side ladder__side--l" aria-hidden="true">${pic('fr-vine1', 276, 1500)}</div>
-  <div class="ladder__side ladder__side--r" aria-hidden="true">${pic('fr-right2', 509, 1500)}</div>
-  <div class="wrap wrap--narrow">
-    ${sectionHead('06', ladder.kicker, ladder.headline, 'ladder-title', ladder.body, true)}
-    ${phases
-      .map((ph) => {
-        const stages = ladder.stages.filter((s) => s.phase === ph);
-        return `
-    <div class="menu" data-reveal>
-      <h3 class="menu__head"><span>${esc(ph)}</span><span class="menu__col">Grant</span></h3>
-      <ol class="menu__list">
-        ${stages
-          .map(
-            (s) => `
-        <li class="item">
-          <img class="item__img" src="${s.image}" alt="${esc(s.imageAlt)}" width="560" height="560" loading="lazy" decoding="async">
-          <div class="item__body">
-            <p class="item__title"><span class="item__level">${esc(s.level)}</span>${esc(s.title)}</p>
-            <p class="item__text">${esc(s.build)}${s.duration ? ` <span class="item__dur">${esc(s.duration)}, indicative</span>` : ''}</p>
+<section class="ladder" id="ladder" aria-labelledby="ladder-title">
+  <div class="ladder__sticky">
+    <div class="wrap ladder__head">
+      <div>
+        ${label(ladder.kicker, '06')}
+        <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
+      </div>
+      <p class="lede">${esc(ladder.body)}</p>
+    </div>
+    <div class="ladder__viewport" data-ladder-viewport tabindex="0" aria-label="The TRL8 stages, scroll sideways">
+      <ol class="ladder__track" data-ladder-track>
+        ${ladder.stages
+          .map((s, i) => {
+            const firstOfPhase = i === 0 || ladder.stages[i - 1].phase !== s.phase;
+            return `
+        <li class="stage stage--${cls(s.phase)}" data-stage>
+          <p class="stage__phase">${firstOfPhase ? esc(s.phase) : '&nbsp;'}</p>
+          <div class="stage__gate" aria-hidden="true"><span class="stage__line"></span><span class="stage__node">${i === 0 ? '' : 'TRR'}</span></div>
+          <div class="stage__card">
+            <div class="stage__img"><img src="${s.image}" alt="${esc(s.imageAlt)}" width="560" height="560" loading="lazy" decoding="async"></div>
+            <p class="stage__level">${esc(s.level)}</p>
+            <h3 class="h3">${esc(s.title)}</h3>
+            <p class="stage__build">${esc(s.build)}</p>
+            <dl class="stage__facts">
+              ${s.duration ? `<div><dt>Duration</dt><dd>${esc(s.duration)} <small>indicative</small></dd></div>` : ''}
+              <div><dt>Grant</dt><dd>${s.grant ? `<b>${esc(s.grant)}</b>` : '<span class="muted">No grant at this stage</span>'}</dd></div>
+              <div><dt>GRIT Miles</dt><dd><span class="muted">Values coming soon</span></dd></div>
+            </dl>
           </div>
-          <p class="item__grant">${s.grant ? esc(s.grant) : '<span aria-label="No grant at this stage">—</span>'}</p>
-        </li>`,
-          )
+        </li>`;
+          })
           .join('')}
       </ol>
-    </div>`;
-      })
-      .join('')}
-    <div class="ladder__foot">
-      <p><b>${esc(ladder.total)}</b></p>
-      <p class="fine">${esc(ladder.gritMiles)}. ${esc(ladder.footnote)}</p>
+    </div>
+    <div class="wrap ladder__foot">
+      <div>
+        <p class="ladder__total"><b>${esc(ladder.total)}</b></p>
+        <p class="fine">${esc(ladder.footnote)}</p>
+      </div>
+      <ul class="ladder__legend" aria-hidden="true">${phases.map((p) => `<li class="lg lg--${cls(p)}">${p}</li>`).join('')}</ul>
     </div>
   </div>
 </section>`;
@@ -285,6 +324,7 @@ function doorsSection() {
         .map(
           (d, i) => `
       <article class="door${i === 0 ? ' door--main' : ''}" data-reveal>
+        <span class="door__edge" aria-hidden="true"></span>
         <p class="door__badge">${esc(d.badge)}</p>
         <h3 class="h3">${esc(d.name)}</h3>
         <p class="muted">${esc(d.for)}</p>
@@ -308,7 +348,7 @@ function valueSection() {
   <div class="wrap">
     ${sectionHead('08', value.kicker, value.headline, 'value-title', undefined, true)}
     <dl class="stats">
-      ${stats.map((s) => `<div data-reveal><dt>${esc(s.l)}</dt><dd>${esc(s.v)}</dd></div>`).join('')}
+      ${stats.map((s) => `<div data-reveal><dt>${esc(s.l)}</dt><dd data-count="${esc(s.v)}">${esc(s.v)}</dd></div>`).join('')}
     </dl>
     <ul class="perks">
       ${value.items.map((v) => `<li data-reveal><h3>${esc(v.name)}</h3><p class="muted">${esc(v.text)}</p></li>`).join('')}
@@ -325,8 +365,9 @@ function registerSection(helpEmail: string) {
 <section class="section register" id="register" aria-labelledby="register-title">
   <div class="wrap">
     ${sectionHead('09', register.kicker, register.headline, 'register-title')}
-    <ol class="steps">
-      ${register.steps.map((s) => `<li data-reveal><p class="steps__n">0${s.n}</p><h3 class="h3">${esc(s.name)}</h3><p class="muted">${esc(s.text)}</p></li>`).join('')}
+    <ol class="steps" data-steps>
+      <li class="steps__rail" aria-hidden="true"><span data-steps-beam></span></li>
+      ${register.steps.map((s) => `<li class="step" data-step-item><span class="steps__node" aria-hidden="true">${s.n}</span><h3 class="h3">${esc(s.name)}</h3><p class="muted">${esc(s.text)}</p></li>`).join('')}
     </ol>
     <div class="register__cta">${cta('register', 'btn--lg')}</div>
   </div>
@@ -354,7 +395,7 @@ function registerSection(helpEmail: string) {
 </section>
 
 <section class="closing" id="join" aria-labelledby="closing-title">
-  ${frame('closing')}
+  ${lab('closing')}
   <div class="closing__inner">
     <h2 id="closing-title" class="closing__title">
       <span class="bracket"><span class="bracket__b" aria-hidden="true">[</span>Ready to build what’s<span class="bracket__b" aria-hidden="true">]</span></span>

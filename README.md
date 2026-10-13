@@ -65,29 +65,30 @@ Student project media (Makers Conclave): add entries to `projects` in
 
 The motion follows the reference recording's grammar, in Trilight's brand:
 
-1. **Hero frame.** Dense cut-out hardware clusters (robot arm, robot head,
-   electronics pile, hanging cables) frame an empty centre and the brand
-   campaign line "[Build what's] NEXT". They assemble on load and follow the
-   mouse at different depths.
-2. **The frame parts.** On scroll each layer flies past the camera at its own
-   depth, two beams lock into the Trilight X, and the camera zooms through a
-   robot's lens.
-3. **The lab stage.** The room fades up, the electronics pile slides in as
-   foreground, the builder and robot rise in, the NASA TRL scale fills (stopping
-   at 8), then the builder exits frame.
-4. **Content sections** stay quiet: one grid, hairline rules, brand labels.
-   The ladder reads like a menu (stage, what you build, grant), flanked by
-   hardware on wide screens.
-5. **Closing.** The frame closes back in around "Ready to build what's NEXT?".
+1. **Hero lab.** A symmetric robotics corridor with octagon/hexagon wall
+   panels, a robot arm, a humanoid, a hovering drone and a bench of tools,
+   seen through a robot-camera viewfinder (REC, timecode, TRL counter). It
+   powers up on load and follows the mouse at different depths.
+2. **Dolly in.** On scroll the camera pushes into the corridor: walls part,
+   kit slides past, the Trilight X locks at the vanishing point, then a robot
+   eye opens like an iris and the camera zooms through its pupil.
+3. **The lab stage.** The builder and robot rise in on the right, floor light
+   lines draw in, the NASA TRL scale fills (stopping at 8), then they exit.
+4. **Sections.** Lamps light along a beam (three green lights), project reel
+   with scanline and timecode, line icons that draw themselves, problem photos
+   with detection boxes, a pinned sideways ladder whose review gates light up,
+   brand-octagon doors with a travelling edge light, numbers that count up,
+   connected register steps.
+5. **Closing.** The lab closes back in around "Ready to build what's NEXT?".
 
 - `prefers-reduced-motion` and no-JS get a static, fully readable page.
-- Phones get smaller image variants and fewer layers. JS is ~50 KB gzipped.
+- Phones get smaller image variants and fewer objects. JS is ~52 KB gzipped.
 
 ## Assets
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `public/img/fr-*`: frame clusters, `lens`, `stage`, `student`, `evo-*` and
-  the problem photos were generated for this page with Magnific (Seedream),
+- `public/img/`: `lab`, `lab-2`, `eye`, `humanoid`, `arm`, `drone`, `tools`,
+  `stage`, `student`, `evo-*` and the problem photos were generated for this page with Magnific (Seedream),
   with backgrounds removed for the layered cut-outs. They're illustrative, not
   photos of real NIAT projects.
