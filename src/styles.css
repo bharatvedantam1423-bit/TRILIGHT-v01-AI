@@ -128,33 +128,33 @@ ol, ul, dl, dd { margin: 0; padding: 0; list-style: none; }
 .motion .scene .sticky { position: sticky; top: 0; height: 100vh; height: 100svh; }
 
 /* --- the lab (hero + closing) ------------------------------------------ */
-.lab { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
-.lab__room, .lab__wall { position: absolute; inset: 0; will-change: transform; }
-.lab__room picture, .lab__room img, .lab__wall picture, .lab__wall img { width: 100%; height: 100%; }
-.lab__room img, .lab__wall img { object-fit: cover; object-position: 50% 50%; }
-.lab__room img { filter: brightness(0.62) saturate(1.05); }
-.lab__wall img { filter: brightness(0.78) saturate(1.1); }
-/* Two masked slices of the same photo become the near walls. */
-.lab__wall--l { -webkit-mask-image: linear-gradient(90deg, #000 0 22%, transparent 34%); mask-image: linear-gradient(90deg, #000 0 22%, transparent 34%); }
-.lab__wall--r { -webkit-mask-image: linear-gradient(270deg, #000 0 22%, transparent 34%); mask-image: linear-gradient(270deg, #000 0 22%, transparent 34%); }
-/* A soft dark core keeps the headline readable at the vanishing point. */
-.lab::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 34% 42% at 50% 46%, rgba(2, 4, 7, 0.82), rgba(2, 4, 7, 0.35) 60%, transparent 80%), linear-gradient(0deg, rgba(2, 4, 7, 0.9) 0%, transparent 28%); }
+.lab { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
+  background: radial-gradient(ellipse 46% 42% at 50% 44%, rgba(11, 92, 169, 0.2), transparent 70%), radial-gradient(ellipse 70% 30% at 50% 100%, rgba(0, 182, 180, 0.12), transparent 70%); }
+.lab__wall { position: absolute; overflow: hidden; will-change: transform; }
+.lab__wall picture, .lab__wall img { width: 100%; height: 100%; }
+.lab__wall img { object-fit: cover; }
+.lab__wall--r img { transform: scaleX(-1); }
+/* Near walls sit at the screen edges; their inner edge fades into the dark. */
+.lab__wall--near { top: -6vh; bottom: -6vh; width: 25vw; }
+.lab__wall--near.lab__wall--l { left: -2vw; -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent); mask-image: linear-gradient(90deg, #000 55%, transparent); }
+.lab__wall--near.lab__wall--r { right: -2vw; -webkit-mask-image: linear-gradient(270deg, #000 55%, transparent); mask-image: linear-gradient(270deg, #000 55%, transparent); }
+.lab__wall--near img { object-position: 100% 50%; filter: brightness(0.9); }
+.lab__wall--near.lab__wall--r img { object-position: 0 50%; }
+/* Far walls: smaller, darker, further in, which makes the room deep. */
+.lab__wall--far { top: 8vh; bottom: 16vh; width: 11vw; filter: brightness(0.38);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent), linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent), linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+  mask-composite: intersect; }
+.lab__wall--far.lab__wall--l { left: 19vw; }
+.lab__wall--far.lab__wall--r { right: 19vw; }
 
-.lab__obj { position: absolute; z-index: 1; will-change: transform; }
-.lab__obj picture, .lab__obj img { height: 100%; width: auto; max-width: none; }
-.lab__obj img { filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.65)); }
-.lab__obj--arm { left: 2%; bottom: 13vh; height: 44vh; }
-.lab__obj--bot { right: -3%; bottom: 9vh; height: 70vh; }
-.lab__obj--drone { left: 18%; top: 16vh; height: 15vh; }
-.bob { height: 100%; animation: bob 5s ease-in-out infinite; }
-@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-.lab__bench { position: absolute; z-index: 2; left: -2vw; right: -2vw; bottom: 0; height: 15vh; will-change: transform;
-  background: linear-gradient(180deg, #0c1622 0%, #060b12 40%, #030609 100%); border-top: 1px solid rgba(51, 220, 217, 0.25); }
-.lab__bench picture { position: absolute; left: 50%; bottom: calc(100% - 2.2vh); width: min(64vw, 1100px); translate: -50% 0; }
-.lab__bench picture img { width: 100%; }
+/* The workbench in front, fading into the floor. */
+.lab__bench { position: absolute; z-index: 2; left: 50%; bottom: -9vh; width: min(58vw, 1060px); translate: -50% 0; will-change: transform;
+  -webkit-mask-image: radial-gradient(ellipse 58% 100% at 50% 70%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 58% 100% at 50% 70%, #000 62%, transparent 100%); }
+.lab__bench picture, .lab__bench img { width: 100%; }
 /* Edge light: a short pulse that runs along the bench lip. */
-.lab__edge { position: absolute; left: 0; right: 0; top: -1px; height: 2px; overflow: hidden; }
+.lab__edge { position: absolute; left: 4%; right: 4%; top: 43%; height: 1.5px; overflow: hidden; }
 .lab__edge::after { content: ''; position: absolute; top: 0; width: 22%; height: 100%; background: linear-gradient(90deg, transparent, var(--teal-hi), transparent); box-shadow: 0 0 14px var(--teal); animation: edge 6s linear infinite; }
 @keyframes edge { from { left: -22%; } to { left: 100%; } }
 
@@ -208,21 +208,22 @@ html:not(.motion) .scrollcue { display: none; }
 .reticle i:nth-child(2) { inset: 14%; border: 1px solid rgba(51, 220, 217, 0.16); border-top-color: var(--teal-hi); animation-duration: 10s; animation-direction: reverse; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .lens-caption { position: absolute; z-index: 4; left: 50%; bottom: 12%; translate: -50% 0; margin: 0; width: min(90vw, 760px); text-align: center; font-family: var(--f-head); font-weight: 600; letter-spacing: -0.03em; font-size: clamp(1.6rem, 3.4vw, 2.7rem); line-height: 1.1; text-shadow: 0 4px 30px rgba(0, 0, 0, 0.85); }
+.lens::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(2, 4, 7, 0.92) 0%, rgba(2, 4, 7, 0.55) 28%, transparent 50%); }
 .blackout { position: absolute; inset: 0; z-index: 6; background: var(--bg); pointer-events: none; }
 
 /* --- 02 · What is TRL8 (lab stage) ------------------------------------- */
 .scene--what .sticky { min-height: 100vh; min-height: 100svh; background: var(--bg); }
 .what__bg { position: absolute; inset: 0; }
 .what__bg img { width: 100%; height: 100%; object-fit: cover; }
-.what__shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(2, 4, 7, 0.94) 0%, rgba(2, 4, 7, 0.78) 32%, rgba(2, 4, 7, 0.1) 60%), linear-gradient(0deg, rgba(2, 4, 7, 0.9), transparent 30%); }
-.what__figure { position: absolute; z-index: 2; margin: 0; right: 5%; bottom: 7%; width: min(50vw, 740px); }
+.what__shade { position: absolute; inset: 0; background: linear-gradient(270deg, rgba(2, 4, 7, 0.94) 0%, rgba(2, 4, 7, 0.78) 32%, rgba(2, 4, 7, 0.1) 60%), linear-gradient(0deg, rgba(2, 4, 7, 0.9), transparent 30%); }
+.what__figure { position: absolute; z-index: 2; margin: 0; left: 3%; bottom: 7%; width: min(50vw, 740px); }
 .what__figure img { width: 100%; filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.7)); }
 .what__floor { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 40%; pointer-events: none; perspective: 600px; overflow: hidden; }
 /* Two floor light lines run toward the builder, like the lab's guide strips. */
 .what__floor i { position: absolute; bottom: 0; width: 2px; height: 140%; transform-origin: bottom; background: linear-gradient(0deg, transparent, rgba(51, 220, 217, 0.9) 40%, transparent); opacity: 0.55; }
 .what__floor i:first-child { left: 30%; transform: rotate(62deg); }
 .what__floor i:last-child { left: 72%; transform: rotate(-58deg); background: linear-gradient(0deg, transparent, rgba(58, 142, 224, 0.9) 40%, transparent); }
-.what__copy { position: absolute; z-index: 4; left: var(--gutter); top: 50%; translate: 0 -50%; width: min(40vw, 500px); }
+.what__copy { position: absolute; z-index: 4; right: var(--gutter); top: 50%; translate: 0 -50%; width: min(40vw, 500px); }
 .motion .what__step { position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; }
 .what__step + .what__step { margin-top: 56px; }
 .motion .what__step + .what__step { margin-top: 0; }
@@ -250,8 +251,7 @@ html:not(.motion) .scrollcue { display: none; }
 .sw--off { outline: 1px dashed rgba(195, 206, 213, 0.6); outline-offset: -1px; }
 
 html:not(.motion) .scene--what .sticky { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; padding: 120px var(--gutter); }
-html:not(.motion) .what__figure, html:not(.motion) .what__copy { position: relative; inset: auto; translate: none; width: auto; order: 2; }
-html:not(.motion) .what__copy { order: 1; }
+html:not(.motion) .what__figure, html:not(.motion) .what__copy { position: relative; inset: auto; translate: none; width: auto; }
 
 /* ==========================================================================
    Content sections
@@ -479,9 +479,8 @@ html:not(.motion) .steps__rail span { transform: none; }
    Responsive
    ========================================================================== */
 @media (max-width: 1100px) {
-  .lab__obj--arm { left: 2%; height: 40vh; }
-  .lab__obj--bot { right: -2%; height: 64vh; }
   .vf__cam { display: none; }
+  .lab__wall--far { display: none; }
 }
 @media (max-height: 820px) and (min-width: 761px) {
   .scrollcue { display: none; }
@@ -492,7 +491,7 @@ html:not(.motion) .steps__rail span { transform: none; }
 }
 @media (max-height: 760px) and (min-width: 761px) {
   .facts { display: none; }
-  .lab__bench picture { width: min(54vw, 900px); }
+  .lab__bench { width: min(52vw, 900px); }
 }
 @media (max-width: 899px) {
   .nav__links { display: none; }
@@ -530,13 +529,8 @@ html:not(.motion) .steps__rail span { transform: none; }
   .nav__logo::after { display: none; }
   .nav__logo img { width: 112px; }
 
-  .lab__wall--l { -webkit-mask-image: linear-gradient(90deg, #000 0 16%, transparent 30%); mask-image: linear-gradient(90deg, #000 0 16%, transparent 30%); }
-  .lab__wall--r { -webkit-mask-image: linear-gradient(270deg, #000 0 16%, transparent 30%); mask-image: linear-gradient(270deg, #000 0 16%, transparent 30%); }
-  .lab__obj--arm { display: none; }
-  .lab__obj--bot { right: -26vw; bottom: 7svh; height: 36svh; opacity: 0.85; }
-  .lab__obj--drone { left: 6vw; top: calc(var(--nav-h) + 4svh); height: 8svh; }
-  .lab__bench { height: 11svh; }
-  .lab__bench picture { width: 96vw; }
+  .lab__wall--near { width: 22vw; }
+  .lab__bench { width: 150vw; bottom: -3svh; }
   .vf { inset: calc(var(--nav-h) + 8px) 12px 14px; font-size: 10px; }
   .vf__tc, .vf__cam { display: none; }
   .vf__rec { left: 32px; top: 4px; }
@@ -548,7 +542,7 @@ html:not(.motion) .steps__rail span { transform: none; }
   .facts { flex-direction: column; gap: 6px; font-size: 11px; letter-spacing: 0.14em; color: var(--ink-2); }
   .facts li + li::before { display: none; }
 
-  .what__figure { left: auto; right: -4%; bottom: auto; top: calc(var(--nav-h) + 8px); width: 96vw; }
+  .what__figure { left: -4%; right: auto; bottom: auto; top: calc(var(--nav-h) + 8px); width: 96vw; }
   .what__shade { background: linear-gradient(180deg, rgba(2, 4, 7, 0.2) 0%, rgba(2, 4, 7, 0.35) 34%, rgba(2, 4, 7, 0.96) 50%, var(--bg) 100%); }
   .what__floor { display: none; }
   .what__copy { left: var(--gutter); right: var(--gutter); width: auto; top: auto; bottom: 96px; translate: none; }

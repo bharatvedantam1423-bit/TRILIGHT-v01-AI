@@ -29,22 +29,21 @@ const pic = (name: string, w: number, h: number, alt = '', priority = false) => 
       </picture>`;
 
 /**
- * The lab: one corridor photo used three times (room + two masked wall
- * slices) so the walls can part at their own depth, plus clean hardware
- * cut-outs, a code-drawn bench and, in the hero, a robot-camera viewfinder.
+ * The lab: a dark room framed by two depths of armoured wall panels (near and
+ * far, mirrored on the right), the workbench in front and, in the hero, a
+ * robot-camera viewfinder. Nothing floats; every layer is anchored.
  */
 function lab(where: 'hero' | 'closing') {
   const eager = where === 'hero';
-  const room = pic('lab', 2200, 1238, '', eager);
+  const far = pic('wall-b', 608, 1400, '', eager);
+  const near = pic('wall-a', 898, 1600, '', eager);
   return `
     <div class="lab lab--${where}" aria-hidden="true" data-lab>
-      <div class="lab__room" data-l="room">${room}</div>
-      <div class="lab__wall lab__wall--l" data-l="wall-l">${room}</div>
-      <div class="lab__wall lab__wall--r" data-l="wall-r">${room}</div>
-      <div class="lab__obj lab__obj--drone" data-l="drone"><div class="bob">${pic('drone', 1100, 551, '', eager)}</div></div>
-      <div class="lab__obj lab__obj--arm" data-l="arm">${pic('arm', 1016, 1300, '', eager)}</div>
-      <div class="lab__obj lab__obj--bot" data-l="bot">${pic('humanoid', 966, 1500, '', eager)}</div>
-      <div class="lab__bench" data-l="bench"><span class="lab__edge"></span>${pic('tools', 2000, 394, '', eager)}</div>
+      <div class="lab__wall lab__wall--far lab__wall--l" data-l="far-l">${far}</div>
+      <div class="lab__wall lab__wall--far lab__wall--r" data-l="far-r">${far}</div>
+      <div class="lab__wall lab__wall--near lab__wall--l" data-l="near-l">${near}</div>
+      <div class="lab__wall lab__wall--near lab__wall--r" data-l="near-r">${near}</div>
+      <div class="lab__bench" data-l="bench">${pic('bench', 2400, 746, '', eager)}<span class="lab__edge"></span></div>
       ${where === 'hero'
         ? `<div class="vf" data-l="vf">
         <i class="vf__c vf__c--tl"></i><i class="vf__c vf__c--tr"></i><i class="vf__c vf__c--bl"></i><i class="vf__c vf__c--br"></i>

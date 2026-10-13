@@ -99,13 +99,11 @@ ScrollTrigger.create({
  * layers travel further, which is what sells the depth.
  */
 const exits: Record<string, gsap.TweenVars> = {
-  room: { scale: 1.7 },
-  'wall-l': { xPercent: -42, scale: 1.35 },
-  'wall-r': { xPercent: 42, scale: 1.35 },
-  arm: { xPercent: -150, scale: 1.4 },
-  bot: { xPercent: 130, scale: 1.4 },
-  drone: { xPercent: -120, yPercent: -160, scale: 1.3 },
-  bench: { yPercent: 140 },
+  'far-l': { xPercent: -170, scale: 1.25 },
+  'far-r': { xPercent: 170, scale: 1.25 },
+  'near-l': { xPercent: -105, scale: 1.35 },
+  'near-r': { xPercent: 105, scale: 1.35 },
+  bench: { yPercent: 110, scale: 1.15 },
   vf: { scale: 1.25, autoAlpha: 0 },
 };
 
@@ -114,18 +112,15 @@ function introScene() {
   const [rightBracket, leftBracket, cross] = $$<SVGPathElement>('.xmark path', intro);
   const L = (k: string) => q(`.lab--hero [data-l="${k}"]`);
 
-  // Entrance: the lab powers up, then the copy.
+  // Entrance: the walls slide in from the edges, the bench rises, then the copy.
   gsap.timeline({ defaults: { duration: 1.6, ease: 'power3.out' } })
-    .from(L('room'), { autoAlpha: 0, scale: 1.12, duration: 2.2 }, 0)
-    .from(L('wall-l'), { xPercent: -10 }, 0.1)
-    .from(L('wall-r'), { xPercent: 10 }, 0.1)
-    .from(L('arm'), { autoAlpha: 0, xPercent: -14 }, 0.35)
-    .from(L('bot'), { autoAlpha: 0, xPercent: 12 }, 0.4)
-    .from(L('drone'), { autoAlpha: 0, yPercent: -40 }, 0.6)
-    .from(L('bench'), { yPercent: 100 }, 0.3)
+    .from([...L('far-l'), ...L('far-r')], { autoAlpha: 0, duration: 2 }, 0)
+    .from(L('near-l'), { xPercent: -40 }, 0.05)
+    .from(L('near-r'), { xPercent: 40 }, 0.05)
+    .from(L('bench'), { yPercent: 60, autoAlpha: 0 }, 0.35)
     .from(q('.vf__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.8)
     .from(q('.vf span'), { autoAlpha: 0, duration: 0.6, stagger: 0.08 }, 1.2)
-    .from(q('.bracket, .hero__display, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.55);
+    .from(q('.bracket, .hero__display, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.5);
 
   gsap.set(q('.lens'), { autoAlpha: 0, clipPath: 'circle(6% at 50% 49%)' });
   gsap.set(q('.xmark'), { autoAlpha: 0 });
@@ -140,7 +135,7 @@ function introScene() {
     scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
   });
 
-  // 1 · dolly into the lab: walls part, kit slides past the lens.
+  // 1 · dolly into the lab: walls part at their own depth, the bench drops away.
   tl.to(q('[data-hero]'), { autoAlpha: 0, y: -60, scale: 0.94, duration: 1.6 }, 0)
     .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.6 }, 0);
   Object.entries(exits).forEach(([k, v]) => tl.to(L(k), { ...v, duration: 3.2 }, 0));
@@ -184,7 +179,7 @@ function whatScene() {
     .fromTo(q('.trl li:not(.is-market) .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5, stagger: 0.16 }, 5.1)
     .fromTo(q('.trl .is-market .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 6.5)
     // Scene change: the builder exits frame.
-    .to(q('.what__figure'), { xPercent: 110, autoAlpha: 0, duration: 1.6, ease: 'power2.in' }, 7.6)
+    .to(q('.what__figure'), { xPercent: -110, autoAlpha: 0, duration: 1.6, ease: 'power2.in' }, 7.6)
     .to(q('[data-step="2"]'), { autoAlpha: 0, y: -20, duration: 0.9 }, 8.2);
 }
 
@@ -345,7 +340,7 @@ function ticker() {
 }
 
 function pointerParallax() {
-  const depth: Record<string, number> = { room: 6, 'wall-l': 14, 'wall-r': 14, drone: 30, arm: 24, bot: 24, bench: 18 };
+  const depth: Record<string, number> = { 'far-l': 8, 'far-r': 8, 'near-l': 22, 'near-r': 22, bench: 16 };
   const layers = $$<HTMLElement>('.lab--hero [data-l]')
     .filter((el) => depth[el.dataset.l ?? ''])
     .map((el) => {

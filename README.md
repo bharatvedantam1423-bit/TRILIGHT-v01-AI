@@ -65,14 +65,14 @@ Student project media (Makers Conclave): add entries to `projects` in
 
 The motion follows the reference recording's grammar, in Trilight's brand:
 
-1. **Hero lab.** A symmetric robotics corridor with octagon/hexagon wall
-   panels, a robot arm, a humanoid, a hovering drone and a bench of tools,
-   seen through a robot-camera viewfinder (REC, timecode, TRL counter). It
-   powers up on load and follows the mouse at different depths.
+1. **Hero lab.** A dark room framed by two depths of armoured octagon/hexagon
+   wall panels with blue light seams, and the workbench in front, seen through
+   a robot-camera viewfinder (REC, timecode, TRL counter). The walls slide in
+   on load and follow the mouse at different depths.
 2. **Dolly in.** On scroll the camera pushes into the corridor: walls part,
    kit slides past, the Trilight X locks at the vanishing point, then a robot
    eye opens like an iris and the camera zooms through its pupil.
-3. **The lab stage.** The builder and robot rise in on the right, floor light
+3. **The lab stage.** The builder and robot rise in on the left, floor light
    lines draw in, the NASA TRL scale fills (stopping at 8), then they exit.
 4. **Sections.** Lamps light along a beam (three green lights), project reel
    with scanline and timecode, line icons that draw themselves, problem photos
@@ -88,7 +88,7 @@ The motion follows the reference recording's grammar, in Trilight's brand:
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `public/img/`: `lab`, `lab-2`, `eye`, `humanoid`, `arm`, `drone`, `tools`,
+- `public/img/`: `wall-a`, `wall-b`, `bench`, `lab-2`, `eye`,
   `stage`, `student`, `evo-*` and the problem photos were generated for this page with Magnific (Seedream),
   with backgrounds removed for the layered cut-outs. They're illustrative, not
   photos of real NIAT projects.
