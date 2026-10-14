@@ -7,7 +7,7 @@
  * scroll scenes (hero frame, lens → lab stage, closing frame).
  */
 import {
-  site, hero, whatIs, lights, projects, commitments, ladder, doors, value, register, faq, closing,
+  site, hero, whatIs, lights, projects, commitments, ladder, doors, value, register, faq, faqHead, closing,
 } from './content';
 
 const esc = (s: string) =>
@@ -49,7 +49,7 @@ function lab(where: 'hero' | 'closing') {
         <i class="vf__c vf__c--tl"></i><i class="vf__c vf__c--tr"></i><i class="vf__c vf__c--bl"></i><i class="vf__c vf__c--br"></i>
         <span class="vf__rec"><i></i>Rec</span>
         <span class="vf__tc" data-timecode>00:00:00</span>
-        <span class="vf__cam">Cam 01 · TRL8 Lab</span>
+        <span class="vf__cam">Cam 01 · Trilight Lab</span>
         <span class="vf__lvl">TRL <b data-trl>0</b>/8</span>
       </div>`
         : ''}
@@ -61,14 +61,14 @@ function nav() {
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav" data-nav>
   <nav class="nav__links" aria-label="Sections">
-    <a href="#what">What is TRL8</a>
+    <a href="#what">What is Trilight</a>
     <a href="#ladder">How it works</a>
     <a href="#faq">FAQ</a>
   </nav>
   <a class="nav__logo" href="#top" aria-label="Trilight, back to top">
     <img src="/brand/wordmark-light.svg" alt="Trilight" width="128" height="29">
   </a>
-  <a class="nav__cta" href="#register" data-register data-section="nav">Register${arrow}</a>
+  <a class="nav__cta" href="#register" data-register data-section="nav">Join${arrow}</a>
 </header>`;
 }
 
@@ -90,13 +90,10 @@ function intro(markSvg: string) {
     ${lab('hero')}
 
     <div class="hero" data-hero>
-      <h1 id="hero-title" class="hero__title">
-        <span class="bracket"><span class="bracket__b" aria-hidden="true">[</span>${esc(hero.bracket)}<span class="bracket__b" aria-hidden="true">]</span></span>
-        <span class="hero__display">NE<span class="hero__x">X</span>T</span>
-      </h1>
-      <p class="hero__sub">${esc(hero.headline)}</p>
+      <h1 id="hero-title" class="hero__headline">${esc(hero.headline).replace(/(\S+-\S+)/g, '<span class="nowrap">$1</span>')}</h1>
+      <p class="hero__sub">${esc(hero.sub)}</p>
       <div class="hero__cta">${cta('hero', 'btn--lg')}</div>
-      <ul class="facts" aria-label="Key facts">${hero.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+      <dl class="facts" aria-label="Key facts">${hero.stats.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>
     </div>
 
     <p class="scrollcue" aria-hidden="true"><span></span>Scroll</p>
@@ -133,10 +130,10 @@ function what() {
       <div class="what__step" data-step="2">
         ${label(whatIs.scaleTitle, '02')}
         <p class="lede">${esc(whatIs.scaleBody)}</p>
-        <ol class="trl" aria-label="NASA Technology Readiness Levels 1 to 9. TRL8 covers levels 1 to 8.">
+        <ol class="trl" aria-label="NASA Technology Readiness Levels 1 to 9. Trilight covers levels 1 to 8.">
           ${levels.map((l) => `<li class="${l === 9 ? 'is-market' : ''}"><span class="trl__bar" style="--h:${20 + l * 8.5}%"></span><b>${l}</b></li>`).join('')}
         </ol>
-        <p class="trl__legend"><span class="sw sw--on"></span>The TRL8 ladder, levels 1–8 <span class="sw sw--off"></span>Level 9, earned in the market</p>
+        <p class="trl__legend"><span class="sw sw--on"></span>The Trilight ladder, levels 1–8 <span class="sw sw--off"></span>Level 9, earned in the market</p>
       </div>
     </div>
   </div>
@@ -157,7 +154,7 @@ function lightsSection() {
 <section class="section lights" id="lights" aria-labelledby="lights-title">
   <div class="lights__bg" aria-hidden="true">${pic('lab-2', 1920, 1080)}</div>
   <div class="wrap">
-    ${sectionHead('03', lights.kicker, lights.headline, 'lights-title', lights.body, true)}
+    ${sectionHead('05', lights.kicker, lights.headline, 'lights-title', lights.body, true)}
     <ol class="lamps" data-lamps>
       <li class="lamps__rail" aria-hidden="true"><span data-lamp-beam></span></li>
       ${lights.items
@@ -210,7 +207,7 @@ function projectsSection() {
   return `
 <section class="section projects" id="projects" aria-labelledby="projects-title">
   <div class="wrap">
-    ${sectionHead('04', 'Student projects', 'Built by NIAT students.', 'projects-title')}
+    ${sectionHead('10', 'Student projects', 'Built by NIAT students.', 'projects-title')}
     ${body}
   </div>
 </section>`;
@@ -229,7 +226,7 @@ function commitmentsSection() {
   return `
 <section class="section commit" id="commitments" aria-labelledby="commit-title">
   <div class="wrap">
-    ${sectionHead('05', commitments.kicker, commitments.headline, 'commit-title')}
+    ${sectionHead('04', commitments.kicker, commitments.headline, 'commit-title')}
     <ol class="rows">
       ${commitments.items
         .map(
@@ -243,8 +240,15 @@ function commitmentsSection() {
         )
         .join('')}
     </ol>
+  </div>
+</section>`;
+}
 
-    <h3 class="h2 h2--sm problems__title">${esc(commitments.problemsHeadline)}</h3>
+function problemsSection() {
+  return `
+<section class="section problems-sec" id="problems" aria-labelledby="problems-title">
+  <div class="wrap">
+    ${sectionHead('09', commitments.problemsKicker, commitments.problemsHeadline, 'problems-title')}
     <ul class="problems">
       ${commitments.problems
         .map(
@@ -272,12 +276,12 @@ function ladderSection() {
   <div class="ladder__sticky">
     <div class="wrap ladder__head">
       <div>
-        ${label(ladder.kicker, '06')}
+        ${label(ladder.kicker, '03')}
         <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
       </div>
       <p class="lede">${esc(ladder.body)}</p>
     </div>
-    <div class="ladder__viewport" data-ladder-viewport tabindex="0" aria-label="The TRL8 stages, scroll sideways">
+    <div class="ladder__viewport" data-ladder-viewport tabindex="0" aria-label="The Trilight stages, scroll sideways">
       <ol class="ladder__track" data-ladder-track>
         ${ladder.stages
           .map((s, i) => {
@@ -326,8 +330,8 @@ function doorsSection() {
         <span class="door__edge" aria-hidden="true"></span>
         <p class="door__badge">${esc(d.badge)}</p>
         <h3 class="h3">${esc(d.name)}</h3>
-        <p class="muted">${esc(d.for)}</p>
-        <ol class="door__steps">${d.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+        <ul class="door__steps">${d.points.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+        ${d.note ? `<p class="muted door__note">${esc(d.note)}</p>` : ''}
       </article>`,
         )
         .join('')}
@@ -345,7 +349,7 @@ function valueSection() {
   return `
 <section class="section value" id="value" aria-labelledby="value-title">
   <div class="wrap">
-    ${sectionHead('08', value.kicker, value.headline, 'value-title', undefined, true)}
+    ${sectionHead('06', value.kicker, value.headline, 'value-title', value.body, true)}
     <dl class="stats">
       ${stats.map((s) => `<div data-reveal><dt>${esc(s.l)}</dt><dd data-count="${esc(s.v)}">${esc(s.v)}</dd></div>`).join('')}
     </dl>
@@ -363,7 +367,7 @@ function registerSection(helpEmail: string) {
   return `
 <section class="section register" id="register" aria-labelledby="register-title">
   <div class="wrap">
-    ${sectionHead('09', register.kicker, register.headline, 'register-title')}
+    ${sectionHead('08', register.kicker, register.headline, 'register-title')}
     <ol class="steps" data-steps>
       <li class="steps__rail" aria-hidden="true"><span data-steps-beam></span></li>
       ${register.steps.map((s) => `<li class="step" data-step-item><span class="steps__node" aria-hidden="true">${s.n}</span><h3 class="h3">${esc(s.name)}</h3><p class="muted">${esc(s.text)}</p></li>`).join('')}
@@ -371,12 +375,13 @@ function registerSection(helpEmail: string) {
     <div class="register__cta">${cta('register', 'btn--lg')}</div>
   </div>
 </section>
-
+${problemsSection()}
+${projectsSection()}
 <section class="section faq" id="faq" aria-labelledby="faq-title">
   <div class="wrap faq__wrap">
     <div class="faq__head">
-      ${label('FAQ', '10')}
-      <h2 id="faq-title" class="h2">Questions, answered.</h2>
+      ${label('FAQ', '11')}
+      <h2 id="faq-title" class="h2">${esc(faqHead.headline)}</h2>
       <p class="muted">${help}</p>
     </div>
     <div class="faq__list">
@@ -396,10 +401,7 @@ function registerSection(helpEmail: string) {
 <section class="closing" id="join" aria-labelledby="closing-title">
   ${lab('closing')}
   <div class="closing__inner">
-    <h2 id="closing-title" class="closing__title">
-      <span class="bracket"><span class="bracket__b" aria-hidden="true">[</span>Ready to build what’s<span class="bracket__b" aria-hidden="true">]</span></span>
-      <span class="hero__display">NE<span class="hero__x">X</span>T?</span>
-    </h2>
+    <h2 id="closing-title" class="closing__title">${esc(closing.headline)}</h2>
     <p class="hero__sub">${esc(closing.body)}</p>
     ${cta('closing', 'btn--lg')}
     <p class="fine">${help}</p>
@@ -416,9 +418,9 @@ function footer() {
       <p class="fine">A NxtWave Physical AI &amp; Robotics Team program for NIAT students. © 2026</p>
     </div>
     <nav class="footer__links" aria-label="Footer">
-      <a href="#what">What is TRL8</a>
+      <a href="#what">What is Trilight</a>
       <a href="#ladder">How it works</a>
-      <a href="#value">What you get</a>
+      <a href="#value">What it takes</a>
       <a href="#faq">FAQ</a>
     </nav>
   </div>
@@ -429,7 +431,7 @@ function footer() {
 <dialog class="dialog" id="reg-dialog" aria-labelledby="reg-dialog-title">
   <form method="dialog">
     <img src="/brand/mark.svg" alt="" width="64" height="36">
-    <h2 id="reg-dialog-title" class="h3">Registration opens soon.</h2>
+    <h2 id="reg-dialog-title" class="h3">Joining opens soon.</h2>
     <p class="muted">When it opens, you’ll log in here with your NxtWave learning portal credentials. Nothing to fill in, nothing to pay.</p>
     <button class="btn" value="close"><span>Got it</span></button>
   </form>
@@ -442,12 +444,11 @@ export function renderBody(opts: { markSvg: string; helpEmail: string }) {
     '<main id="main">',
     intro(opts.markSvg),
     what(),
-    lightsSection(),
-    projectsSection(),
-    commitmentsSection(),
     ladderSection(),
-    doorsSection(),
+    commitmentsSection(),
+    lightsSection(),
     valueSection(),
+    doorsSection(),
     registerSection(opts.helpEmail),
     '</main>',
     footer(),

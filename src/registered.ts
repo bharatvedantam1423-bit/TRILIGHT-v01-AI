@@ -9,17 +9,17 @@ const ok = params.get('registered') === '1';
 if (!ok) {
   // Landed here directly, not from the portal: don't claim a registration.
   $('[data-title]').textContent = 'You’re not registered yet.';
-  $('[data-body]').textContent = 'Head back to the TRL8 page and tap “Register your interest” to log in with your learning portal credentials.';
+  $('[data-body]').textContent = 'Head back to the Trilight page and tap “Join the Program” to log in with your learning portal credentials.';
 } else {
   document.body.classList.add('is-ok');
   track('login_success');
   $('[data-title]').textContent = 'You’re registered.';
   if (config.platformUrl) {
-    $('[data-body]').textContent = 'Taking you to the TRL8 platform…';
+    $('[data-body]').textContent = 'Taking you to the Trilight platform…';
     const a = document.createElement('a');
     a.className = 'btn btn--primary';
     a.href = config.platformUrl;
-    a.textContent = 'Continue to the TRL8 platform';
+    a.textContent = 'Continue to the Trilight platform';
     $('[data-action]').append(a);
     setTimeout(() => {
       track('platform_redirect');

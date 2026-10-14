@@ -22,34 +22,39 @@ export type Stage = {
 };
 
 export const site = {
-  name: 'TRL8 · Trilight',
-  title: 'TRL8 (Trilight) · Build Physical AI at NIAT',
+  name: 'Trilight',
+  title: 'Trilight · Turn your ideas into real-world products',
   description:
-    'TRL8 is NxtWave’s funded, gated journey that takes a NIAT student’s Physical AI or robotics idea from a sketch to a qualified product real customers pay for. No fee. Grants up to ₹5L per team.',
-  cta: 'Register your interest',
+    'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer. Grants up to ₹5 Lakh per team.',
+  cta: 'Join the Program',
 };
 
+// Copy: "TRILIGHT | WEBSITE COPY" doc. Where the doc offers two headlines
+// ("… or …"), the first is used and the alternative is kept as `alt`.
 export const hero = {
-  // Display line is the brand campaign "[Build what's] NEXT" from the guidelines.
-  bracket: 'Build what’s',
-  display: 'NEXT',
-  headline: 'TRL8, Tri-Light. Take your Physical AI idea from a sketch to a product customers pay for.',
+  headline: 'Turn Your Ideas Into Real-world Products',
+  alt: 'Take Your Idea All the Way to the Real World',
+  sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   // SIGN-OFF: ₹5L per team (PRD §12.8)
-  facts: ['Open to every NIAT student', 'No fee', 'Grants up to ₹5L per team'],
+  stats: [
+    { value: 'Up to ₹5 Lakh', label: 'Grant per team' },
+    { value: '8', label: 'Stages' },
+    { value: 'April 2027', label: 'Demo Day' },
+  ],
 };
 
 export const whatIs = {
-  kicker: 'What is TRL8',
+  kicker: 'What is Trilight',
   headline: 'Physical AI is AI with a body.',
-  body: 'AI that senses the physical world, decides what to do, and acts on it: robots, drones, smart sensors, machines. TRL8 is NxtWave’s journey for NIAT students to build one, from first idea to a product real customers pay for.',
-  scaleTitle: 'Why “TRL8”?',
+  body: 'AI that senses the physical world, decides what to do, and acts on it: robots, drones, smart sensors, machines. Trilight is NxtWave’s journey for NIAT students to build one, from first idea to a product real customers pay for.',
+  scaleTitle: 'Why TRL 8?',
   scaleBody:
     'NASA rates technology on a Technology Readiness Level (TRL) scale from 1 to 9. TRL 8 means a complete, qualified system. The program stops at 8, because TRL 9 is earned in the market, not inside a program.',
 };
 
 export const lights = {
-  kicker: 'Three green lights',
-  headline: 'Three lights. One real product.',
+  kicker: 'Why it’s called Trilight',
+  headline: 'The Three Forces that Power TRILIGHT',
   body: 'You reach TRL 8 when all three lights are green. That is what “done” means here.',
   items: [
     { n: '01', name: 'Build', text: 'An outside team can build a second unit from your SOP, BOM and QA checks.' },
@@ -67,7 +72,7 @@ export const projects: { title: string; team: string; level: string; poster: str
 
 export const commitments = {
   kicker: 'Our three commitments',
-  headline: 'What we hold every team to.',
+  headline: 'Fundamentals That Matter While You Build',
   items: [
     {
       n: '01',
@@ -88,7 +93,9 @@ export const commitments = {
       tag: 'FIELD · CUSTOMER',
     },
   ],
-  problemsHeadline: 'Start with a problem you can go and see.',
+  problemsKicker: 'Problems around you',
+  problemsHeadline: 'Fix the Problems Hiding in Plain Sight',
+  problemsAlt: 'You are Surrounded by Problems, Spot One & Fix It!',
   problems: [
     {
       image: '/img/farm.webp',
@@ -119,7 +126,8 @@ export const commitments = {
 
 export const ladder = {
   kicker: 'How it works · The ladder',
-  headline: 'From idea to object.',
+  headline: 'See How Far Your Ideas Can Go',
+  alt: 'Earn Your Way to a Real Product',
   body: 'Every step up is a Technology Readiness Review. Clear it with evidence and the next level, and its grant, unlocks.',
   // SIGN-OFF: per-stage grants (Figma outline; they sum to the PRD's ₹5L cap),
   // Explorer duration (PRD §6) and total length (PRD §12.6).
@@ -181,31 +189,32 @@ export const ladder = {
 
 export const doors = {
   kicker: 'Two ways in',
-  headline: 'Start at the beginning, or prove you’re further along.',
-  note: 'Both doors start with the same registration.',
+  headline: 'NIATians, Find Your Way Into TRILIGHT',
+  note: 'Both doors start when you join the program.',
   items: [
     {
       name: 'Standard Door',
       badge: 'Most students start here',
-      for: 'For anyone with curiosity, with or without a team or an idea.',
-      steps: ['Register your interest', 'Explorer, solo (4–6 weeks)', 'Form a team of 3–5', 'Submit your TRL 1–2 proposal'],
+      points: ['Learn the basics of hardware and AIoT', 'Clear checkpoints'],
+      note: 'Your score in the evaluation decides your entry.',
     },
     {
       name: 'Fast-Track Door',
-      badge: 'TRL 4+ prototype',
-      for: 'For teams that already have a working prototype at TRL 4 or above.',
-      steps: ['Register your interest', 'Share your prototype evidence', 'One-time Fast-Track review', 'Enter at the level you prove'],
+      badge: 'Working prototype',
+      points: ['Showcase your working prototype and get a direct entry to the program'],
+      note: null,
     },
   ],
 };
 
 export const value = {
-  kicker: 'What you get',
-  headline: 'Real money, real mentors, real hardware.',
+  kicker: 'What it really takes',
+  headline: 'Know What It Takes to Build Beyond Prototype',
+  body: 'Your first prototype will probably fail. So will the third. Trilight doesn’t reward the best pitch; it rewards the team that keeps fixing, testing and showing evidence until the thing works in the real world.',
   // SIGN-OFF: ₹5L per team and ₹3 Cr annual pool (PRD §12.8).
   big: [
     { value: '₹5L', label: 'in grants per team, at most', sub: 'Unlocked stage by stage as you clear each review.' },
-    { value: '₹3 Cr', label: 'annual grant pool', sub: 'Set aside for TRL8 teams.' },
+    { value: '₹3 Cr', label: 'annual grant pool', sub: 'Set aside for Trilight teams.' },
   ],
   items: [
     { name: 'GRIT Miles', text: 'Earned at every stage you clear. Updated values coming soon.' },
@@ -219,19 +228,19 @@ export const value = {
 };
 
 export const register = {
-  kicker: 'How to register',
-  headline: 'Register in under a minute.',
+  kicker: 'Who can join',
+  headline: 'Start Building on Your Terms at Your Pace',
   steps: [
-    { n: '1', name: 'Click Register', text: 'Tap “Register your interest” anywhere on this page.' },
-    { n: '2', name: 'Log in', text: 'Use your NxtWave learning portal credentials. No new account, no form.' },
-    { n: '3', name: 'Continue on the platform', text: 'Your interest is recorded and you continue on the TRL8 platform.' },
+    { n: '1', name: 'Any batch, any branch', text: 'Every NIAT student can join. Log in with your NIAT learning portal account.' },
+    { n: '2', name: 'Solo first, then a team', text: 'Explore alone, then form a team of 3–5 at TRL 1–2.' },
+    { n: '3', name: 'No fee, no deadlines', text: 'Optional and self-paced. Move up when your evidence is ready.' },
   ],
 };
 
 export const faq = [
   {
     q: 'Who can join?',
-    a: 'Every NIAT student, from any campus, year or branch. You register with your NxtWave learning portal login.',
+    a: 'Every NIAT student, from any campus, year or branch. You join with your NxtWave learning portal login.',
   },
   {
     q: 'Do I need a team or an idea?',
@@ -239,7 +248,7 @@ export const faq = [
   },
   {
     q: 'Is there a fee?',
-    a: 'No. TRL8 is free, optional and voluntary. There’s no fee and no academic credit; you move up when your evidence is ready.',
+    a: 'No. Trilight is free, optional and voluntary. There’s no fee and no academic credit; you move up when your evidence is ready.',
   },
   {
     q: 'Do I need prior electronics experience?',
@@ -258,17 +267,21 @@ export const faq = [
     a: 'The IP, equity and revenue-share policy is still being finalised. It will be shared in full before any team is asked to agree to anything.',
   },
   {
-    q: 'What happens after I register?',
-    a: 'You log in with your learning portal credentials, your interest is recorded, and you continue on the TRL8 platform, where Explorer, team formation and proposals live. If the platform isn’t open yet, you’ll see a confirmation and we’ll notify you about next steps.',
+    q: 'What happens after I join?',
+    a: 'You log in with your learning portal credentials, your interest is recorded, and you continue on the Trilight platform, where Explorer, team formation and proposals live. If the platform isn’t open yet, you’ll see a confirmation and we’ll notify you about next steps.',
   },
   {
     q: 'I can’t log in. What now?',
-    a: 'Use the same credentials you use for the NxtWave learning portal. If you’ve forgotten them, reset your password on the portal first. Still stuck? Reach out to the TRL8 team using the help contact below.',
+    a: 'Use the same credentials you use for the NxtWave learning portal. If you’ve forgotten them, reset your password on the portal first. Still stuck? Reach out to the Trilight team using the help contact below.',
   },
 ];
 
+export const faqHead = {
+  headline: 'Have Questions Before You Build?',
+};
+
 export const closing = {
-  headline: 'Ready to build what’s next?',
-  body: 'Registering takes under a minute with your learning portal login.',
-  help: 'Need help? Ask your campus TRL8 coordinator',
+  headline: 'Come, Make Your Ideas Real with TRILIGHT',
+  body: 'Joining takes under a minute with your learning portal login.',
+  help: 'Need help? Ask your campus Trilight coordinator',
 };

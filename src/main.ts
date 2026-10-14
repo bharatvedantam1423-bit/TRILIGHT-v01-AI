@@ -73,7 +73,7 @@ ScrollTrigger.create({
 ScrollTrigger.create({
   trigger: intro,
   start: 'bottom 80%',
-  endTrigger: '#register',
+  endTrigger: '#join',
   end: 'top 80%',
   onToggle: (self) => mobileCta?.classList.toggle('is-visible', self.isActive),
 });
@@ -120,7 +120,7 @@ function introScene() {
     .from(L('bench'), { yPercent: 60, autoAlpha: 0 }, 0.35)
     .from(q('.vf__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.8)
     .from(q('.vf span'), { autoAlpha: 0, duration: 0.6, stagger: 0.08 }, 1.2)
-    .from(q('.bracket, .hero__display, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.5);
+    .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.5);
 
   gsap.set(q('.lens'), { autoAlpha: 0, clipPath: 'circle(6% at 50% 49%)' });
   gsap.set(q('.xmark'), { autoAlpha: 0 });
