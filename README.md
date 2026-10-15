@@ -77,7 +77,7 @@ fills settle in.
 1. **Hero · the circuit city.** A dense board in isometric line art,
    components standing like buildings round an empty socket. On scroll the
    copy clears, a hand with tweezers seats the Trilight chip, the copper lights
-   out from the socket, and the camera pushes into the chip. The static board
+   out from the socket. Before that, a soft beam rises from the empty socket. The static board
    is prerendered to images (see below), so scrolling only moves pictures.
 2. **The ladder (pinned).** Title on top; the drawing on the left grows from a
    pencil sketch of a drone to its wireframe model, the bare prototype and the

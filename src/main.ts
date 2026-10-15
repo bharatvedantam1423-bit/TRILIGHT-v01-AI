@@ -103,7 +103,7 @@ const draw = (svg: Element | null | undefined) => svg?.classList.add('is-drawn')
 /**
  * The hero. The prerendered board fades in behind the copy and the chip draws
  * itself. On scroll the copy clears, the hand brings the chip in and seats it,
- * the copper lights out from the socket, and the camera pushes into the chip.
+ * the copper lights out from the socket.
  * Only transforms and a few attributes change per frame, so it stays smooth.
  */
 function introScene() {
@@ -123,6 +123,8 @@ function introScene() {
     const hy = (ly * state.drop - 420 * state.out) * unit;
     hand.style.transform = `translate3d(${hx.toFixed(1)}px, ${hy.toFixed(1)}px, 0)`;
     live.style.setProperty('--power', state.power.toFixed(3));
+    // The socket's light fades as the chip comes down into it.
+    live.style.setProperty('--socket', Math.min(1, Math.max(0, (state.drop - 0.05) / 0.6)).toFixed(3));
     live.style.setProperty('--power-on', state.power > 0.01 ? '1' : '0');
   };
   apply();
@@ -159,10 +161,9 @@ function introScene() {
       .to(hand, { opacity: 0, duration: 0.4 }, 3.8)
       // Power-up: the copper lights out from the socket.
       .to(state, { power: 1, duration: 1.1 }, 3.4)
-      // A short push into the chip, then a fade to the ladder.
-      .to(q('.dwg'), { autoAlpha: 0, duration: 0.4 }, 4.6)
-      .to(stage, { scale: isPhone ? 3 : 2.4, duration: 1.4, ease: 'power2.in' }, 4.7)
-      .to(q('.dive'), { opacity: 1, duration: 0.6 }, 5.5);
+      // Hold on the powered board a moment, then hand over to the ladder.
+      .to({}, { duration: 0.8 }, 4.5)
+      .to(q('.dwg'), { autoAlpha: 0, duration: 0.5 }, 4.8);
     apply();
     return () => tl.scrollTrigger?.kill();
   });

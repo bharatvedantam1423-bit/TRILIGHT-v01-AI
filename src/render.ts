@@ -115,7 +115,6 @@ function intro(markSvg: string) {
 
     <script type="application/json" data-city-data>${JSON.stringify(data)}</script>
     <p class="scrollcue" aria-hidden="true"><span></span>Scroll</p>
-    <div class="dive" aria-hidden="true"></div>
   </div>
 </section>`;
 }

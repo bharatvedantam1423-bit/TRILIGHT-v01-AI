@@ -191,10 +191,25 @@ export function heroLayers() {
   };
   const svg = (className: string, body: string, label = '') =>
     k.figureSvg({ width: HERO_W, height: HERO_H, label, className, body }).replace(label ? '' : ' role="img" aria-label=""', label ? '' : ' aria-hidden="true"');
+  // A soft shaft of light rising out of the empty socket: the board waiting
+  // for its chip. It fades as the chip comes down.
+  const corners = ([[-32, -32], [32, -32], [32, 32], [-32, 32]] as const).map(([x, y]) => c.at([x, y, Z]));
+  const L = corners.reduce((a, q) => (q[0] < a[0] ? q : a));
+  const R = corners.reduce((a, q) => (q[0] > a[0] ? q : a));
+  const T = corners.reduce((a, q) => (q[1] < a[1] ? q : a));
+  const B = corners.reduce((a, q) => (q[1] > a[1] ? q : a));
+  const up = k.axisVector(P, [0, 0, 240]);
+  const pt = (q: readonly [number, number]) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`;
+  const beam = `<g class="bp-socket" data-socket>
+    <defs><linearGradient id="bp-shaft" x1="0" y1="${B[1].toFixed(1)}" x2="0" y2="${(T[1] + up[1]).toFixed(1)}" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#33dcd9" stop-opacity=".36"/><stop offset=".35" stop-color="#33dcd9" stop-opacity=".12"/><stop offset="1" stop-color="#33dcd9" stop-opacity="0"/></linearGradient></defs>
+    <path class="bp-socket__floor" d="M${pt(L)}L${pt(T)}L${pt(R)}L${pt(B)}Z"/>
+    <path class="bp-socket__shaft" d="M${pt(L)}L${L[0].toFixed(1)} ${(L[1] + up[1]).toFixed(1)}L${R[0].toFixed(1)} ${(R[1] + up[1]).toFixed(1)}L${pt(R)}L${pt(B)}Z" fill="url(#bp-shaft)"/>
+  </g>`;
   return {
     base: svg('bp-svg', `${b.svg}${c.sorted(behind)}`),
     front: svg('bp-svg', c.sorted(front)),
-    overlay: svg('bp-svg bp-draw city__live', `<g class="bp-power-layer">${b.power}</g><g data-hero-chip>${chip(c)}</g>`),
+    overlay: svg('bp-svg bp-draw city__live', `${beam}<g class="bp-power-layer">${b.power}</g><g data-hero-chip>${chip(c)}</g>`),
     lift,
     centre,
     hand,
