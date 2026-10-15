@@ -143,14 +143,14 @@ export const doors = {
       note: 'The score against your evaluation will decide your entry',
       // Photo slot: drop /public/img/door-standard.webp in and it replaces the drawing.
       image: 'door-standard', figure: 'idea',
-      imageAlt: 'A student learning hardware basics at a lab bench',
+      imageAlt: 'A student soldering a small sensor board at a lab bench, with a breadboard, sensor modules and a multimeter around her',
     },
     {
       name: 'Fastrack Door',
       points: ['Showcase your working prototype and get a direct entry to the program'],
       note: null,
       image: 'door-fasttrack', figure: 'prototype',
-      imageAlt: 'A student team showing a working drone prototype',
+      imageAlt: 'Three students presenting their working drone prototype and its live telemetry to a reviewer',
     },
   ],
 };

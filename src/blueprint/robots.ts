@@ -1,7 +1,7 @@
 /**
  * Closing stage: two six-axis robot arms on a workbench either side of a
  * frosted glass block that carries the Trilight logo. The left arm turns to
- * the block and lights it with a teal beam; the right arm waits, folded.
+ * the block and lights it with a teal beam; the right arm turns to watch it.
  *
  * Drawn front-on (a stage, not a plan) in the blueprint palette. Each arm is
  * a chain of joint groups; the static markup holds the final pose, and the
@@ -10,7 +10,7 @@
 const W = 1600;
 const H = 620;
 const TABLE = 548;
-const CUBE = { x: 646, y: 150, w: 308, h: 340 };
+const CUBE = { x: 650, y: 132, w: 300, h: 330 };
 
 type Pose = { a1: number; a2: number; a3: number };
 const SHOULDER: [number, number] = [0, -185];
@@ -76,20 +76,24 @@ function tipOf(baseX: number, mirror: boolean, pose: Pose): [number, number] {
 export function robotStage(label: string) {
   const LX = 300;
   const RX = 1300;
-  // Left arm: aims its tool at the block. Solve the wrist so the beam points at it.
-  const aim: [number, number] = [CUBE.x + 70, CUBE.y + CUBE.h * 0.48];
-  const left: Pose = { a1: 22, a2: 8, a3: 0 };
-  const wristAt = (() => {
-    let p = rot(WRIST, ELBOW, left.a2);
-    p = rot(p, SHOULDER, left.a1);
-    return [LX + p[0], TABLE + p[1]] as [number, number];
-  })();
-  left.a3 = Math.round((Math.atan2(aim[1] - wristAt[1], aim[0] - wristAt[0]) * 180) / Math.PI - left.a1 - left.a2);
-  const right: Pose = { a1: -6, a2: 48, a3: 52 };
+  // Both arms reach up and over toward the block, as in the reference: the
+  // left one lights it, the right one looks on. The wrist is solved so each
+  // tool points at its spot on the block.
+  const solve = (baseX: number, mirror: boolean, a1: number, a2: number, target: [number, number]): Pose => {
+    let w = rot(WRIST, ELBOW, a2);
+    w = rot(w, SHOULDER, a1);
+    const wx = baseX + (mirror ? -w[0] : w[0]);
+    const wy = TABLE + w[1];
+    const dx = mirror ? -(target[0] - wx) : target[0] - wx;
+    const a3 = Math.round((Math.atan2(target[1] - wy, dx) * 180) / Math.PI - a1 - a2);
+    return { a1, a2, a3 };
+  };
+  const left = solve(LX, false, 24, 34, [CUBE.x + 40, CUBE.y + CUBE.h * 0.45]);
+  const right = solve(RX, true, 26, 30, [CUBE.x + CUBE.w - 30, CUBE.y + CUBE.h * 0.4]);
   const rest: Pose = { a1: -8, a2: 96, a3: 70 };
   const tip = tipOf(LX, false, left);
-  const beamTop: [number, number] = [CUBE.x + CUBE.w * 0.62, CUBE.y + 30];
-  const beamBot: [number, number] = [CUBE.x + CUBE.w * 0.62, CUBE.y + CUBE.h - 40];
+  const beamTop: [number, number] = [CUBE.x + CUBE.w * 0.55, CUBE.y + 6];
+  const beamBot: [number, number] = [CUBE.x + CUBE.w * 0.78, CUBE.y + CUBE.h - 16];
 
   const svg = `
 <svg class="stage__svg" viewBox="0 0 ${W} ${H}" aria-hidden="true">
@@ -105,9 +109,10 @@ export function robotStage(label: string) {
   <path class="rb-edge" d="M0 ${TABLE}H${W}"/>
   <path class="rb-detail" d="M0 ${TABLE + 16}H${W}"/>
   <ellipse class="rb-pool" data-beam cx="${CUBE.x + CUBE.w / 2}" cy="${TABLE - 6}" rx="${CUBE.w * 0.9}" ry="18" fill="url(#rb-pool)"/>
-  ${rect(CUBE.x - 56, TABLE - 38, CUBE.w + 112, 38, 3)}
-  ${rect(CUBE.x - 34, CUBE.y + CUBE.h, CUBE.w + 68, TABLE - 38 - CUBE.y - CUBE.h, 2)}
-  ${line(CUBE.x - 56, TABLE - 26, CUBE.x + CUBE.w + 56, TABLE - 26)}
+  ${rect(CUBE.x - 70, TABLE - 34, CUBE.w + 140, 34, 3, 'rb-part rb-stone')}
+  ${rect(CUBE.x - 44, TABLE - 34 - 26, CUBE.w + 88, 26, 2, 'rb-part rb-stone')}
+  ${rect(CUBE.x - 22, CUBE.y + CUBE.h, CUBE.w + 44, TABLE - 60 - CUBE.y - CUBE.h, 2, 'rb-part rb-stone')}
+  ${line(CUBE.x - 70, TABLE - 22, CUBE.x + CUBE.w + 70, TABLE - 22)}
   <g transform="translate(${LX} 0) translate(0 ${TABLE})" data-arm="left">${arm('l', left, rest, true)}</g>
   <g transform="translate(${RX} 0) translate(0 ${TABLE}) scale(-1 1)" data-arm="right">${arm('r', right, rest, false)}</g>
   <path class="rb-beam" data-beam d="M${f(tip[0])} ${f(tip[1])}L${f(beamTop[0])} ${f(beamTop[1])}L${f(beamBot[0])} ${f(beamBot[1])}Z" fill="url(#rb-beam)"/>
