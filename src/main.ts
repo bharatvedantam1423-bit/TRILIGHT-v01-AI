@@ -2,7 +2,6 @@ import './styles.css';
 import './blueprint/blueprint.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 import { registerUrl } from './config';
 import { track } from './analytics';
 
@@ -39,24 +38,16 @@ dialog?.addEventListener('click', (e) => {
 
 track('page_view', { path: location.pathname });
 
-/* ------------------------------------------------------------ smooth scroll */
-
-let lenis: Lenis | null = null;
-if (!reduceMotion) {
-  lenis = new Lenis({ lerp: 0.12, wheelMultiplier: 1 });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((t) => lenis!.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
-}
-
+/* ------------------------------------------------------------ in-page links */
+// Native scrolling (no smooth-scroll library): the scenes scrub with their
+// own easing, and input stays instant.
 $$<HTMLAnchorElement>('a[href^="#"]:not([data-register])').forEach((a) => {
   a.addEventListener('click', (e) => {
     const id = a.getAttribute('href')!;
     const target = id === '#top' ? document.body : $(id);
     if (!target) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(target as HTMLElement, { offset: id === '#top' ? 0 : -8 });
-    else target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 });
 
@@ -311,6 +302,54 @@ function closingScene() {
   });
 }
 
+/**
+ * The Demo Day banner answers the pointer: a light follows it across the
+ * panel, the cards tilt toward it, and the year resolves like a readout when
+ * the banner arrives. One rAF-throttled handler, nothing runs while idle.
+ */
+function finaleScene() {
+  const panel = $('[data-finale]');
+  if (!panel) return;
+  const year = $('[data-scramble]', panel);
+  if (year) {
+    const final = year.dataset.scramble ?? '';
+    ScrollTrigger.create({
+      trigger: panel, start: 'top 80%', once: true,
+      onEnter: () => {
+        let frame = 0;
+        const id = window.setInterval(() => {
+          frame++;
+          year.textContent = final.split('').map((ch, i) => (frame > 6 + i * 4 ? ch : String(Math.floor(Math.random() * 10)))).join('');
+          if (frame > 6 + final.length * 4) window.clearInterval(id);
+        }, 45);
+      },
+    });
+  }
+  if (!finePointer) return;
+  const cards = $$('.finale__cards li', panel);
+  let raf = 0;
+  let ev: PointerEvent | null = null;
+  const update = () => {
+    raf = 0;
+    if (!ev) return;
+    const r = panel.getBoundingClientRect();
+    panel.style.setProperty('--mx', `${(((ev.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+    panel.style.setProperty('--my', `${(((ev.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
+    cards.forEach((c) => {
+      const b = c.getBoundingClientRect();
+      const nx = Math.max(-1, Math.min(1, (ev!.clientX - (b.left + b.width / 2)) / (b.width / 2 + 120)));
+      const ny = Math.max(-1, Math.min(1, (ev!.clientY - (b.top + b.height / 2)) / (b.height / 2 + 120)));
+      c.style.setProperty('--ry', `${(nx * 7).toFixed(2)}deg`);
+      c.style.setProperty('--rx', `${(-ny * 7).toFixed(2)}deg`);
+    });
+  };
+  panel.addEventListener('pointermove', (e) => { ev = e; if (!raf) raf = requestAnimationFrame(update); });
+  panel.addEventListener('pointerleave', () => {
+    ev = null;
+    cards.forEach((c) => { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); });
+  });
+}
+
 function reveals() {
   const items = $$('[data-reveal]');
   gsap.set(items, { autoAlpha: 0, y: 32 });
@@ -359,6 +398,7 @@ if (!reduceMotion) {
   loopScene();
   lampsScene();
   closingScene();
+  finaleScene();
   reveals();
   ticker();
   if (finePointer) pointerParallax();

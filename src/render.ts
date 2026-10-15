@@ -9,7 +9,7 @@
  * Every illustration is an isometric blueprint drawn in src/blueprint/.
  */
 import {
-  site, nav as navLinks, hero, ladder, loop, lights, value, doors, register, problems, faq, closing, finale, footer as foot,
+  site, nav as navLinks, footerNav, hero, ladder, loop, lights, value, doors, register, problems, faq, closing, finale, footer as foot,
 } from './content';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -52,13 +52,15 @@ function navBar() {
   return `
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav" data-nav>
-  <nav class="nav__links" aria-label="Sections">
-    ${navLinks.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('\n    ')}
-  </nav>
-  <a class="nav__logo" href="#top" aria-label="Trilight, back to top">
-    <img src="/brand/wordmark-light.svg" alt="Trilight" width="128" height="29">
-  </a>
-  <a class="nav__cta" href="#register" data-register data-section="nav">${esc(site.cta)}${arrow}</a>
+  <div class="nav__inner">
+    <a class="nav__logo" href="#top" aria-label="Trilight, back to top">
+      <img src="/brand/wordmark-light.svg" alt="Trilight" width="128" height="29">
+    </a>
+    <nav class="nav__links" aria-label="Sections">
+      ${navLinks.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('')}
+      <a class="nav__cta" href="#register" data-register data-section="nav"><i class="nav__dot" aria-hidden="true"></i><span class="nav__cta-long">${esc(site.cta)}</span><span class="nav__cta-short" aria-hidden="true">Join</span>${arrow}</a>
+    </nav>
+  </div>
 </header>`;
 }
 
@@ -89,7 +91,7 @@ function intro(markSvg: string) {
   const layer = (name: string, cls: string, eager: boolean) => `
         <picture class="${cls}">
           <source media="(max-width: 760px)" srcset="/img/${name}-sm.webp">
-          <img src="/img/${name}.webp" width="2600" height="2028" alt="" decoding="async"${eager ? ' fetchpriority="high"' : ''}>
+          <img src="/img/${name}.webp" width="2600" height="2028" alt="" decoding="async" fetchpriority="${eager ? 'high' : 'low'}">
         </picture>`;
   return `
 <section class="scene scene--intro bp-grid" id="top" aria-labelledby="hero-title">
@@ -99,7 +101,7 @@ function intro(markSvg: string) {
         ${layer('hero-base', 'city__layer', true)}
         ${fig.overlay}
         ${layer('hero-front', 'city__layer', false)}
-        <img class="city__hand" data-city-hand src="${HAND_IMG.src}" alt="" width="${HAND_IMG.w}" height="${HAND_IMG.h}" decoding="async"
+        <img class="city__hand" data-city-hand src="${HAND_IMG.src}" alt="" width="${HAND_IMG.w}" height="${HAND_IMG.h}" decoding="async" fetchpriority="low"
           style="left:${pct(fig.hand.left, HERO_W)};top:${pct(fig.hand.top, HERO_H)};width:${pct(fig.hand.width, HERO_W)}">
       </div>
     </div>
@@ -248,7 +250,7 @@ function doorsSection() {
           (d, i) => `
       <article class="door${i === 0 ? ' door--main' : ''}" data-reveal>
         <span class="door__edge" aria-hidden="true"></span>
-        <div class="door__media" data-door-media>${media(d)}</div>
+        <div class="door__media" data-door-media>${media(d)}<span class="door__scan" aria-hidden="true"></span></div>
         <div class="door__body">
           <h3 class="h3">${esc(d.name)}</h3>
           <ul class="door__steps">${d.points.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
@@ -353,10 +355,11 @@ function closingSection() {
 <section class="section finale" id="demo-day" aria-labelledby="finale-title">
   <div class="wrap">
     <h2 id="finale-title" class="finale__title">${esc(finale.title[0])} <span>${esc(finale.title[1])}</span></h2>
-    <div class="finale__panel" data-reveal>
+    <div class="finale__panel" data-reveal data-finale>
+      <span class="finale__trace" aria-hidden="true"></span>
       <div class="finale__date">
         <p class="label"><span>${esc(finale.kicker)}</span></p>
-        <p class="finale__when"><span>${esc(finale.month)}</span><b>${esc(finale.year)}</b></p>
+        <p class="finale__when"><span>${esc(finale.month)}</span><b data-scramble="${esc(finale.year)}">${esc(finale.year)}</b></p>
         <p class="fine">${esc(finale.note)}</p>
       </div>
       <div class="finale__body">
@@ -380,7 +383,7 @@ function footer() {
       <p class="fine">${esc(foot.line)}</p>
     </div>
     <nav class="footer__links" aria-label="Footer">
-      ${navLinks.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('\n      ')}
+      ${footerNav.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('\n      ')}
     </nav>
   </div>
 </footer>

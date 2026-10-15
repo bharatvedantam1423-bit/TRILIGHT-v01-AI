@@ -20,8 +20,11 @@ export const site = {
   cta: 'Join the Program',
 };
 
-/** Nav labels (Figma skeleton header). */
-export const nav = [
+/** Top bar: one link beside the call to action. */
+export const nav = [{ href: '#demo-day', label: 'Demo Day' }];
+
+/** Footer links (labels from the Figma skeleton header). */
+export const footerNav = [
   { href: '#ladder', label: 'The ladder' },
   { href: '#loop', label: 'The loop' },
   { href: '#demo-day', label: 'Demo Day' },
