@@ -9,7 +9,7 @@
  */
 import { loopCard } from './board';
 import { stageFigure } from './ladder';
-import { heroFigure } from './hero';
+import { heroLayers } from './hero';
 import { journeyFigure, forceFigure } from './journey';
 
 const BUCKETS = 10;
@@ -31,9 +31,9 @@ export function stage(id: string, label: string) {
   return drawable(stageFigure(id, label));
 }
 
-export function heroScene(label: string) {
-  const f = heroFigure(label);
-  return { ...f, svg: drawable(f.svg) };
+export function heroScene() {
+  const f = heroLayers();
+  return { ...f, overlay: drawable(f.overlay) };
 }
 
 export function journey(id: string, label: string) {

@@ -74,31 +74,41 @@ navy grid paper, built at build time from real solids with correct hidden lines
 iso kit, MIT). Each figure draws itself in like a pen, back to front, then its
 fills settle in.
 
-1. **Hero · the circuit city.** A dense board drawn in isometric line art,
+1. **Hero · the circuit city.** A dense board in isometric line art,
    components standing like buildings round an empty socket. On scroll the
    copy clears, a hand with tweezers seats the Trilight chip, the copper lights
-   out from the socket, and the camera dives into the chip.
-2. **The ladder (pinned).** The drawing on the left grows from a pencil sketch
-   of a drone (Idea) to its simulation wireframe (Model), the bare prototype
-   with its flight-controller chip (Prototype) and the finished drone with a
-   robotic rover (Product); the step on the right changes with it.
-3. **Fundamentals.** One sense → decide → act board framed in three cards:
-   signal pulses run along the copper and the motor pulley turns.
-4. **The three forces.** One drawing per light: Build (a second identical unit
-   and its BOM/SOP/QA sheet), Test (a rover on a roller rig), Deploy (a drone
-   delivering parcels). Each light, and the LED in its drawing, turns on in turn.
-5. **Closing.** The finished drone and rover draw in above the last call to
-   action, followed by the Demo Day program finale.
+   out from the socket, and the camera pushes into the chip. The static board
+   is prerendered to images (see below), so scrolling only moves pictures.
+2. **The ladder (pinned).** Title on top; the drawing on the left grows from a
+   pencil sketch of a drone to its wireframe model, the bare prototype and the
+   finished drone with a rover, while the one active step reads on the right.
+3. **Fundamentals.** One sense → decide → act board framed in three cards.
+4. **The three forces.** One drawing per light (Build, Test, Deploy), drawn
+   with the scroll position itself; each light turns on as its drawing completes.
+5. **Closing.** Two robot arms either side of a glass block with the Trilight
+   logo; as you scroll in they wake into pose and the left arm lights the block.
 
 - `prefers-reduced-motion` and no-JS get a static, fully drawn, readable page.
 - Figure text (callouts, alt text) lives in `src/content.ts` (`anatomy`, `loop`, `ladder`, `value`).
 
 ## Assets
 
+**Optional media slots** (drop the file in and rebuild; nothing else to change):
+
+| File | Replaces |
+|---|---|
+| `public/img/door-standard.webp`, `public/img/door-fasttrack.webp` | The drawings on the two doors (16:9) |
+| `public/video/closing.mp4` (+ optional `closing-poster.webp`) | The drawn robot-arm stage in the closing section (plays muted, looped, in view) |
+
+**Hero board images.** `public/img/hero-base(-sm).webp` and `hero-front(-sm).webp`
+are rendered from `src/blueprint/hero.ts`. After changing the board, run
+`node scripts/render-hero.mjs` (needs Playwright with Chromium and Python Pillow).
+The hand is `public/img/hand.webp`, a cut-out of the supplied line drawing.
+
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `src/blueprint/`: the figures, as code. `hero.ts` (circuit city, chip and
-  hand), `journey.ts` (ladder stages and the three forces), `vehicles.ts`
+- `src/blueprint/`: the figures, as code. `hero.ts` (circuit city and chip),
+  `robots.ts` (closing stage), `journey.ts` (ladder stages and the three forces), `vehicles.ts`
   (drone and rover), `board.ts` (the loop cards), `ladder.ts` (field node), `parts.ts` (ICs,
   passives, headers, jumpers), `blueprint.css` (palette and draw-on).
 - `public/img/`: the problem photos were generated for this page with Magnific

@@ -207,5 +207,5 @@ const forces: Record<string, () => string> = { build: forceBuild, test: forceTes
 export function forceFigure(id: string, label: string) {
   const build = forces[id];
   if (!build) return '';
-  return k.figureSvg({ width: FORCE_W, height: FORCE_H, label, className: 'bp-svg bp-draw', body: build() });
+  return k.figureSvg({ width: FORCE_W, height: FORCE_H, label, className: 'bp-svg bp-scrub', body: build() });
 }

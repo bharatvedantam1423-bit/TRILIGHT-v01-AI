@@ -11,8 +11,14 @@
 import {
   site, nav as navLinks, hero, ladder, loop, lights, value, doors, register, problems, faq, closing, finale, footer as foot,
 } from './content';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import * as bp from './blueprint';
-import { HERO_W, HERO_H } from './blueprint/hero';
+import { robotStage } from './blueprint/robots';
+import { HERO_W, HERO_H, HAND_IMG } from './blueprint/hero';
+
+/** True when an optional asset has been dropped into /public. */
+const hasAsset = (path: string) => existsSync(resolve(__dirname, '../public', path));
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -77,12 +83,26 @@ function drawingFrame(markSvg: string) {
  * seats the chip, the board powers up and the camera dives into the chip.
  */
 function intro(markSvg: string) {
-  const fig = bp.heroScene(hero.figureLabel);
+  const fig = bp.heroScene();
   const data = { w: HERO_W, h: HERO_H, lift: fig.lift, centre: fig.centre };
+  const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+  const layer = (name: string, cls: string, eager: boolean) => `
+        <picture class="${cls}">
+          <source media="(max-width: 760px)" srcset="/img/${name}-sm.webp">
+          <img src="/img/${name}.webp" width="2600" height="2028" alt="" decoding="async"${eager ? ' fetchpriority="high"' : ''}>
+        </picture>`;
   return `
 <section class="scene scene--intro bp-grid" id="top" aria-labelledby="hero-title">
   <div class="sticky">
-    <div class="city" data-city>${fig.svg}</div>
+    <div class="city" data-city>
+      <div class="city__stage" data-city-stage role="img" aria-label="${esc(hero.figureLabel)}">
+        ${layer('hero-base', 'city__layer', true)}
+        ${fig.overlay}
+        ${layer('hero-front', 'city__layer', false)}
+        <img class="city__hand" data-city-hand src="${HAND_IMG.src}" alt="" width="${HAND_IMG.w}" height="${HAND_IMG.h}" decoding="async"
+          style="left:${pct(fig.hand.left, HERO_W)};top:${pct(fig.hand.top, HERO_H)};width:${pct(fig.hand.width, HERO_W)}">
+      </div>
+    </div>
     <div class="city__shade" aria-hidden="true"></div>
     ${drawingFrame(markSvg)}
 
@@ -101,42 +121,48 @@ function intro(markSvg: string) {
 }
 
 /*
- * 2 · The ladder: pinned. The drawing on the left grows from a sketch into a
- * finished drone; the step on the right changes with it. Every arrow between
- * steps is a Technology Readiness Review.
+ * 2 · The ladder: pinned. The title sits on top; below it the drawing grows on
+ * the left while the step changes on the right. One thing moves at a time.
  */
 function ladderSection() {
   const groups = ladder.groups;
+  const n = groups.length;
   return `
 <section class="journey" id="ladder" aria-labelledby="ladder-title">
   <div class="journey__sticky">
-    <div class="wrap journey__grid">
-      <div class="journey__stage" aria-hidden="true">
-        ${groups.map((g, i) => `<div class="journey__fig${i === 0 ? ' is-active' : ''}" data-journey-fig>${bp.journey(g.figure, g.figureLabel)}</div>`).join('')}
-        <span class="journey__tag" data-journey-tag>${esc(groups[0]!.step)}</span>
-      </div>
-      <div class="journey__copy">
-        ${label(ladder.kicker)}
-        <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
+    <div class="wrap">
+      <header class="journey__head">
+        <div>
+          ${label(ladder.kicker)}
+          <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
+        </div>
         <p class="lede">${esc(ladder.body)}</p>
-        <ol class="journey__gates" aria-hidden="true">
-          ${groups.map((g, i) => `<li class="${i === 0 ? 'is-on' : ''}" data-journey-gate><span>${String(i + 1).padStart(2, '0')}</span><b>${esc(g.title)}</b></li>`).join('')}
-        </ol>
+      </header>
+      <div class="journey__grid">
+        <div class="journey__left">
+          <div class="journey__stage" aria-hidden="true">
+            ${groups.map((g, i) => `<div class="journey__fig${i === 0 ? ' is-active' : ''}" data-journey-fig>${bp.journey(g.figure, g.figureLabel)}</div>`).join('')}
+          </div>
+          <ol class="journey__gates" aria-hidden="true">
+            ${groups.map((g, i) => `<li class="${i === 0 ? 'is-on' : ''}" data-journey-gate><b>${esc(g.title)}</b></li>`).join('')}
+          </ol>
+        </div>
         <div class="journey__steps">
           ${groups
             .map(
               (g, i) => `
           <div class="journey__step${i === 0 ? ' is-active' : ''}" data-journey-step>
-            <p class="journey__n">${esc(g.step)}</p>
+            <p class="journey__count"><b>${String(i + 1).padStart(2, '0')}</b> / ${String(n).padStart(2, '0')}</p>
             <h3 class="journey__title">${esc(g.title)}</h3>
+            <p class="journey__n">${esc(g.step)}</p>
             <dl class="journey__rows">
               ${g.rows.map((r) => `<div><dt>${esc(r.level)}</dt><dd>${esc(r.text)}</dd>${r.grant ? `<dd class="journey__grant">${esc(r.grant)}</dd>` : ''}</div>`).join('')}
             </dl>
           </div>`,
             )
             .join('')}
+          <p class="fine journey__foot">${esc(ladder.footnote)}</p>
         </div>
-        <p class="fine journey__foot">${esc(ladder.footnote)}</p>
       </div>
     </div>
   </div>
@@ -190,28 +216,29 @@ function lightsSection() {
 </section>`;
 }
 
-/* 5 · What it takes: the field build on the left, the numbers on the right. */
+/* 5 · What it takes: the point, then the numbers. Nothing else. */
 function valueSection() {
   return `
 <section class="section value" id="value" aria-labelledby="value-title">
   <div class="wrap">
     ${head(value.kicker, value.headline, 'value-title')}
-    <div class="value__grid">
-      <div class="value__copy">
-        <p class="value__lines">${value.lines.map((l) => `<span>${esc(l)}</span>`).join('')}</p>
-        <p class="lede">${esc(value.body)}</p>
-        <div class="value__fig" data-reveal>${bp.stage('trl5', value.figureLabel)}</div>
-      </div>
-      <dl class="stats6">
-        ${value.stats.map((s) => `<div data-reveal><dd>${esc(s.value)}</dd><dt>${esc(s.label)}</dt></div>`).join('')}
-      </dl>
+    <div class="value__intro" data-reveal>
+      <p class="value__lines">${value.lines.map((l) => `<span>${esc(l)}</span>`).join('')}</p>
+      <p class="lede">${esc(value.body)}</p>
     </div>
+    <dl class="stats6">
+      ${value.stats.map((s) => `<div data-reveal><dd>${esc(s.value)}</dd><dt>${esc(s.label)}</dt></div>`).join('')}
+    </dl>
   </div>
 </section>`;
 }
 
-/* 6 · Two doors in. */
+/* 6 · Two doors in, each with its picture (a photo when supplied, else a drawing). */
 function doorsSection() {
+  const media = (d: (typeof doors.items)[number]) =>
+    hasAsset(`img/${d.image}.webp`)
+      ? `<img src="/img/${d.image}.webp" alt="${esc(d.imageAlt)}" loading="lazy" decoding="async">`
+      : bp.journey(d.figure, d.imageAlt);
   return `
 <section class="section doors" id="doors" aria-labelledby="doors-title">
   <div class="wrap">
@@ -222,9 +249,12 @@ function doorsSection() {
           (d, i) => `
       <article class="door${i === 0 ? ' door--main' : ''}" data-reveal>
         <span class="door__edge" aria-hidden="true"></span>
-        <h3 class="h3">${esc(d.name)}</h3>
-        <ul class="door__steps">${d.points.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
-        ${d.note ? `<p class="muted door__note">${esc(d.note)}</p>` : ''}
+        <div class="door__media" data-door-media>${media(d)}</div>
+        <div class="door__body">
+          <h3 class="h3">${esc(d.name)}</h3>
+          <ul class="door__steps">${d.points.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+          ${d.note ? `<p class="muted door__note">${esc(d.note)}</p>` : ''}
+        </div>
       </article>`,
         )
         .join('')}
@@ -234,16 +264,15 @@ function doorsSection() {
 </section>`;
 }
 
-/* 7 · Who can join: three bracket cards. */
+/* 7 · Who can join: three cards. */
 function registerSection() {
   return `
 <section class="section register" id="register" aria-labelledby="register-title">
   <div class="wrap">
     ${head(register.kicker, register.headline, 'register-title')}
-    <ul class="brackets">
-      ${register.steps.map((s) => `<li class="bracket" data-reveal><h3 class="h3">${esc(s.name)}</h3><p class="muted">${esc(s.text)}</p></li>`).join('')}
+    <ul class="join-cards">
+      ${register.steps.map((s, i) => `<li class="join-card" data-reveal><span class="join-card__n">${String(i + 1).padStart(2, '0')}</span><h3 class="h3">${esc(s.name)}</h3><p class="muted">${esc(s.text)}</p></li>`).join('')}
     </ul>
-    <div class="register__cta">${cta('register', 'btn--lg')}</div>
   </div>
 </section>`;
 }
@@ -298,12 +327,25 @@ function faqSection() {
 </section>`;
 }
 
+/*
+ * 10 · CTA. The stage: two robot arms either side of a glass block with the
+ * Trilight logo; the left arm lights it. A video replaces it when supplied.
+ */
+function closingScene() {
+  const v = closing.video;
+  if (hasAsset(`video/${v}.mp4`)) {
+    const poster = hasAsset(`video/${v}-poster.webp`) ? ` poster="/video/${v}-poster.webp"` : '';
+    return `<div class="stagebox stagebox--video"><video src="/video/${v}.mp4"${poster} muted loop playsinline preload="metadata" data-closing-video aria-label="${esc(closing.sceneLabel)}"></video></div>`;
+  }
+  return robotStage(closing.sceneLabel);
+}
+
 /* 10 · CTA, then the program finale: Demo Day. */
 function closingSection() {
   return `
-<section class="closing bp-grid" id="join" aria-labelledby="closing-title">
+<section class="closing" id="join" aria-labelledby="closing-title">
+  ${closingScene()}
   <div class="closing__inner">
-    <div class="closing__fig" data-closing-fig>${bp.journey('product', 'The finished drone flying over its landing pad, with a robotic rover beside it')}</div>
     <h2 id="closing-title" class="closing__title">${esc(closing.headline)}</h2>
     ${cta('closing', 'btn--lg')}
   </div>

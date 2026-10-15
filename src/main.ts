@@ -101,50 +101,56 @@ type CityData = { w: number; h: number; lift: [number, number]; centre: [number,
 const draw = (svg: Element | null | undefined) => svg?.classList.add('is-drawn');
 
 /**
- * The hero. The circuit city draws itself in on load behind the copy. On
- * scroll the copy clears, a hand brings the chip in and seats it, the copper
- * lights out from the socket, and the camera dives into the chip.
+ * The hero. The prerendered board fades in behind the copy and the chip draws
+ * itself. On scroll the copy clears, the hand brings the chip in and seats it,
+ * the copper lights out from the socket, and the camera pushes into the chip.
+ * Only transforms and a few attributes change per frame, so it stays smooth.
  */
 function introScene() {
   const q = gsap.utils.selector(intro);
-  const svg = $<SVGSVGElement>('[data-city] svg', intro)!;
+  const stage = $('[data-city-stage]', intro)!;
+  const live = $<SVGSVGElement>('.city__live', stage)!;
+  const chip = $('[data-hero-chip]', live)!;
+  const hand = $('[data-city-hand]', stage)!;
   const data = JSON.parse($('[data-city-data]', intro)!.textContent ?? '{}') as CityData;
-  const chip = $('[data-hero-chip]', svg)!;
-  const hand = $('[data-hero-hand]', svg)!;
-  // Drop: 1 = held up at lift height, 0 = seated. Out: the hand pulling away.
+  // Drop: 1 = held at lift height, 0 = seated. Out: the hand pulling away.
   const state = { drop: 2.2, out: 0, power: 0 };
+  let unit = stage.offsetWidth / data.w;
   const apply = () => {
     const [lx, ly] = data.lift;
-    const t = `translate(${(lx * state.drop).toFixed(2)} ${(ly * state.drop).toFixed(2)})`;
-    chip.setAttribute('transform', t);
-    hand.setAttribute('transform', `translate(${(lx * state.drop + 260 * state.out).toFixed(2)} ${(ly * state.drop - 420 * state.out).toFixed(2)})`);
-    svg.style.setProperty('--power', state.power.toFixed(3));
-    svg.style.setProperty('--power-on', state.power > 0.01 ? '1' : '0');
+    chip.setAttribute('transform', `translate(${(lx * state.drop).toFixed(2)} ${(ly * state.drop).toFixed(2)})`);
+    const hx = (lx * state.drop + 260 * state.out) * unit;
+    const hy = (ly * state.drop - 420 * state.out) * unit;
+    hand.style.transform = `translate3d(${hx.toFixed(1)}px, ${hy.toFixed(1)}px, 0)`;
+    live.style.setProperty('--power', state.power.toFixed(3));
+    live.style.setProperty('--power-on', state.power > 0.01 ? '1' : '0');
   };
   apply();
-  gsap.set(svg, { transformOrigin: `${((data.centre[0] / data.w) * 100).toFixed(2)}% ${((data.centre[1] / data.h) * 100).toFixed(2)}%` });
+  window.addEventListener('resize', () => { unit = stage.offsetWidth / data.w; apply(); });
+  gsap.set(stage, { transformOrigin: `${((data.centre[0] / data.w) * 100).toFixed(2)}% ${((data.centre[1] / data.h) * 100).toFixed(2)}%` });
 
   gsap.timeline({ defaults: { duration: 1.2, ease: 'power3.out' } })
+    .fromTo(q('.city__layer'), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.8, ease: 'power2.inOut', stagger: 0.15 }, 0)
     .from(q('.dwg__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.1)
     .from(q('.dwg__ruler, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
     .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
-  window.setTimeout(() => draw(svg), 200);
+  window.setTimeout(() => draw(live), 600);
 
   const mm = gsap.matchMedia();
   mm.add({ phone: '(max-width: 760px)', wide: '(min-width: 761px)' }, (ctx) => {
     const isPhone = ctx.conditions?.phone;
     gsap.set(q('[data-hero]'), { yPercent: isPhone ? 0 : -46 });
     // The city sits right of the copy on desktop, under it on a phone.
-    gsap.set(svg, isPhone ? { x: 0, y: () => window.innerHeight * 0.18, scale: 1 } : { x: () => window.innerWidth * 0.2, y: 0, scale: 0.92 });
+    gsap.set(stage, isPhone ? { x: 0, y: () => window.innerHeight * 0.18, scale: 1 } : { x: () => window.innerWidth * 0.2, y: 0, scale: 0.92 });
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
-      scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true },
+      scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true },
       onUpdate: apply,
     });
     tl.to(q('[data-hero]'), { autoAlpha: 0, x: isPhone ? 0 : -60, y: isPhone ? -40 : 0, duration: 0.9 }, 0)
       .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.4 }, 0)
       .to(q('.city__shade'), { autoAlpha: 0, duration: 1 }, 0.1)
-      .to(svg, { x: 0, y: 0, scale: isPhone ? 1.25 : 1.05, duration: 1.3, ease: 'power2.inOut' }, 0.2)
+      .to(stage, { x: 0, y: 0, scale: isPhone ? 1.25 : 1.05, duration: 1.3, ease: 'power2.inOut' }, 0.2)
       // The hand brings the chip in from above, pauses over the socket, seats it.
       .to(hand, { opacity: 1, duration: 0.3 }, 0.8)
       .to(state, { drop: 0.35, duration: 1.4, ease: 'power2.out' }, 0.8)
@@ -153,10 +159,10 @@ function introScene() {
       .to(hand, { opacity: 0, duration: 0.4 }, 3.8)
       // Power-up: the copper lights out from the socket.
       .to(state, { power: 1, duration: 1.1 }, 3.4)
-      // The dive into the chip, then a cut to the ladder.
+      // A short push into the chip, then a fade to the ladder.
       .to(q('.dwg'), { autoAlpha: 0, duration: 0.4 }, 4.6)
-      .to(svg, { scale: isPhone ? 12 : 9, duration: 1.6, ease: 'power3.in' }, 4.7)
-      .to(q('.dive'), { opacity: 1, duration: 0.5 }, 5.9);
+      .to(stage, { scale: isPhone ? 3 : 2.4, duration: 1.4, ease: 'power2.in' }, 4.7)
+      .to(q('.dive'), { opacity: 1, duration: 0.6 }, 5.5);
     apply();
     return () => tl.scrollTrigger?.kill();
   });
@@ -223,39 +229,73 @@ function ladderScene() {
   });
 }
 
+/**
+ * The three forces draw with the scroll, not after it: each drawing's --d
+ * follows the scroll position, and its light turns on as the drawing completes.
+ * Side by side (desktop) they go left to right; stacked (phone) each follows
+ * its own card.
+ */
 function lampsScene() {
-  const sec = $('#lights');
   const list = $('[data-lamps]');
+  if (!list) return;
   const beam = $('[data-lamp-beam]');
-  if (!sec || !list) return;
   const lamps = $$('[data-lamp]', list);
-  ScrollTrigger.create({
-    trigger: list,
-    start: 'top 72%',
-    end: 'bottom 55%',
-    scrub: 0.4,
-    onUpdate: (self) => {
-      const p = self.progress;
-      if (beam) gsap.set(beam, { scaleX: p });
-      const on = p > 0.9 ? 3 : p > 0.45 ? 2 : p > 0.02 ? 1 : 0;
-      lamps.forEach((l, i) => {
-        l.classList.toggle('is-on', i < on);
-        if (i < on) draw($('svg', l));
-      });
-    },
+  const figs = lamps.map((l) => $<SVGSVGElement>('svg', l)!);
+  const set = (i: number, d: number) => {
+    figs[i]?.style.setProperty('--d', d.toFixed(3));
+    lamps[i]?.classList.toggle('is-on', d > 0.92);
+  };
+  const clamp = gsap.utils.clamp(0, 1);
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 900px)', () => {
+    const st = ScrollTrigger.create({
+      trigger: list, start: 'top 85%', end: 'bottom 55%', scrub: true,
+      onUpdate: (self) => {
+        const p = self.progress;
+        if (beam) gsap.set(beam, { scaleX: p });
+        lamps.forEach((_, i) => set(i, clamp((p - i * 0.27) / 0.46)));
+      },
+    });
+    return () => st.kill();
+  });
+  mm.add('(max-width: 899px)', () => {
+    const sts = lamps.map((l, i) => ScrollTrigger.create({
+      trigger: l, start: 'top 90%', end: 'center 50%', scrub: true,
+      onUpdate: (self) => set(i, self.progress),
+    }));
+    return () => sts.forEach((t) => t.kill());
   });
 }
 
+/**
+ * Closing: the arms wake from rest into their pose as the section scrolls in,
+ * then the left arm's beam lights the glass block. A supplied video plays
+ * while in view instead.
+ */
 function closingScene() {
   const sec = $('.closing');
   if (!sec) return;
   const q = gsap.utils.selector(sec);
-  ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: () => draw($('[data-closing-fig] svg', sec)) });
-  const fig = $('.value__fig svg');
-  if (fig) ScrollTrigger.create({ trigger: fig, start: 'top 80%', once: true, onEnter: () => draw(fig) });
-  gsap.from(q('.closing__inner > :not([data-closing-fig])'), {
+  const video = $<HTMLVideoElement>('[data-closing-video]', sec);
+  if (video) {
+    ScrollTrigger.create({ trigger: sec, start: 'top 80%', end: 'bottom 20%', onToggle: (self) => (self.isActive ? video.play().catch(() => {}) : video.pause()) });
+  }
+  const joints = $$<SVGGElement>('[data-joint]', sec);
+  if (joints.length) {
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: sec, start: 'top 85%', end: 'top 15%', scrub: 0.6 } });
+    joints.forEach((j) => {
+      const [ox, oy] = (j.dataset.origin ?? '0 0').split(' ').map(Number);
+      const from = Number(j.dataset.rest);
+      const to = Number(j.dataset.pose);
+      j.removeAttribute('transform');
+      tl.fromTo(j, { rotation: from, svgOrigin: `${ox} ${oy}` }, { rotation: to, svgOrigin: `${ox} ${oy}`, duration: 1, ease: 'power2.inOut' }, 0);
+    });
+    tl.fromTo(q('[data-beam]'), { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.85)
+      .fromTo(q('.stage__glass'), { '--glow': 0 }, { '--glow': 1, duration: 0.35 }, 0.85);
+  }
+  gsap.from(q('.closing__inner > *'), {
     autoAlpha: 0, y: 30, duration: 0.9, ease: 'power3.out', stagger: 0.08,
-    scrollTrigger: { trigger: sec, start: 'top 60%', once: true },
+    scrollTrigger: { trigger: q('.closing__inner')[0], start: 'top 85%', once: true },
   });
 }
 
@@ -267,6 +307,11 @@ function reveals() {
     once: true,
     onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, overwrite: true }),
   });
+
+  // Drawings outside the scroll scenes draw in as they arrive.
+  $$('[data-door-media] svg').forEach((svg) =>
+    ScrollTrigger.create({ trigger: svg, start: 'top 85%', once: true, onEnter: () => draw(svg) }),
+  );
 
   // Kicker rules draw in as each section head arrives.
   $$('.head').forEach((h) =>

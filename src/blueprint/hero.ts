@@ -159,43 +159,17 @@ function chip(c: Ctx) {
     + c.engrave('TRL-08', 0, 16, Z + 7.4, 6.5, 'mid', 'middle');
 }
 
-/* The hand, in its own frame: tweezer tip at the origin, +u up the tweezers. */
-const capsule = (u0: number, u1: number, v: number, r: number) =>
-  `M${u0} ${v - r}L${u1} ${v - r}A${r} ${r} 0 0 1 ${u1} ${v + r}L${u0} ${v + r}A${r} ${r} 0 0 1 ${u0} ${v - r}Z`;
-const nail = (u: number, v: number, r: number) =>
-  `M${u + r * 0.25} ${v - r * 0.55}Q${u - r * 0.15} ${v} ${u + r * 0.25} ${v + r * 0.55}L${u + r * 1.25} ${v + r * 0.55}Q${u + r * 1.5} ${v} ${u + r * 1.25} ${v - r * 0.55}Z`;
-const crease = (u: number, v: number, r: number) => `M${u} ${v - r * 0.7}Q${u - r * 0.25} ${v} ${u} ${v + r * 0.7}`;
+/** The hand drawing (public/img/hand.webp): its size and where the tweezer tip is. */
+export const HAND_IMG = { src: '/img/hand.webp', w: 1254, h: 1254, tipX: 303, tipY: 1108 };
 
-function handSvg() {
-  const part = (d: string, extra = '') => `<path class="bp-hand__fill" d="${d}"/><path class="bp-hand__line" d="${d}"/>${extra}`;
-  const L = 360; // tweezer length
-  const leg = (s: number) => {
-    // A tapering tweezer leg with an inner edge line and a knurled grip.
-    const pts = [[0, s * 1], [L - 14, s * 7], [L, s * 12], [L, s * 15], [L - 14, s * 17], [0, s * 3]];
-    const d = `M${pts.map((p) => p.join(' ')).join('L')}Z`;
-    const grip = Array.from({ length: 7 }, (_, i) => {
-      const u = 170 + i * 9;
-      const w0 = 1 + (6 / (L - 14)) * u;
-      return `M${u} ${s * (w0 + 0.8)}L${u + 4} ${s * (w0 + 2.6)}`;
-    }).join('');
-    return part(d, `<path class="bp-hand__detail" d="M10 ${s * 2}L${L - 20} ${s * 11}${grip}"/>`);
-  };
-  const r = 18;
-  const o = 120; // where the grip starts along the tweezers
-  return [
-    // Ring and middle fingers curled behind, then the back of the hand.
-    part(capsule(o + 85, o + 300, -70, r + 1), `<path class="bp-hand__detail" d="${crease(o + 140, -70, r) + crease(o + 200, -70, r)}"/>`),
-    part(capsule(o + 60, o + 300, -36, r + 1), `<path class="bp-hand__detail" d="${nail(o + 60, -36, r) + crease(o + 125, -36, r) + crease(o + 185, -36, r)}"/>`),
-    part(`M${o + 210} -104C${o + 260} -130 ${o + 350} -120 ${o + 400} -70L${o + 440} 40C${o + 420} 120 ${o + 350} 150 ${o + 290} 140L${o + 210} 120Z`),
-    leg(-1),
-    // Thumb under the tweezers, index finger over them.
-    part(capsule(o + 30, o + 250, 26, r), `<path class="bp-hand__detail" d="${nail(o + 30, 26, r) + crease(o + 105, 26, r)}"/>`),
-    leg(1),
-    part(capsule(o, o + 270, -6, r - 1), `<path class="bp-hand__detail" d="${nail(o, -6, r - 1) + crease(o + 72, -6, r - 1) + crease(o + 140, -6, r - 1)}"/>`),
-  ].join('');
-}
-
-export function heroFigure(label: string) {
+/**
+ * The hero in layers. The board never changes, so it ships as two prerendered
+ * images (scripts/render-hero.mjs): `base` (board and the parts behind the
+ * socket) and `front` (the low parts in front of it, over the chip). Only what
+ * moves stays live SVG: the copper's power-up and the chip. The hand is an
+ * image placed so its tweezer tip sits on the chip.
+ */
+export function heroLayers() {
   // Framed tight: the board runs off every edge, like a city seen from a tower.
   const P = k.fitProjection(k.boxCorners({ x: -175, y: -175, w: 350, d: 350, r: 0 }, 0, 40), HERO_W, HERO_H, { pad: 0 });
   const c = ctx(P);
@@ -206,18 +180,23 @@ export function heroFigure(label: string) {
   const front = items.filter((i) => c.depth(i.at) > seam);
   const lift = k.axisVector(P, [0, 0, LIFT]);
   const centre = c.at([0, 0, Z + 7]);
-  // Tweezer tip on the chip's top face, a little toward the far corner.
-  const tip = c.at([-6, -6, Z + 7.4]);
+  const tip = c.at([-8, -8, Z + 7.4]);
   const chipW = Math.hypot(...([0, 1].map((i) => c.at([CHIP / 2, -CHIP / 2, Z])[i]! - c.at([-CHIP / 2, CHIP / 2, Z])[i]!)) as [number, number]);
-  const handScale = chipW / 190;
-  const body = [
-    `<g data-hero-board>${b.svg}${c.sorted(behind)}</g>`,
-    `<g class="bp-power-layer" data-hero-power>${b.power}</g>`,
-    // Seated by default (no-JS, reduced motion); the scroll scene lifts it.
-    `<g data-hero-chip>${chip(c)}</g>`,
-    `<g data-hero-front>${c.sorted(front)}</g>`,
-    `<g class="bp-hand" data-hero-hand transform="translate(${lift[0].toFixed(2)} ${lift[1].toFixed(2)})"><g transform="translate(${tip[0].toFixed(1)} ${tip[1].toFixed(1)}) rotate(-58) scale(${handScale.toFixed(3)})">${handSvg()}</g></g>`,
-  ].join('');
-  const svg = k.figureSvg({ width: HERO_W, height: HERO_H, label, className: 'bp-svg bp-svg--hero bp-svg--crop bp-draw', body });
-  return { svg, lift, centre };
+  // The hand drawn so its tweezers run about 1.6 chip widths, fingers in frame.
+  const handW = chipW * 2.5;
+  const hand = {
+    left: tip[0] - (HAND_IMG.tipX / HAND_IMG.w) * handW,
+    top: tip[1] - (HAND_IMG.tipY / HAND_IMG.h) * handW,
+    width: handW,
+  };
+  const svg = (className: string, body: string, label = '') =>
+    k.figureSvg({ width: HERO_W, height: HERO_H, label, className, body }).replace(label ? '' : ' role="img" aria-label=""', label ? '' : ' aria-hidden="true"');
+  return {
+    base: svg('bp-svg', `${b.svg}${c.sorted(behind)}`),
+    front: svg('bp-svg', c.sorted(front)),
+    overlay: svg('bp-svg bp-draw city__live', `<g class="bp-power-layer">${b.power}</g><g data-hero-chip>${chip(c)}</g>`),
+    lift,
+    centre,
+    hand,
+  };
 }

@@ -141,11 +141,16 @@ export const doors = {
       name: 'Standard Door',
       points: ['Learn the basics of hardware and AIoT', 'Clear checkpoints'],
       note: 'The score against your evaluation will decide your entry',
+      // Photo slot: drop /public/img/door-standard.webp in and it replaces the drawing.
+      image: 'door-standard', figure: 'idea',
+      imageAlt: 'A student learning hardware basics at a lab bench',
     },
     {
       name: 'Fastrack Door',
       points: ['Showcase your working prototype and get a direct entry to the program'],
       note: null,
+      image: 'door-fasttrack', figure: 'prototype',
+      imageAlt: 'A student team showing a working drone prototype',
     },
   ],
 };
@@ -234,6 +239,10 @@ export const faq = {
 /* 10 · CTA and the program finale ---------------------------------------- */
 export const closing = {
   headline: 'Come, Make Your Ideas Real with TRILIGHT',
+  // Video slot: drop /public/video/closing.mp4 (and closing-poster.webp) in and
+  // it replaces the drawn robot-arm scene.
+  video: 'closing',
+  sceneLabel: 'Two robot arms on a workbench either side of a glass block carrying the Trilight logo; the left arm lights it with a teal beam.',
 };
 
 export const finale = {

@@ -125,3 +125,18 @@
   background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
   background-position: center center;
 }
+
+/* ---------------------------------------------------------------- scrubbed
+   Figures marked bp-scrub draw with the scroll itself: the page sets --d
+   (0 → 1) and each line draws in its painter's-order slot, with no timers. */
+.bp-scrub [data-k="0"] { --k: 0; } .bp-scrub [data-k="1"] { --k: 0.1; } .bp-scrub [data-k="2"] { --k: 0.2; }
+.bp-scrub [data-k="3"] { --k: 0.3; } .bp-scrub [data-k="4"] { --k: 0.4; } .bp-scrub [data-k="5"] { --k: 0.5; }
+.bp-scrub [data-k="6"] { --k: 0.6; } .bp-scrub [data-k="7"] { --k: 0.7; } .bp-scrub [data-k="8"] { --k: 0.8; }
+.bp-scrub [data-k="9"] { --k: 0.9; }
+.motion .bp-scrub .iso-line:not([data-dashed]) {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: clamp(0, calc(1 - (var(--d, 0) * 1.8 - var(--k, 0) * 0.8) * 1.4), 1);
+}
+.motion .bp-scrub .iso-fill, .motion .bp-scrub .iso-shade, .motion .bp-scrub .iso-top { fill-opacity: clamp(0, calc((var(--d, 0) - 0.55) * 2.6), 1); }
+.motion .bp-scrub .iso-line[data-dashed], .motion .bp-scrub .iso-dots, .motion .bp-scrub .iso-face-text, .motion .bp-scrub .bp-led { opacity: clamp(0, calc((var(--d, 0) - 0.6) * 2.6), 1); }
+.motion .bp-scrub .iso-halo { opacity: clamp(0, calc((var(--d, 0) - 0.6) * 1.4), 0.55); }
