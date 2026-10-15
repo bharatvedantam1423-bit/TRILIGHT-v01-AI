@@ -132,11 +132,21 @@ function introScene() {
   gsap.set(stage, { transformOrigin: `${((data.centre[0] / data.w) * 100).toFixed(2)}% ${((data.centre[1] / data.h) * 100).toFixed(2)}%` });
 
   gsap.timeline({ defaults: { duration: 1.2, ease: 'power3.out' } })
-    .fromTo(q('.city__layer'), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.8, ease: 'power2.inOut', stagger: 0.15 }, 0)
     .from(q('.dwg__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.1)
     .from(q('.dwg__ruler, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
     .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
-  window.setTimeout(() => draw(live), 600);
+  // The board reveals only once its image is decoded; the chip, its copper and
+  // the socket's light come in after it, never before.
+  const baseImg = $<HTMLImageElement>('.city__layer img', stage);
+  const ready = baseImg && !baseImg.complete ? baseImg.decode().catch(() => undefined) : Promise.resolve();
+  ready.then(() => {
+    gsap.set(q('.city__layer'), { visibility: 'visible' });
+    gsap.timeline()
+      .fromTo(q('.city__layer'), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.6, ease: 'power2.inOut', stagger: 0.12 }, 0)
+      .set(live, { visibility: 'visible' }, 1.1)
+      .add(() => draw(live), 1.1)
+      .fromTo(live, { '--socket-in': 0 }, { '--socket-in': 1, duration: 1.2, ease: 'power1.out' }, 1.6);
+  });
 
   const mm = gsap.matchMedia();
   mm.add({ phone: '(max-width: 760px)', wide: '(min-width: 761px)' }, (ctx) => {
@@ -146,7 +156,8 @@ function introScene() {
     gsap.set(stage, isPhone ? { x: 0, y: () => window.innerHeight * 0.18, scale: 1 } : { x: () => window.innerWidth * 0.2, y: 0, scale: 0.92 });
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
-      scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true },
+      // Ends a screen early: the last screen is the ladder sliding up over it.
+      scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom 200%', scrub: 0.6, invalidateOnRefresh: true },
       onUpdate: apply,
     });
     tl.to(q('[data-hero]'), { autoAlpha: 0, x: isPhone ? 0 : -60, y: isPhone ? -40 : 0, duration: 0.9 }, 0)
