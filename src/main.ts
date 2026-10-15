@@ -1,4 +1,5 @@
 import './styles.css';
+import './blueprint/blueprint.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
@@ -94,92 +95,145 @@ ScrollTrigger.create({
 /* ------------------------------------------------------------ motion scenes */
 
 
-/**
- * How each lab layer leaves as the camera dollies into the corridor. Nearer
- * layers travel further, which is what sells the depth.
- */
-const exits: Record<string, gsap.TweenVars> = {
-  'far-l': { xPercent: -170, scale: 1.25 },
-  'far-r': { xPercent: 170, scale: 1.25 },
-  'near-l': { xPercent: -105, scale: 1.35 },
-  'near-r': { xPercent: 105, scale: 1.35 },
-  bench: { yPercent: 110, scale: 1.15 },
-  vf: { scale: 1.25, autoAlpha: 0 },
+type CoreData = {
+  w: number;
+  h: number;
+  shift: number;
+  layers: { id: string; lift: [number, number]; left: [number, number]; right: [number, number] }[];
 };
 
+/** Adds `is-drawn` to a blueprint figure: its lines draw in, then fills settle. */
+const draw = (svg: Element | null | undefined) => svg?.classList.add('is-drawn');
+
+/**
+ * The hero blueprint. The core draws itself in on load beside the headline;
+ * on scroll the copy steps aside, the core moves to centre and comes apart
+ * into its six layers, and each layer's callout runs out to it.
+ */
 function introScene() {
   const q = gsap.utils.selector(intro);
-  const [rightBracket, leftBracket, cross] = $$<SVGPathElement>('.xmark path', intro);
-  const L = (k: string) => q(`.lab--hero [data-l="${k}"]`);
+  const fig = $('[data-core-fig]', intro)!;
+  const svg = $('svg', fig)!;
+  const data = JSON.parse($('[data-core-data]', intro)!.textContent ?? '{}') as CoreData;
+  const groups = new Map(data.layers.map((l) => [l.id, $(`[data-layer="${l.id}"]`, svg)!]));
+  const callouts = $$('[data-callout]', intro);
+  const labels = $('[data-core-labels]', intro)!;
+  const state = { e: 0, show: 0 };
+  const phone = () => window.matchMedia('(max-width: 760px)').matches;
 
-  // Entrance: the walls slide in from the edges, the bench rises, then the copy.
-  gsap.timeline({ defaults: { duration: 1.6, ease: 'power3.out' } })
-    .from([...L('far-l'), ...L('far-r')], { autoAlpha: 0, duration: 2 }, 0)
-    .from(L('near-l'), { xPercent: -40 }, 0.05)
-    .from(L('near-r'), { xPercent: 40 }, 0.05)
-    .from(L('bench'), { yPercent: 60, autoAlpha: 0 }, 0.35)
-    .from(q('.vf__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.8)
-    .from(q('.vf span'), { autoAlpha: 0, duration: 0.6, stagger: 0.08 }, 1.2)
-    .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.5);
+  // Layer offsets (viewBox units) for an explode amount e: lifted apart, and
+  // re-centred so the assembled stack sits in the middle of the drawing.
+  const offset = (lift: [number, number], e: number) => lift[1] * e + data.shift * (1 - e);
 
-  gsap.set(q('.lens'), { autoAlpha: 0, clipPath: 'circle(6% at 50% 49%)' });
-  gsap.set(q('.xmark'), { autoAlpha: 0 });
-  gsap.set(leftBracket, { x: -260, autoAlpha: 0 });
-  gsap.set(rightBracket, { x: 260, autoAlpha: 0 });
-  gsap.set(cross, { scale: 0, rotate: -90, transformOrigin: '50% 50%', autoAlpha: 0 });
-  gsap.set(q('.lens-caption'), { autoAlpha: 0, y: 24 });
-  gsap.set(q('.blackout'), { autoAlpha: 0 });
+  function layout() {
+    const e = state.e;
+    data.layers.forEach((l) => groups.get(l.id)?.setAttribute('transform', `translate(0 ${offset(l.lift, e).toFixed(2)})`));
+    const box = labels.getBoundingClientRect();
+    const r = svg.getBoundingClientRect();
+    const k = r.width / data.w;
+    const pad = phone() ? 8 : Math.max(24, box.width * 0.04);
+    callouts.forEach((c, i) => {
+      const l = data.layers.find((x) => x.id === c.dataset.callout)!;
+      const left = c.classList.contains('callout--l');
+      const [px, py] = left ? l.left : l.right;
+      const x = r.left - box.left + px * k;
+      const y = r.top - box.top + (py + offset(l.lift, e)) * k;
+      c.style.top = `${y}px`;
+      if (left) { c.style.left = `${pad}px`; c.style.width = `${Math.max(0, x - pad)}px`; }
+      else { c.style.left = `${x}px`; c.style.width = `${Math.max(0, box.width - pad - x)}px`; }
+      // Callouts arrive top layer first, once the stack has opened up.
+      const t = gsap.utils.clamp(0, 1, state.show * 1.6 - i * 0.12);
+      c.style.opacity = String(t);
+    });
+  }
 
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
+  gsap.timeline({ defaults: { duration: 1.2, ease: 'power3.out' } })
+    .from(q('.dwg__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.1)
+    .from(q('.dwg__ruler, .dwg__tag, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
+    .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
+  window.setTimeout(() => draw(svg), 250);
+
+  const mm = gsap.matchMedia();
+  mm.add({ phone: '(max-width: 760px)', wide: '(min-width: 761px)' }, (ctx) => {
+    const isPhone = ctx.conditions?.phone;
+    // Beside the copy on desktop; faint behind it on a phone.
+    // GSAP owns the transform, so the centring lives in xPercent/yPercent.
+    gsap.set(fig, { xPercent: -50, yPercent: -50 });
+    gsap.set(q('[data-hero]'), { yPercent: isPhone ? 0 : -46 });
+    gsap.set(fig, isPhone ? { x: 0, scale: 0.9, autoAlpha: 0.35 } : { x: () => window.innerWidth * 0.2, scale: 0.92, autoAlpha: 1 });
+    const tl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true },
+      onUpdate: layout,
+    });
+    tl.to(q('[data-hero]'), { autoAlpha: 0, x: isPhone ? 0 : -60, y: isPhone ? -40 : 0, duration: 1 }, 0)
+      .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.4 }, 0)
+      .to(fig, { x: 0, scale: 1, autoAlpha: 1, duration: 1.2, ease: 'power2.inOut' }, 0.2)
+      .to(state, { e: 1, duration: 2.2, ease: 'power2.inOut' }, 1.2)
+      .to(state, { show: 1, duration: 1.2 }, 2.2)
+      .fromTo(q('[data-core-head]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 2.6)
+      .to({}, { duration: 1 }, 3.6)
+      .to(q('[data-core-head], [data-core-labels]'), { autoAlpha: 0, duration: 0.6 }, 4.4)
+      .to(fig, { autoAlpha: 0, scale: 0.94, duration: 0.6 }, 4.5);
+    layout();
+    return () => tl.scrollTrigger?.kill();
   });
-
-  // 1 · dolly into the lab: walls part at their own depth, the bench drops away.
-  tl.to(q('[data-hero]'), { autoAlpha: 0, y: -60, scale: 0.94, duration: 1.6 }, 0)
-    .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.6 }, 0);
-  Object.entries(exits).forEach(([k, v]) => tl.to(L(k), { ...v, duration: 3.2 }, 0));
-  tl.to(q('.lab--hero'), { autoAlpha: 0, duration: 0.9 }, 2.6)
-
-    // 2 · at the vanishing point, two beams lock into the Trilight X.
-    .to(q('.xmark'), { autoAlpha: 1, duration: 0.3 }, 1.8)
-    .to(leftBracket, { x: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.9)
-    .to(rightBracket, { x: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 1.9)
-    .to(cross, { scale: 1, rotate: 0, autoAlpha: 1, duration: 1.6, ease: 'power2.out' }, 2.1)
-    .to(q('.xmark'), { scale: 3.2, autoAlpha: 0, duration: 1, ease: 'power1.in' }, 4.1)
-
-    // 3 · through the robot's eye.
-    .to(q('.lens'), { autoAlpha: 1, duration: 0.3 }, 4.9)
-    .to(q('.lens'), { clipPath: 'circle(80% at 50% 49%)', duration: 1.8, ease: 'power2.inOut' }, 4.95)
-    .to(q('.lens-caption'), { autoAlpha: 1, y: 0, duration: 0.9 }, 5.6)
-    .to(q('.lens-caption'), { autoAlpha: 0, y: -16, duration: 0.7 }, 7)
-    .to(q('.reticle'), { autoAlpha: 0, duration: 0.6 }, 7)
-    .to(q('.lens picture'), { scale: 9, duration: 2.6, ease: 'power2.in' }, 7)
-    .to(q('.blackout'), { autoAlpha: 1, duration: 0.6 }, 9.0);
+  window.addEventListener('resize', layout);
 }
 
+/**
+ * The board draws itself in, then the loop runs: pulses ride the copper
+ * sense → decide → act, the tags light in turn and the motor's pulley turns.
+ */
 function whatScene() {
   const scene = $('.scene--what')!;
   const q = gsap.utils.selector(scene);
+  const board = $('[data-board]', scene)!;
+  const svg = $('svg', board)!;
+  const tags = $$('[data-tag]', board);
+  const shaft = $<SVGPathElement>('.bp-shaft', svg);
+  const steps: string[] = shaft ? JSON.parse(shaft.dataset.steps ?? '[]') : [];
   gsap.set(q('[data-step="2"]'), { autoAlpha: 0, y: 30 });
+  gsap.set(tags, { autoAlpha: 0 });
+
+  // The loop: one cycle every 1.65 s, matching the pulse animation in CSS.
+  let raf = 0;
+  let t0 = 0;
+  const run = (now: number) => {
+    const t = (Math.max(0, now - t0) / 1650) % 1;
+    const live = t < 0.4 ? 0 : t < 0.73 ? 1 : 2;
+    tags.forEach((tag, i) => tag.classList.toggle('is-on', i === live));
+    if (shaft && steps.length) shaft.setAttribute('d', steps[Math.floor(Math.max(0, now - t0) / 60) % steps.length]!);
+    raf = requestAnimationFrame(run);
+  };
+  const start = () => {
+    if (raf) return;
+    board.classList.add('is-live');
+    t0 = performance.now();
+    raf = requestAnimationFrame(run);
+  };
+  const stop = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
+    board.classList.remove('is-live');
+  };
 
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: scene, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
+    scrollTrigger: {
+      trigger: scene, start: 'top 90%', end: 'bottom bottom', scrub: 0.8,
+      onEnter: () => draw(svg),
+      onToggle: (self) => (self.isActive ? start() : stop()),
+    },
   });
-
-  tl.fromTo(q('.what__bg'), { scale: 1.18, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.2 }, 0)
-    .fromTo(q('.what__shade'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.2 }, 0)
-    .fromTo(q('.what__floor i'), { scaleY: 0 }, { scaleY: 1, duration: 1.4, stagger: 0.2, ease: 'power2.out' }, 0.5)
-    .fromTo(q('.what__figure'), { yPercent: 30, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 2, ease: 'power2.out' }, 0.9)
-    .fromTo(q('[data-step="1"]'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 1.4)
-    .fromTo(q('.det'), { autoAlpha: 0, scale: 1.2 }, { autoAlpha: 1, scale: 1, duration: 0.6 }, 2.6)
+  tl.fromTo(board, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
+    .fromTo(q('[data-step="1"]'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 0.8)
+    .to(tags, { autoAlpha: 1, duration: 0.6, stagger: 0.25 }, 1.6)
     .to(q('[data-step="1"]'), { autoAlpha: 0, y: -30, duration: 0.9 }, 4.4)
     .to(q('[data-step="2"]'), { autoAlpha: 1, y: 0, duration: 0.9 }, 4.9)
     .fromTo(q('.trl li:not(.is-market) .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5, stagger: 0.16 }, 5.1)
     .fromTo(q('.trl .is-market .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 6.5)
-    // Scene change: the builder exits frame.
-    .to(q('.what__figure'), { xPercent: -110, autoAlpha: 0, duration: 1.6, ease: 'power2.in' }, 7.6)
+    .to(board, { autoAlpha: 0, x: -60, duration: 1.2, ease: 'power2.in' }, 7.8)
     .to(q('[data-step="2"]'), { autoAlpha: 0, y: -20, duration: 0.9 }, 8.2);
 }
 
@@ -210,7 +264,10 @@ function ladderScene() {
   const viewport = $('[data-ladder-viewport]', section)!;
   const trackEl = $('[data-ladder-track]', section)!;
   const stages = $$('[data-stage]', section);
-  const light = (upTo: number) => stages.forEach((s, i) => s.classList.toggle('is-lit', i <= upTo));
+  const light = (upTo: number) => stages.forEach((s, i) => {
+    s.classList.toggle('is-lit', i <= upTo);
+    if (i <= upTo + 1) draw($('svg', s));
+  });
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 900px)', () => {
@@ -237,7 +294,11 @@ function ladderScene() {
   });
   mm.add('(max-width: 899px)', () => {
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((en) => en.isIntersecting && en.target.classList.add('is-lit')),
+      (entries) => entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-lit');
+        draw($('svg', en.target));
+      }),
       { root: viewport, threshold: 0.55 },
     );
     stages.forEach((s) => io.observe(s));
@@ -268,15 +329,11 @@ function closingScene() {
   const sec = $('.closing');
   if (!sec) return;
   const q = gsap.utils.selector(sec);
-  // The lab closes back in around the final call to action.
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: { trigger: sec, start: 'top bottom', end: 'center center', scrub: 0.8 },
+  ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: () => draw($('[data-closing-fig] svg', sec)) });
+  gsap.from(q('.closing__inner > :not([data-closing-fig])'), {
+    autoAlpha: 0, y: 30, duration: 0.9, ease: 'power3.out', stagger: 0.08,
+    scrollTrigger: { trigger: sec, start: 'top 60%', once: true },
   });
-  Object.entries(exits).forEach(([k, v]) => {
-    if (k !== 'vf') tl.from(q(`[data-l="${k}"]`), { ...v, duration: 1 }, 0);
-  });
-  tl.from(q('.closing__inner'), { autoAlpha: 0, y: 40, duration: 0.6 }, 0.4);
 }
 
 function reveals() {
@@ -321,7 +378,7 @@ function reveals() {
 }
 
 function ticker() {
-  // Viewfinder timecode and the TRL counter that climbs with the page.
+  // Reel timecode and the title block's TRL counter, which climbs with the page.
   const tcs = $$('[data-timecode]');
   const t0 = performance.now();
   window.setInterval(() => {
@@ -340,21 +397,14 @@ function ticker() {
 }
 
 function pointerParallax() {
-  const depth: Record<string, number> = { 'far-l': 8, 'far-r': 8, 'near-l': 22, 'near-r': 22, bench: 16 };
-  const layers = $$<HTMLElement>('.lab--hero [data-l]')
-    .filter((el) => depth[el.dataset.l ?? ''])
-    .map((el) => {
-      const p = $('picture', el)!;
-      return {
-        x: gsap.quickTo(p, 'x', { duration: 1, ease: 'power3.out' }),
-        y: gsap.quickTo(p, 'y', { duration: 1, ease: 'power3.out' }),
-        d: depth[el.dataset.l ?? ''],
-      };
-    });
+  // The drawing tilts a few pixels toward the pointer, like paper under a lamp.
+  const fig = $('[data-core-fig] svg', intro);
+  if (!fig) return;
+  const x = gsap.quickTo(fig, 'x', { duration: 1, ease: 'power3.out' });
+  const y = gsap.quickTo(fig, 'y', { duration: 1, ease: 'power3.out' });
   intro.addEventListener('pointermove', (e) => {
-    const nx = e.clientX / window.innerWidth - 0.5;
-    const ny = e.clientY / window.innerHeight - 0.5;
-    layers.forEach((l) => { l.x(-nx * l.d); l.y(-ny * l.d * 0.6); });
+    x(-(e.clientX / window.innerWidth - 0.5) * 14);
+    y(-(e.clientY / window.innerHeight - 0.5) * 10);
   });
 }
 

@@ -17,7 +17,7 @@ export type Stage = {
   duration: string | null;
   /** null = no grant at this stage. */
   grant: string | null;
-  image: string;
+  /** Describes the stage's blueprint figure (src/blueprint/ladder.ts). */
   imageAlt: string;
 };
 
@@ -140,49 +140,49 @@ export const ladder = {
       id: 'explorer', phase: 'Pre-program', level: 'Explorer', title: 'Learn the basics',
       build: 'Solo modules on sensing, AI and hardware. Find a problem worth solving.',
       duration: '4–6 weeks', grant: null,
-      image: '/img/evo-1.webp', imageAlt: 'A pencil sketch of a drone on a notebook page',
+      imageAlt: 'Blueprint of a parts tray: a chip, LEDs, capacitors, buttons and a small dev board',
     },
     {
       id: 'trl12', phase: 'Foundation', level: 'TRL 1–2', title: 'Idea',
       build: 'Pick a real problem, form a team of 3–5 and submit a proposal.',
       duration: null, grant: null,
-      image: '/img/evo-1.webp', imageAlt: 'A pencil sketch of a drone on a notebook page',
+      imageAlt: 'Pencil sketch of a sensor node on graph paper, with a pencil beside it',
     },
     {
       id: 'trl3', phase: 'Foundation', level: 'TRL 3', title: 'Model',
       build: 'A working simulation that proves the idea can work.',
       duration: null, grant: null,
-      image: '/img/evo-2.webp', imageAlt: 'A glowing wireframe simulation model of a drone',
+      imageAlt: 'Wireframe simulation model of the sensor node, with dimensions',
     },
     {
       id: 'trl4', phase: 'Foundation', level: 'TRL 4', title: 'Prototype',
       build: 'A breadboard that senses, decides and acts.',
       duration: null, grant: '₹30K',
-      image: '/img/evo-3.webp', imageAlt: 'A rough prototype drone with exposed wires and a bare circuit board',
+      imageAlt: 'Blueprint of a breadboard prototype: a dev board, a sensor and jumper wires',
     },
     {
       id: 'trl5', phase: 'Execution', level: 'TRL 5', title: 'Proof of concept',
       build: 'Your prototype working at a real host site.',
       duration: null, grant: '₹70K',
-      image: '/img/evo-3.webp', imageAlt: 'A rough prototype drone with exposed wires and a bare circuit board',
+      imageAlt: 'Blueprint of a custom circuit board in an open enclosure, wired to a soil probe',
     },
     {
       id: 'trl6', phase: 'Execution', level: 'TRL 6', title: 'Golden sample',
       build: 'A refined unit in the hands of real users.',
       duration: null, grant: '₹1.5L',
-      image: '/img/evo-4.webp', imageAlt: 'A finished white production drone with teal lights',
+      imageAlt: 'Blueprint of the finished sensor node: closed enclosure, antenna and status light',
     },
     {
       id: 'trl7', phase: 'Execution', level: 'TRL 7', title: 'First customer',
       build: 'Your first paying customer.',
       duration: null, grant: '₹2.5L',
-      image: '/img/evo-4.webp', imageAlt: 'A finished white production drone with teal lights',
+      imageAlt: 'Blueprint of the sensor node beside its shipping carton and a paid invoice',
     },
     {
       id: 'trl8', phase: 'Execution', level: 'TRL 8', title: 'Qualified product',
       build: 'Qualified, repeatable, sold. All three lights green.',
       duration: null, grant: null,
-      image: '/img/evo-4.webp', imageAlt: 'A finished white production drone with teal lights',
+      imageAlt: 'Blueprint of three qualified sensor nodes on a test rack, all status lights on',
     },
   ] satisfies Stage[],
 };
@@ -284,4 +284,34 @@ export const closing = {
   headline: 'Come, Make Your Ideas Real with TRILIGHT',
   body: 'Joining takes under a minute with your learning portal login.',
   help: 'Need help? Ask your campus Trilight coordinator',
+};
+
+/**
+ * Hero blueprint: the exploded hardware core and its callouts (top layer
+ * first). `side` is where the callout sits in the exploded view.
+ */
+export const anatomy = {
+  kicker: 'Anatomy of a build',
+  headline: 'Every real product is built layer by layer.',
+  figureLabel:
+    'An isometric blueprint of a hardware core, exploded into six layers: a protective shield, the processing die, a signal routing grid, a neural logic array, a power distribution layer and the hardware interface base.',
+  layers: [
+    { id: 'shield', side: 'l', name: 'Protective Core Shield', text: 'A durable casing that protects what’s inside, built to survive the field, not just the bench.' },
+    { id: 'die', side: 'r', name: 'Processing Matrix', text: 'The compute layer that turns sensor readings into decisions in milliseconds.' },
+    { id: 'routing', side: 'r', name: 'Signal Routing Grid', text: 'High-density copper carrying signals between sensors, compute and memory.' },
+    { id: 'logic', side: 'l', name: 'Neural Logic Array', text: 'AI that runs on the device itself: parallel inference at the edge.' },
+    { id: 'power', side: 'r', name: 'Power Distribution Layer', text: 'Steady, efficient power so it works the same on day 300 as on day one.' },
+    { id: 'base', side: 'l', name: 'Hardware Interface Base', text: 'Where your build meets the real world: sensors, motors and the rest of the system.' },
+  ],
+};
+
+/** Fig. 2 · the sense → decide → act board in "What is Trilight". */
+export const loop = {
+  figureLabel:
+    'An isometric blueprint of a circuit board: an optical sensor on a header reads the world, a microcontroller decides, and a driver chip turns a geared motor. Signals run along the copper from sense to decide to act.',
+  tags: [
+    { id: 'sense', name: 'Sense', text: 'Reads the world' },
+    { id: 'decide', name: 'Decide', text: 'Runs the logic' },
+    { id: 'act', name: 'Act', text: 'Moves something real' },
+  ],
 };

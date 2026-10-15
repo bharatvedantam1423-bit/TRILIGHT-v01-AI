@@ -7,8 +7,11 @@
  * scroll scenes (hero frame, lens → lab stage, closing frame).
  */
 import {
-  site, hero, whatIs, lights, projects, commitments, ladder, doors, value, register, faq, faqHead, closing,
+  site, hero, whatIs, lights, projects, commitments, ladder, doors, value, register, faq, faqHead, closing, anatomy, loop,
 } from './content';
+import * as bp from './blueprint';
+import { CORE_W, CORE_H } from './blueprint/core';
+import { BOARD_W, BOARD_H } from './blueprint/board';
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -28,34 +31,6 @@ const pic = (name: string, w: number, h: number, alt = '', priority = false) => 
         <img src="/img/${name}.webp" width="${w}" height="${h}" alt="${esc(alt)}" decoding="async"${priority ? ' fetchpriority="high"' : ' loading="lazy"'}>
       </picture>`;
 
-/**
- * The lab: a dark room framed by two depths of armoured wall panels (near and
- * far, mirrored on the right), the workbench in front and, in the hero, a
- * robot-camera viewfinder. Nothing floats; every layer is anchored.
- */
-function lab(where: 'hero' | 'closing') {
-  const eager = where === 'hero';
-  const far = pic('wall-b', 608, 1400, '', eager);
-  const near = pic('wall-a', 898, 1600, '', eager);
-  return `
-    <div class="lab lab--${where}" aria-hidden="true" data-lab>
-      <div class="lab__wall lab__wall--far lab__wall--l" data-l="far-l">${far}</div>
-      <div class="lab__wall lab__wall--far lab__wall--r" data-l="far-r">${far}</div>
-      <div class="lab__wall lab__wall--near lab__wall--l" data-l="near-l">${near}</div>
-      <div class="lab__wall lab__wall--near lab__wall--r" data-l="near-r">${near}</div>
-      <div class="lab__bench" data-l="bench">${pic('bench', 2400, 746, '', eager)}<span class="lab__edge"></span></div>
-      ${where === 'hero'
-        ? `<div class="vf" data-l="vf">
-        <i class="vf__c vf__c--tl"></i><i class="vf__c vf__c--tr"></i><i class="vf__c vf__c--bl"></i><i class="vf__c vf__c--br"></i>
-        <span class="vf__rec"><i></i>Rec</span>
-        <span class="vf__tc" data-timecode>00:00:00</span>
-        <span class="vf__cam">Cam 01 · Trilight Lab</span>
-        <span class="vf__lvl">TRL <b data-trl>0</b>/8</span>
-      </div>`
-        : ''}
-    </div>`;
-}
-
 function nav() {
   return `
 <a class="skip" href="#main">Skip to content</a>
@@ -72,22 +47,35 @@ function nav() {
 </header>`;
 }
 
-function intro(markSvg: string) {
+/** Pencil filter for the sketch-stage figures, defined once for the page. */
+const defs = `<svg class="bp-defs" width="0" height="0" aria-hidden="true" focusable="false"><filter id="bp-pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter></svg>`;
+
+/**
+ * Engineering-drawing frame around the hero: corner registration marks, edge
+ * rulers and a title block, with the TRL counter that climbs with the page.
+ */
+function drawingFrame(markSvg: string) {
   return `
-<section class="scene scene--intro" id="top" aria-labelledby="hero-title">
+    <div class="dwg" aria-hidden="true">
+      <i class="dwg__c dwg__c--tl"></i><i class="dwg__c dwg__c--tr"></i><i class="dwg__c dwg__c--bl"></i><i class="dwg__c dwg__c--br"></i>
+      <span class="dwg__ruler dwg__ruler--top"></span><span class="dwg__ruler dwg__ruler--left"></span>
+      <span class="dwg__tag">Fig. 01 · Iso 30°</span>
+      <div class="dwg__block">
+        <span class="dwg__logo">${markSvg}</span>
+        <span><small>Dwg</small>TRL-08 Core</span>
+        <span><small>Scale</small>4 : 1</span>
+        <span><small>Level</small><span>TRL <b data-trl>0</b>/8</span></span>
+      </div>
+    </div>`;
+}
+
+function intro(markSvg: string) {
+  const fig = bp.core(anatomy.figureLabel);
+  const data = { w: CORE_W, h: CORE_H, shift: fig.centreShift, layers: fig.info };
+  return `
+<section class="scene scene--intro bp-grid" id="top" aria-labelledby="hero-title">
   <div class="sticky">
-    <div class="glow" aria-hidden="true"></div>
-
-    <div class="lens only-motion" aria-hidden="true">
-      <picture>
-        <source media="(max-width: 760px)" srcset="/img/eye-sm.webp">
-        <img src="/img/eye.webp" width="1920" height="1080" alt="" fetchpriority="low" decoding="async">
-      </picture>
-      <div class="reticle"><i></i><i></i></div>
-    </div>
-    <div class="xmark only-motion" aria-hidden="true">${markSvg}</div>
-
-    ${lab('hero')}
+    ${drawingFrame(markSvg)}
 
     <div class="hero" data-hero>
       <h1 id="hero-title" class="hero__headline">${esc(hero.headline).replace(/(\S+-\S+)/g, '<span class="nowrap">$1</span>')}</h1>
@@ -96,31 +84,34 @@ function intro(markSvg: string) {
       <dl class="facts" aria-label="Key facts">${hero.stats.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>
     </div>
 
+    <figure class="core" data-core>
+      <div class="core__fig" data-core-fig>${fig.svg}</div>
+      <figcaption class="core__head" data-core-head>
+        <p class="label"><span>${esc(anatomy.kicker)}</span></p>
+        <p class="core__title">${esc(anatomy.headline)}</p>
+      </figcaption>
+      <ol class="core__labels" data-core-labels>
+        ${anatomy.layers.map((l) => `<li class="callout callout--${l.side}" data-callout="${l.id}"><span class="callout__text"><b>${esc(l.name)}</b><span>${esc(l.text)}</span></span><i class="callout__line"></i></li>`).join('')}
+      </ol>
+      <script type="application/json" data-core-data>${JSON.stringify(data)}</script>
+    </figure>
+
     <p class="scrollcue" aria-hidden="true"><span></span>Scroll</p>
-    <p class="lens-caption only-motion" aria-hidden="true">Seeing the world the way a machine does.</p>
-    <div class="blackout only-motion" aria-hidden="true"></div>
   </div>
 </section>`;
 }
 
 function what() {
   const levels = Array.from({ length: 9 }, (_, i) => i + 1);
+  const fig = bp.board(loop.figureLabel);
+  const pct = ([x, y]: [number, number]) => `left:${((x / BOARD_W) * 100).toFixed(2)}%;top:${((y / BOARD_H) * 100).toFixed(2)}%`;
   return `
-<section class="scene scene--what" id="what" aria-labelledby="what-title">
+<section class="scene scene--what bp-grid" id="what" aria-labelledby="what-title">
   <div class="sticky">
-    <picture class="what__bg" aria-hidden="true">
-      <source media="(max-width: 760px)" srcset="/img/stage-sm.webp">
-      <img src="/img/stage.webp" width="1920" height="1080" alt="" fetchpriority="low" decoding="async">
-    </picture>
-    <div class="what__shade" aria-hidden="true"></div>
-    <figure class="what__figure">
-      <picture>
-        <source media="(max-width: 760px)" srcset="/img/student-sm.webp">
-        <img src="/img/student.webp" width="1100" height="976" alt="A NIAT student kneeling to adjust a small wheeled robot" fetchpriority="low" decoding="async">
-      </picture>
-      <span class="det" aria-hidden="true"><span>Robot</span><b>Sense → Decide → Act</b></span>
+    <figure class="what__figure" data-board>
+      ${fig.svg}
+      ${loop.tags.map((t) => `<span class="tag" data-tag="${t.id}" style="${pct(fig.anchors[t.id as keyof typeof fig.anchors])}" aria-hidden="true"><b>${esc(t.name)}</b><span>${esc(t.text)}</span></span>`).join('')}
     </figure>
-    <div class="what__floor" aria-hidden="true"><i></i><i></i></div>
     <div class="what__copy">
       <div class="what__step" data-step="1">
         ${label(whatIs.kicker, '01')}
@@ -151,8 +142,7 @@ function sectionHead(n: string, kicker: string, title: string, id: string, body?
 
 function lightsSection() {
   return `
-<section class="section lights" id="lights" aria-labelledby="lights-title">
-  <div class="lights__bg" aria-hidden="true">${pic('lab-2', 1920, 1080)}</div>
+<section class="section lights bp-grid" id="lights" aria-labelledby="lights-title">
   <div class="wrap">
     ${sectionHead('05', lights.kicker, lights.headline, 'lights-title', lights.body, true)}
     <ol class="lamps" data-lamps>
@@ -291,7 +281,7 @@ function ladderSection() {
           <p class="stage__phase">${firstOfPhase ? esc(s.phase) : '&nbsp;'}</p>
           <div class="stage__gate" aria-hidden="true"><span class="stage__line"></span><span class="stage__node">${i === 0 ? '' : 'TRR'}</span></div>
           <div class="stage__card">
-            <div class="stage__img"><img src="${s.image}" alt="${esc(s.imageAlt)}" width="560" height="560" loading="lazy" decoding="async"></div>
+            <div class="stage__img">${bp.stage(s.id, s.imageAlt)}</div>
             <p class="stage__level">${esc(s.level)}</p>
             <h3 class="h3">${esc(s.title)}</h3>
             <p class="stage__build">${esc(s.build)}</p>
@@ -398,9 +388,9 @@ ${projectsSection()}
   </div>
 </section>
 
-<section class="closing" id="join" aria-labelledby="closing-title">
-  ${lab('closing')}
+<section class="closing bp-grid" id="join" aria-labelledby="closing-title">
   <div class="closing__inner">
+    <div class="closing__fig" data-closing-fig>${bp.stage('trl8', 'Blueprint of three qualified units on a test rack, all three lights on')}</div>
     <h2 id="closing-title" class="closing__title">${esc(closing.headline)}</h2>
     <p class="hero__sub">${esc(closing.body)}</p>
     ${cta('closing', 'btn--lg')}
@@ -440,6 +430,7 @@ function footer() {
 
 export function renderBody(opts: { markSvg: string; helpEmail: string }) {
   return [
+    defs,
     nav(),
     '<main id="main">',
     intro(opts.markSvg),

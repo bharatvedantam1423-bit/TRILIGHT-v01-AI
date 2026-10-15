@@ -63,32 +63,39 @@ Student project media (Makers Conclave): add entries to `projects` in
 
 ## Motion and performance
 
-The motion follows the reference recording's grammar, in Trilight's brand:
+Every illustration is an isometric **blueprint**: hardware drawn as line art on
+navy grid paper, built at build time from real solids with correct hidden lines
+(`src/blueprint/`, using the vendored [Anatomy](https://github.com/wheresryan22/anatomy)
+iso kit, MIT). Each figure draws itself in like a pen, back to front, then its
+fills settle in.
 
-1. **Hero lab.** A dark room framed by two depths of armoured octagon/hexagon
-   wall panels with blue light seams, and the workbench in front, seen through
-   a robot-camera viewfinder (REC, timecode, TRL counter). The walls slide in
-   on load and follow the mouse at different depths.
-2. **Dolly in.** On scroll the camera pushes into the corridor: walls part,
-   kit slides past, the Trilight X locks at the vanishing point, then a robot
-   eye opens like an iris and the camera zooms through its pupil.
-3. **The lab stage.** The builder and robot rise in on the left, floor light
-   lines draw in, the NASA TRL scale fills (stopping at 8), then they exit.
-4. **Sections.** Lamps light along a beam (three green lights), project reel
-   with scanline and timecode, line icons that draw themselves, problem photos
-   with detection boxes, a pinned sideways ladder whose review gates light up,
-   brand-octagon doors with a travelling edge light, numbers that count up,
+1. **Hero.** An engineering-drawing frame (registration corners, rulers, title
+   block with a TRL counter) around the Trilight core: a six-layer hardware
+   stack beside the headline. On scroll it moves to centre and explodes into
+   its layers (shield, processing matrix, routing grid, neural logic array,
+   power distribution, interface base), each with a callout.
+2. **What is Trilight.** A sense → decide → act circuit board: signal pulses
+   run along the copper from the sensor to the MCU to the motor driver, the
+   tags light in turn and the motor pulley turns. Then the NASA TRL scale fills.
+3. **The ladder.** One product, a field sensor node, at every stage: parts
+   tray, pencil sketch, simulation wireframe, breadboard, open enclosure in the
+   field, golden sample, unit with its carton and paid invoice, and three
+   qualified units with all three lights on. Each draws in as its gate lights.
+4. **Sections.** Lamps on a beam, project reel, self-drawing line icons,
+   problem photos with detection boxes, brand-octagon doors, count-up numbers,
    connected register steps.
-5. **Closing.** The lab closes back in around "Ready to build what's NEXT?".
+5. **Closing.** The qualified units draw in above the last call to action.
 
-- `prefers-reduced-motion` and no-JS get a static, fully readable page.
-- Phones get smaller image variants and fewer objects. JS is ~52 KB gzipped.
+- `prefers-reduced-motion` and no-JS get a static, fully drawn, readable page.
+- Figure copy (callouts, tags, alt text) lives in `src/content.ts` (`anatomy`, `loop`, ladder `imageAlt`).
 
 ## Assets
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `public/img/`: `wall-a`, `wall-b`, `bench`, `lab-2`, `eye`,
-  `stage`, `student`, `evo-*` and the problem photos were generated for this page with Magnific (Seedream),
-  with backgrounds removed for the layered cut-outs. They're illustrative, not
-  photos of real NIAT projects.
+- `src/blueprint/`: the figures, as code. `core.ts` (hero stack), `board.ts`
+  (sense → decide → act), `ladder.ts` (stage figures), `parts.ts` (ICs,
+  passives, headers, jumpers), `blueprint.css` (palette and draw-on).
+- `public/img/`: `lab-2` (project reel) and the problem photos were generated
+  for this page with Magnific (Seedream). They're illustrative, not photos of
+  real NIAT projects.
