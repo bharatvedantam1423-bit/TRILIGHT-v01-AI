@@ -81,7 +81,7 @@ ScrollTrigger.create({
 
 /* ------------------------------------------------------------ scroll depth */
 
-['#what', '#ladder', '#value', '#faq'].forEach((sel) => {
+['#ladder', '#loop', '#value', '#faq'].forEach((sel) => {
   const el = $(sel);
   if (!el) return;
   ScrollTrigger.create({
@@ -171,9 +171,8 @@ function introScene() {
       .to(fig, { x: 0, scale: 1, autoAlpha: 1, duration: 1.2, ease: 'power2.inOut' }, 0.2)
       .to(state, { e: 1, duration: 2.2, ease: 'power2.inOut' }, 1.2)
       .to(state, { show: 1, duration: 1.2 }, 2.2)
-      .fromTo(q('[data-core-head]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 2.6)
       .to({}, { duration: 1 }, 3.6)
-      .to(q('[data-core-head], [data-core-labels]'), { autoAlpha: 0, duration: 0.6 }, 4.4)
+      .to(q('[data-core-labels]'), { autoAlpha: 0, duration: 0.6 }, 4.4)
       .to(fig, { autoAlpha: 0, scale: 0.94, duration: 0.6 }, 4.5);
     layout();
     return () => tl.scrollTrigger?.kill();
@@ -182,59 +181,53 @@ function introScene() {
 }
 
 /**
- * The board draws itself in, then the loop runs: pulses ride the copper
- * sense → decide → act, the tags light in turn and the motor's pulley turns.
+ * The loop: each card's board block draws in as it arrives; while the section
+ * is on screen the copper carries pulses sense → decide → act and the motor's
+ * pulley turns.
  */
-function whatScene() {
-  const scene = $('.scene--what')!;
-  const q = gsap.utils.selector(scene);
-  const board = $('[data-board]', scene)!;
-  const svg = $('svg', board)!;
-  const tags = $$('[data-tag]', board);
-  const shaft = $<SVGPathElement>('.bp-shaft', svg);
+function loopScene() {
+  const sec = $('#loop');
+  if (!sec) return;
+  const cards = $$('.card3__fig svg', sec);
+  const shaft = $<SVGPathElement>('.bp-shaft', sec);
   const steps: string[] = shaft ? JSON.parse(shaft.dataset.steps ?? '[]') : [];
-  gsap.set(q('[data-step="2"]'), { autoAlpha: 0, y: 30 });
-  gsap.set(tags, { autoAlpha: 0 });
-
-  // The loop: one cycle every 1.65 s, matching the pulse animation in CSS.
+  cards.forEach((svg, i) => ScrollTrigger.create({
+    trigger: svg, start: 'top 85%', once: true,
+    onEnter: () => window.setTimeout(() => draw(svg), i * 180),
+  }));
   let raf = 0;
   let t0 = 0;
   const run = (now: number) => {
-    const t = (Math.max(0, now - t0) / 1650) % 1;
-    const live = t < 0.4 ? 0 : t < 0.73 ? 1 : 2;
-    tags.forEach((tag, i) => tag.classList.toggle('is-on', i === live));
     if (shaft && steps.length) shaft.setAttribute('d', steps[Math.floor(Math.max(0, now - t0) / 60) % steps.length]!);
     raf = requestAnimationFrame(run);
   };
-  const start = () => {
-    if (raf) return;
-    board.classList.add('is-live');
-    t0 = performance.now();
-    raf = requestAnimationFrame(run);
-  };
-  const stop = () => {
-    cancelAnimationFrame(raf);
-    raf = 0;
-    board.classList.remove('is-live');
-  };
-
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: {
-      trigger: scene, start: 'top 90%', end: 'bottom bottom', scrub: 0.8,
-      onEnter: () => draw(svg),
-      onToggle: (self) => (self.isActive ? start() : stop()),
+  ScrollTrigger.create({
+    trigger: sec, start: 'top 60%', end: 'bottom 30%',
+    onToggle: (self) => {
+      sec.classList.toggle('is-live', self.isActive);
+      if (self.isActive && !raf) { t0 = performance.now(); raf = requestAnimationFrame(run); }
+      if (!self.isActive) { cancelAnimationFrame(raf); raf = 0; }
     },
   });
-  tl.fromTo(board, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0)
-    .fromTo(q('[data-step="1"]'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 0.8)
-    .to(tags, { autoAlpha: 1, duration: 0.6, stagger: 0.25 }, 1.6)
-    .to(q('[data-step="1"]'), { autoAlpha: 0, y: -30, duration: 0.9 }, 4.4)
-    .to(q('[data-step="2"]'), { autoAlpha: 1, y: 0, duration: 0.9 }, 4.9)
-    .fromTo(q('.trl li:not(.is-market) .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5, stagger: 0.16 }, 5.1)
-    .fromTo(q('.trl .is-market .trl__bar'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 6.5)
-    .to(board, { autoAlpha: 0, x: -60, duration: 1.2, ease: 'power2.in' }, 7.8)
-    .to(q('[data-step="2"]'), { autoAlpha: 0, y: -20, duration: 0.9 }, 8.2);
+}
+
+/**
+ * The ladder: each step draws in as it arrives, and its review gate lights
+ * once the drawing is done. Steps that share a row (desktop) run left to
+ * right; stacked steps (phone) each go as they scroll into view.
+ */
+function ladderScene() {
+  const sec = $('#ladder');
+  if (!sec) return;
+  const steps = $$('[data-step4]', sec);
+  steps.forEach((step) => ScrollTrigger.create({
+    trigger: step, start: 'top 80%', once: true,
+    onEnter: () => {
+      const row = steps.filter((s) => s.offsetTop === step.offsetTop);
+      const delay = row.indexOf(step) * 450;
+      window.setTimeout(() => { draw($('svg', step)); step.classList.add('is-lit'); }, delay);
+    },
+  }));
 }
 
 function lampsScene() {
@@ -259,77 +252,13 @@ function lampsScene() {
   });
 }
 
-function ladderScene() {
-  const section = $('#ladder')!;
-  const viewport = $('[data-ladder-viewport]', section)!;
-  const trackEl = $('[data-ladder-track]', section)!;
-  const stages = $$('[data-stage]', section);
-  const light = (upTo: number) => stages.forEach((s, i) => {
-    s.classList.toggle('is-lit', i <= upTo);
-    if (i <= upTo + 1) draw($('svg', s));
-  });
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
-    const distance = () => Math.max(0, trackEl.scrollWidth - viewport.clientWidth);
-    light(0);
-    const tween = gsap.to(trackEl, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${distance() + window.innerHeight * 0.35}`,
-        pin: true,
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => light(Math.round(self.progress * (stages.length - 1))),
-      },
-    });
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-      gsap.set(trackEl, { clearProps: 'transform' });
-    };
-  });
-  mm.add('(max-width: 899px)', () => {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        en.target.classList.add('is-lit');
-        draw($('svg', en.target));
-      }),
-      { root: viewport, threshold: 0.55 },
-    );
-    stages.forEach((s) => io.observe(s));
-    return () => io.disconnect();
-  });
-}
-
-function stepsScene() {
-  const list = $('[data-steps]');
-  const beam = $('[data-steps-beam]');
-  if (!list || !beam) return;
-  const items = $$('[data-step-item]', list);
-  const vertical = () => window.matchMedia('(max-width: 899px)').matches;
-  ScrollTrigger.create({
-    trigger: list,
-    start: 'top 75%',
-    end: 'bottom 55%',
-    scrub: 0.4,
-    onUpdate: (self) => {
-      const p = self.progress;
-      gsap.set(beam, vertical() ? { scaleY: p, scaleX: 1 } : { scaleX: p, scaleY: 1 });
-      items.forEach((it, i) => it.classList.toggle('is-lit', p >= i / (items.length - 1) - 0.02));
-    },
-  });
-}
-
 function closingScene() {
   const sec = $('.closing');
   if (!sec) return;
   const q = gsap.utils.selector(sec);
   ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: () => draw($('[data-closing-fig] svg', sec)) });
+  const fig = $('.value__fig svg');
+  if (fig) ScrollTrigger.create({ trigger: fig, start: 'top 80%', once: true, onEnter: () => draw(fig) });
   gsap.from(q('.closing__inner > :not([data-closing-fig])'), {
     autoAlpha: 0, y: 30, duration: 0.9, ease: 'power3.out', stagger: 0.08,
     scrollTrigger: { trigger: sec, start: 'top 60%', once: true },
@@ -349,51 +278,16 @@ function reveals() {
   $$('.head').forEach((h) =>
     ScrollTrigger.create({ trigger: h, start: 'top 85%', once: true, onEnter: () => h.classList.add('is-in') }),
   );
-
-  // Line icons draw themselves.
-  $$<SVGElement>('[data-draw] svg *').forEach((el) => {
-    const len = (el as unknown as SVGGeometryElement).getTotalLength?.() ?? 100;
-    gsap.fromTo(el, { strokeDasharray: len, strokeDashoffset: len }, {
-      strokeDashoffset: 0, duration: 1.4, ease: 'power2.out',
-      scrollTrigger: { trigger: el.closest('.row')!, start: 'top 82%', once: true },
-    });
-  });
-
-  // Big numbers count up once.
-  $$('[data-count]').forEach((el) => {
-    const raw = el.dataset.count ?? '';
-    const m = raw.match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
-    if (!m) return;
-    const [, pre, num, post] = m;
-    const target = parseFloat(num);
-    if (target === 0) return;
-    const o = { v: 0 };
-    el.textContent = `${pre}0${post}`;
-    gsap.to(o, {
-      v: target, duration: 1.4, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 85%', once: true },
-      onUpdate: () => { el.textContent = `${pre}${Math.round(o.v)}${post}`; },
-    });
-  });
 }
 
 function ticker() {
-  // Reel timecode and the title block's TRL counter, which climbs with the page.
-  const tcs = $$('[data-timecode]');
-  const t0 = performance.now();
-  window.setInterval(() => {
-    if (document.hidden) return;
-    const s = Math.floor((performance.now() - t0) / 1000);
-    const txt = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map((n) => String(n).padStart(2, '0')).join(':');
-    tcs.forEach((t) => { t.textContent = txt; });
-  }, 1000);
+  // The title block's TRL counter climbs with the page.
   const trl = $('[data-trl]');
-  if (trl) {
-    ScrollTrigger.create({
-      start: 0, end: 'max',
-      onUpdate: (self) => { trl.textContent = String(Math.min(8, Math.round(self.progress * 8))); },
-    });
-  }
+  if (!trl) return;
+  ScrollTrigger.create({
+    start: 0, end: 'max',
+    onUpdate: (self) => { trl.textContent = String(Math.min(8, Math.round(self.progress * 8))); },
+  });
 }
 
 function pointerParallax() {
@@ -410,10 +304,9 @@ function pointerParallax() {
 
 if (!reduceMotion) {
   introScene();
-  whatScene();
-  lampsScene();
   ladderScene();
-  stepsScene();
+  loopScene();
+  lampsScene();
   closingScene();
   reveals();
   ticker();

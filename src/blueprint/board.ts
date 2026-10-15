@@ -1,16 +1,17 @@
 /**
- * Fig. 2 · Sense → decide → act, as one real board.
+ * The loop · sense → decide → act, as one real board seen in three cards.
  *
  * A sensor breakout on a pin header reads the world (SENSE), a QFP
  * microcontroller decides (DECIDE), and a driver IC switches a geared motor
- * through a screw terminal (ACT). The copper between them carries the signal:
- * each net is drawn twice, once as the trace and once as a lit pulse path the
- * page runs along it, stage by stage.
+ * through a screw terminal (ACT). Each card frames its own block of the same
+ * board, so the copper runs out of one card and into the next. Every net is
+ * drawn twice: once as the trace, once as a lit pulse path the page runs
+ * along it, stage by stage.
  */
 import { k, ctx, ic, smd, header, hole, type Ctx, type Plan, type Point3 } from './parts';
 
-export const BOARD_W = 760;
-export const BOARD_H = 560;
+export const CARD_W = 400;
+export const CARD_H = 320;
 
 const PCB: Plan = { x: -170, y: -80, w: 340, d: 160, r: 7 };
 const PCB_H = 4;
@@ -159,29 +160,33 @@ function motor(c: Ctx) {
   return out.join('');
 }
 
-export function boardFigure(label: string) {
-  const extreme: Point3[] = [...k.boxCorners(PCB, -14, PCB_H), [MOTOR.x, MOTOR.y, MOTOR_TOP + 4], [MOTOR.x - MOTOR_R, MOTOR.y - MOTOR_R, 0]];
-  const P = k.fitProjection(extreme, BOARD_W, BOARD_H, { pad: 20 });
+type Stage = 'sense' | 'decide' | 'act';
+
+/** The board block each card frames (its silkscreen outline), and how tall its parts stand. */
+const REGIONS: Record<Stage, { plan: Plan; top: number }> = {
+  sense: { plan: { x: -160, y: -66, w: 82, d: 120, r: 0 }, top: 30 },
+  decide: { plan: { x: -40, y: -50, w: 84, d: 102, r: 0 }, top: 12 },
+  act: { plan: { x: 58, y: -70, w: 104, d: 136, r: 0 }, top: MOTOR_TOP + 4 },
+};
+
+export function loopCard(stage: Stage, label: string) {
+  const r = REGIONS[stage];
+  const P = k.fitProjection(k.boxCorners(r.plan, 0, r.top), CARD_W, CARD_H, { pad: 26 });
   const c = ctx(P);
-  // Parts paint back to front by their anchor.
-  const parts = [
-    { at: [SENSOR.x, SENSOR.y, Z] as Point3, svg: `<g data-part="sense">${sensor(c)}</g>` },
-    { at: [MCU.x, MCU.y, Z] as Point3, svg: `<g data-part="decide">${mcu(c)}</g>` },
-    { at: [DRIVER.x, DRIVER.y, Z] as Point3, svg: `<g data-part="act">${driver(c)}</g>` },
-    { at: [MOTOR.x, MOTOR.y, Z] as Point3, svg: `<g data-part="motor">${motor(c)}</g>` },
-    { at: [TERMINAL.x, TERMINAL.y, Z] as Point3, svg: `<g data-part="terminal">${terminal(c)}</g>` },
-  ];
-  const anchors = {
-    sense: c.at([SENSOR.x + 4, SENSOR.y + 4, Z + 17]),
-    decide: c.at([MCU.x, MCU.y, Z + 4]),
-    act: c.at([MOTOR.x, MOTOR.y, MOTOR_TOP + 2]),
-  };
-  const svg = k.figureSvg({
-    width: BOARD_W,
-    height: BOARD_H,
+  // The card shows its own parts; the board and its copper run on past the frame.
+  const parts =
+    stage === 'sense' ? sensor(c)
+      : stage === 'decide' ? mcu(c)
+        : c.sorted([
+          { at: [DRIVER.x, DRIVER.y, Z], svg: driver(c) },
+          { at: [MOTOR.x, MOTOR.y, Z], svg: motor(c) },
+          { at: [TERMINAL.x, TERMINAL.y, Z], svg: terminal(c) },
+        ]);
+  return k.figureSvg({
+    width: CARD_W,
+    height: CARD_H,
     label,
-    className: 'bp-svg bp-draw',
-    body: [pcb(c), copper(c), c.sorted(parts)].join(''),
+    className: 'bp-svg bp-svg--crop bp-draw',
+    body: [pcb(c), copper(c), parts].join(''),
   });
-  return { svg, anchors };
 }

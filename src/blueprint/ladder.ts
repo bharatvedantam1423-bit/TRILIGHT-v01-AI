@@ -1,16 +1,13 @@
 /**
- * Ladder figures: one product, a field sensor node, at every stage of the
- * Trilight ladder. All eight share one camera and scale so the set reads as a
- * single object growing up:
+ * Ladder figures: one product, a field sensor node, as it grows up. All share
+ * one camera and scale so the set reads as a single object:
  *
- *   explorer  a parts tray: the basics, loose on the bench
- *   trl12     a pencil sketch of the node on graph paper
- *   trl3      the node as a simulation wireframe with dimensions
- *   trl4      a breadboard prototype with jumpers
- *   trl5      a custom PCB in an open enclosure, probe in the soil
- *   trl6      the golden sample, closed and finished
- *   trl7      the unit beside its shipping carton and a paid invoice
- *   trl8      three qualified units on a test rack, all three lights lit
+ *   trl12     Idea: a pencil sketch of the node on graph paper
+ *   trl3      Model: the node as a simulation wireframe with dimensions
+ *   trl4      Prototype: a breadboard with jumpers
+ *   trl5      a custom PCB in an open enclosure, probe in the soil (What it takes)
+ *   trl6      the golden sample, closed and finished (closing CTA)
+ *   trl8      Product: three qualified units on a test rack, all three lights lit
  */
 import { k, ctx, ic, smd, header, hole, jumper, wireBox, rng, type Plan, type Point3 } from './parts';
 
@@ -81,73 +78,7 @@ function closedNode(ox: number, oy: number, { led = true, lit = true } = {}) {
   return out.join('');
 }
 
-/** A shipping carton with tape, flaps seam and a label on the near face. */
-function carton(plan: Plan, z: number, h: number) {
-  const zt = z + h;
-  const out: string[] = [c.box(plan, z, h, { tone: 'mid', crease: 'lo' }, 2, 0.8)];
-  const midY = plan.y + plan.d / 2;
-  out.push(c.L(k.lineOnTop([plan.x, midY], [plan.x + plan.w, midY], zt, P), { tone: 'lo' }));
-  out.push(c.L(k.planOutline({ x: plan.x, y: midY - 4, w: plan.w, d: 8, r: 0 }, zt, P, 1), { tone: 'mid' }));
-  // Label on the +y face.
-  const fy = plan.y + plan.d;
-  const lx = plan.x + plan.w * 0.55;
-  out.push(c.L(c.path3([[lx, fy, z + h * 0.35], [lx + 18, fy, z + h * 0.35], [lx + 18, fy, z + h * 0.75], [lx, fy, z + h * 0.75]], true), { tone: 'mid' }));
-  // "This side up" arrows on the +x face.
-  const fx = plan.x + plan.w;
-  const ay = plan.y + plan.d * 0.3;
-  out.push(c.L(c.path3([[fx, ay, z + h * 0.3], [fx, ay, z + h * 0.7]]) + c.path3([[fx, ay - 3, z + h * 0.6], [fx, ay, z + h * 0.7], [fx, ay + 3, z + h * 0.6]]), { tone: 'lo' }));
-  return out.join('');
-}
-
 /* ------------------------------------------------------------------ stages */
-
-function explorer() {
-  const tray: Plan = { x: -104, y: -70, w: 208, d: 140, r: 6 };
-  const zt = 9;
-  const out: string[] = [c.halo(k.insetPlan(tray, 6), 0), c.box(tray, 0, zt, { tone: 'mid', crease: 'lo' }, 6, 1)];
-  // Six compartments.
-  const cells: Plan[] = [];
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) cells.push({ x: tray.x + 6 + i * 66, y: tray.y + 6 + j * 66, w: 62, d: 62, r: 3 });
-  out.push(c.L(cells.map((p) => k.planOutline(p, zt, P, 3)).join(''), { tone: 'lo' }));
-  const items: { at: Point3; svg: string }[] = [];
-  const cx = (i: number) => tray.x + 37 + i * 66;
-  const cy = (j: number) => tray.y + 37 + j * 66;
-  // A DIP chip.
-  items.push({ at: [cx(0), cy(0), zt], svg: ic(c, { cx: cx(0), cy: cy(0), z: zt, w: 18, d: 34, h: 4, pins: 7, sides: 2, mark: '555', markSize: 4 }) });
-  // Three LEDs.
-  [-14, 0, 14].forEach((o) => items.push({
-    at: [cx(1) + o, cy(0), zt],
-    svg: c.post(cx(1) + o, cy(0) + o * 0.4, 4, zt, 2, { tone: 'mid' }, 18) + c.post(cx(1) + o, cy(0) + o * 0.4, 3.2, zt + 2, 8, { tone: 'hi', crease: 'lo', lit: o === 0 }, 18),
-  }));
-  // Electrolytic capacitors.
-  [[-10, -8], [10, 6]].forEach(([dx, dy]) => items.push({
-    at: [cx(2) + dx, cy(0) + dy, zt],
-    svg: c.post(cx(2) + dx, cy(0) + dy, 7, zt, 16, { tone: 'mid', crease: 'lo' }, 28)
-      + c.L(k.sideArc(cx(2) + dx, cy(0) + dy, 7, zt + 3, P, 20), { tone: 'faint' })
-      + c.L(k.ring(cx(2) + dx, cy(0) + dy, 4, zt + 16, P, 20), { tone: 'lo' }),
-  }));
-  // Tactile buttons.
-  [[-12, 0], [12, 0]].forEach(([dx, dy]) => items.push({
-    at: [cx(0) + dx, cy(1) + dy, zt],
-    svg: c.box({ x: cx(0) + dx - 7, y: cy(1) + dy - 7, w: 14, d: 14, r: 1 }, zt, 4, { tone: 'mid', crease: 'lo' }, 2, 0.4)
-      + c.post(cx(0) + dx, cy(1) + dy, 3.4, zt + 4, 3, { tone: 'hi', crease: 'lo' }, 18),
-  }));
-  // A strip of SMD resistors on tape.
-  items.push({
-    at: [cx(1), cy(1), zt],
-    svg: c.box({ x: cx(1) - 26, y: cy(1) - 6, w: 52, d: 12, r: 0.6 }, zt, 0.8, { tone: 'lo', crease: 'none' }, 2)
-      + [-18, -6, 6, 18].map((o) => smd(c, cx(1) + o, cy(1), zt + 0.8, 'x', 6, 3, 1.6)).join(''),
-  });
-  // A small dev board.
-  items.push({
-    at: [cx(2), cy(1), zt],
-    svg: c.box({ x: cx(2) - 22, y: cy(1) - 14, w: 44, d: 28, r: 2 }, zt, 2, { tone: 'mid', crease: 'lo' }, 3, 0.5)
-      + ic(c, { cx: cx(2) - 2, cy: cy(1), z: zt + 2, w: 12, d: 12, h: 2, pins: 4, sides: 4 })
-      + c.box({ x: cx(2) + 12, y: cy(1) - 5, w: 10, d: 10, r: 1 }, zt + 2, 4, { tone: 'hi', crease: 'lo' }, 2),
-  });
-  out.push(c.sorted(items));
-  return out.join('');
-}
 
 function idea() {
   const sheet: Plan = { x: -96, y: -66, w: 172, d: 128, r: 1 };
@@ -311,22 +242,6 @@ function golden() {
   return closedNode(0, 0);
 }
 
-function firstCustomer() {
-  const out: string[] = [];
-  const box: Plan = { x: 6, y: -62, w: 90, d: 70, r: 1 };
-  out.push(c.halo(box, 0));
-  out.push(carton(box, 0, 50));
-  out.push(closedNode(-46, 10));
-  // The invoice on the bench, stamped paid.
-  const inv: Plan = { x: 22, y: 30, w: 58, d: 42, r: 0.5 };
-  out.push(c.box(inv, 0, 0.6, { tone: 'mid', crease: 'none' }, 2));
-  out.push(c.engrave('INVOICE 0001', inv.x + 5, inv.y + 9, 0.6, 4.2, 'mid'));
-  out.push(c.L([16, 22, 28].map((dy) => k.lineOnTop([inv.x + 5, inv.y + dy], [inv.x + 34, inv.y + dy], 0.6, P)).join(''), { tone: 'lo', free: true }));
-  out.push(c.L(k.ring(inv.x + 46, inv.y + 26, 8, 0.6, P, 28), { tone: 'lit' }));
-  out.push(c.engrave('PAID', inv.x + 46, inv.y + 28, 0.6, 4.6, 'hi', 'middle'));
-  return out.join('');
-}
-
 function qualified() {
   const out: string[] = [];
   const rack: Plan = { x: -110, y: -46, w: 220, d: 92, r: 4 };
@@ -362,13 +277,13 @@ function smallNode(ox: number, oy: number) {
 }
 
 const builders: Record<string, () => string> = {
-  explorer, trl12: idea, trl3: model, trl4: prototype, trl5: proofOfConcept, trl6: golden, trl7: firstCustomer, trl8: qualified,
+  trl12: idea, trl3: model, trl4: prototype, trl5: proofOfConcept, trl6: golden, trl8: qualified,
 };
 
 export function stageFigure(id: string, label: string) {
   const build = builders[id];
   if (!build) return '';
-  const sketchy = id === 'trl12' || id === 'explorer';
+  const sketchy = id === 'trl12';
   return k.figureSvg({
     width: STAGE_W,
     height: STAGE_H,

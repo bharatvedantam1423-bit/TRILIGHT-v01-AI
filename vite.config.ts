@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
           handler(html, ctx) {
             if (!ctx.filename.endsWith('index.html')) return html;
             return html
-              .replace('<!--@body-->', renderBody({ markSvg, helpEmail: env.VITE_HELP_EMAIL ?? '' }))
+              .replace('<!--@body-->', renderBody({ markSvg }))
               .replaceAll('%TRL8_TITLE%', meta.title)
               .replaceAll('%TRL8_DESC%', meta.description)
               .replaceAll('%TRL8_OG_IMAGE%', `${siteUrl}/og.jpg`)

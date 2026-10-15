@@ -8,7 +8,7 @@
  * the figures are simply drawn.
  */
 import { coreFigure } from './core';
-import { boardFigure } from './board';
+import { loopCard } from './board';
 import { stageFigure } from './ladder';
 
 const BUCKETS = 10;
@@ -27,9 +27,8 @@ export function core(label: string) {
   return { ...f, svg: drawable(f.svg) };
 }
 
-export function board(label: string) {
-  const f = boardFigure(label);
-  return { ...f, svg: drawable(f.svg) };
+export function loop(stage: 'sense' | 'decide' | 'act', label: string) {
+  return drawable(loopCard(stage, label));
 }
 
 export function stage(id: string, label: string) {
