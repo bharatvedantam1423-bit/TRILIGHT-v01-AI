@@ -160,32 +160,27 @@ html:not(.motion) .scrollcue { display: none; }
 .dwg__block b { color: var(--teal-hi); font-weight: 600; }
 .dwg__logo .mark { width: 34px; height: auto; }
 
-/* --- the exploded core and its callouts --------------------------------- */
-.core { position: absolute; inset: 0; z-index: 2; margin: 0; pointer-events: none; }
-.core__fig { position: absolute; left: 50%; top: calc(50% + 46px); translate: -50% -50%; width: min(56vw, calc((100svh - var(--nav-h) - 150px) * 0.927)); will-change: transform; }
-.motion .core__fig, .motion .hero { translate: none; }
-.motion .core__fig { --bp-t: 2.6s; }
-.motion .core__labels { position: absolute; inset: 0; }
-.motion .callout { position: absolute; display: flex; align-items: center; gap: 0; translate: 0 -50%; opacity: 0; }
-.callout--r { flex-direction: row-reverse; }
-.callout__text { display: grid; gap: 4px; flex: none; width: min(250px, 22vw); }
-.callout--l .callout__text { text-align: right; padding-right: 14px; }
-.callout--r .callout__text { padding-left: 14px; }
-.callout__text b { font-family: var(--f-head); font-weight: 600; font-size: 15px; letter-spacing: -0.01em; color: var(--ink); }
-.callout__text span { font-size: 13px; line-height: 1.45; color: var(--muted); }
-.callout__line { position: relative; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(120, 198, 232, 0.25), rgba(120, 198, 232, 0.8)); }
-.callout--r .callout__line { background: linear-gradient(270deg, rgba(120, 198, 232, 0.25), rgba(120, 198, 232, 0.8)); }
-.callout__line::after { content: ''; position: absolute; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: var(--teal-hi); box-shadow: 0 0 10px var(--teal); }
-.callout--l .callout__line::after { right: -3px; }
-.callout--r .callout__line::after { left: -3px; }
+/* --- the circuit city ----------------------------------------------------- */
+.city { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+/* Centred by margins (not transforms): GSAP owns the transform for the dive. */
+.city .bp-svg { --cw: max(100vw, calc(100svh * 1.28)); position: absolute; left: 50%; top: 50%; width: var(--cw); max-width: none; margin: calc(var(--cw) * -0.39) 0 0 calc(var(--cw) / -2); will-change: transform; --bp-t: 2.4s; }
+.city__shade { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(90deg, rgba(3, 12, 22, 0.94) 0%, rgba(3, 12, 22, 0.8) 34%, rgba(3, 12, 22, 0.15) 62%, transparent 75%), linear-gradient(0deg, rgba(3, 12, 22, 0.7), transparent 24%); }
+.dive { position: absolute; inset: 0; z-index: 7; pointer-events: none; background: var(--bg); opacity: 0; }
+.motion .hero { translate: none; }
 
-/* Without motion the hero is a plain section: copy, the drawing, a list. */
-html:not(.motion) .scene--intro .sticky { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; padding: calc(var(--nav-h) + 60px) var(--gutter) 80px; }
-html:not(.motion) .hero, html:not(.motion) .core, html:not(.motion) .core__fig { position: relative; inset: auto; translate: none; width: auto; left: auto; top: auto; }
-html:not(.motion) .core { display: grid; gap: 24px; }
-html:not(.motion) .core__labels { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
-html:not(.motion) .callout__line { display: none; }
-html:not(.motion) .callout__text { width: auto; text-align: left !important; padding: 0 !important; }
+/* The hand that seats the chip. */
+.bp-hand__fill { fill: var(--bp-paper); stroke: none; }
+.bp-hand__line { fill: none; stroke: var(--bp-hi); stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.bp-hand__detail { fill: none; stroke: var(--bp-mid); stroke-width: 1.1; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.motion .bp-hand { opacity: 0; }
+html:not(.motion) .bp-hand { display: none; }
+
+/* The power-up: copper lights out from the socket. */
+.bp-power { fill: none; stroke: var(--bp-lit); stroke-width: calc(var(--bp-w) * 2); stroke-linecap: round; stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--power, 0)); filter: drop-shadow(0 0 3px var(--bp-lit)); }
+.bp-power-layer { opacity: var(--power-on, 0); }
+html:not(.motion) .bp-power-layer { --power: 1; --power-on: 1; }
+.bp-hero-led { opacity: var(--power-on, 0) !important; }
+
 html:not(.motion) .dwg { display: none; }
 
 /* ==========================================================================
@@ -201,20 +196,23 @@ html:not(.motion) .dwg { display: none; }
 /* 03 · Lights: the corridor glows behind three lamps; a beam runs through them. */
 .lights { overflow: hidden; }
 .lights .wrap { position: relative; }
-.lamps { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 4vw, 56px); text-align: center; }
-.lamps__rail { position: absolute; top: 56px; left: 16.6%; right: 16.6%; height: 1px; background: var(--line-2); }
-.lamps__rail span { position: absolute; inset: 0; background: linear-gradient(90deg, var(--blue-hi), var(--teal-hi)); box-shadow: 0 0 12px var(--teal); transform: scaleX(0); transform-origin: left; }
-html:not(.motion) .lamps__rail span { transform: none; }
-.lamp { position: relative; }
-.lamp__bulb { position: relative; z-index: 1; display: grid; place-items: center; width: 112px; height: 112px; margin: 0 auto 28px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); transition: border-color 0.6s var(--ease), box-shadow 0.8s var(--ease); }
-.lamp__bulb i { width: 40px; height: 40px; border-radius: 50%; background: #14212b; transition: background-color 0.6s var(--ease), box-shadow 0.8s var(--ease); }
-.lamp.is-on .lamp__bulb, html:not(.motion) .lamp__bulb { border-color: var(--teal); box-shadow: 0 0 0 10px rgba(0, 182, 180, 0.07), 0 0 70px rgba(0, 182, 180, 0.45); }
-.lamp.is-on .lamp__bulb i, html:not(.motion) .lamp__bulb i { background: var(--teal-hi); box-shadow: 0 0 20px var(--teal-hi), 0 0 60px var(--teal); }
-.lamp__n { font-family: var(--f-head); font-weight: 500; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-.lamp .h3 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); transition: color 0.6s; }
-.lamp:not(.is-on) .h3 { color: var(--muted); }
-html:not(.motion) .lamp .h3 { color: var(--ink); }
-.lamp .muted { max-width: 30ch; margin-inline: auto; }
+.forces { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 32px); }
+.forces__rail { position: absolute; top: 16px; left: 16.6%; right: 16.6%; height: 1px; background: var(--line-2); }
+.forces__rail span { position: absolute; inset: 0; background: linear-gradient(90deg, var(--blue-hi), var(--teal-hi)); box-shadow: 0 0 12px var(--teal); transform: scaleX(0); transform-origin: left; }
+html:not(.motion) .forces__rail span { transform: none; }
+.force { position: relative; text-align: center; }
+.force__light { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; margin: 0 auto 22px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-2); transition: border-color 0.6s var(--ease), box-shadow 0.8s var(--ease); }
+.force__light i { width: 12px; height: 12px; border-radius: 50%; background: #14212b; transition: background-color 0.6s var(--ease), box-shadow 0.8s var(--ease); }
+.force.is-on .force__light, html:not(.motion) .force__light { border-color: var(--teal); box-shadow: 0 0 0 6px rgba(0, 182, 180, 0.08), 0 0 34px rgba(0, 182, 180, 0.45); }
+.force.is-on .force__light i, html:not(.motion) .force__light i { background: var(--teal-hi); box-shadow: 0 0 12px var(--teal-hi); }
+.force__fig { aspect-ratio: 7 / 5; margin-bottom: 24px; border: 1px solid var(--line-2); background: rgba(3, 12, 22, 0.75); transition: border-color 0.6s; }
+.force.is-on .force__fig { border-color: rgba(51, 220, 217, 0.4); }
+.force__fig .bp-svg { --bp-w: 0.75; }
+.motion .force:not(.is-on) .bp-force-led { opacity: 0.2 !important; }
+.force__n { font-family: var(--f-head); font-weight: 500; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal-hi); margin-bottom: 8px; }
+.force .h3 { font-size: clamp(1.6rem, 2.4vw, 2rem); transition: color 0.6s; }
+.motion .force:not(.is-on) .h3 { color: var(--muted); }
+.force .muted { max-width: 32ch; margin-inline: auto; }
 
 /* Problems */
 .problems__title { margin-bottom: 32px; max-width: 18ch; }
@@ -273,28 +271,40 @@ html:not(.motion) .lamp .h3 { color: var(--ink); }
 .head--split .lede { margin: 0; }
 .bp-svg--crop { overflow: hidden; }
 
-/* 02 · The ladder: four steps, each with its drawing; every arrow is a review gate. */
-.steps4 { display: grid; grid-template-columns: repeat(4, 1fr); }
-.step4 { --c: var(--blue-hi); }
-.step4:nth-child(n + 3) { --c: var(--teal); }
-.step4__fig { aspect-ratio: 4 / 3; margin-right: 16px; display: grid; place-items: center; border: 1px solid var(--line); background-color: #041120; background-image: linear-gradient(rgba(90, 190, 235, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(90, 190, 235, 0.07) 1px, transparent 1px); background-size: 20px 20px; background-position: center; transition: border-color 0.5s; }
-.step4__fig .bp-svg { --bp-w: 0.7; }
-.step4.is-lit .step4__fig { border-color: color-mix(in srgb, var(--c) 45%, transparent); }
-.step4__gate { position: relative; height: 34px; margin: 20px 0 22px; display: flex; align-items: center; justify-content: flex-end; }
-.step4__line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--line-2); }
-.step4__line::after { content: ''; position: absolute; inset: 0; background: var(--c); box-shadow: 0 0 12px var(--c); transform: scaleX(0); transform-origin: left; transition: transform 0.8s var(--ease); }
-.step4.is-lit .step4__line::after, html:not(.motion) .step4__line::after { transform: scaleX(1); }
-.step4__node { position: relative; z-index: 1; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: var(--muted); background: var(--bg); border: 1px solid var(--line-2); transition: color 0.4s 0.5s, background-color 0.4s 0.5s, border-color 0.4s 0.5s; }
-.step4__node .i { width: 16px; height: 16px; }
-.step4.is-lit .step4__node, html:not(.motion) .step4__node { color: #011213; background: var(--c); border-color: transparent; }
-.step4 > :not(.step4__fig):not(.step4__gate) { padding-right: 28px; }
-.step4__n { font-family: var(--f-head); font-weight: 500; font-size: 12px; letter-spacing: 0.1em; color: var(--c); filter: brightness(1.3); margin-bottom: 6px; }
-.step4 .h3 { font-size: clamp(1.5rem, 2.2vw, 1.9rem); margin-bottom: 12px; }
-.step4__rows > div { display: grid; grid-template-columns: 70px 1fr auto; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.35; }
-.step4__rows dt { font-family: var(--f-head); font-weight: 600; font-size: 13px; color: var(--ink); }
-.step4__rows dd { margin: 0; color: var(--ink-2); }
-.step4__rows dd.step4__grant { font-family: var(--f-head); font-weight: 600; color: var(--teal-hi); text-align: right; white-space: nowrap; }
-.ladder__foot { margin: 40px 0 0; max-width: 80ch; }
+/* 02 · The ladder: pinned. The drawing grows on the left, the step changes on the right. */
+.journey { position: relative; border-top: 1px solid var(--line); background: var(--bg-2); }
+.motion .journey { height: 420vh; }
+.journey__sticky { position: relative; padding: clamp(96px, 12vw, 140px) 0; }
+.motion .journey__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; padding: var(--nav-h) 0 0; overflow: hidden; }
+.journey__grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.journey__stage { position: relative; aspect-ratio: 640 / 520; border: 1px solid var(--line-2); background-color: #041120; background-image: linear-gradient(rgba(90, 190, 235, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(90, 190, 235, 0.07) 1px, transparent 1px); background-size: 24px 24px; background-position: center; }
+.journey__fig { position: absolute; inset: 0; transition: opacity 0.7s var(--ease), transform 0.9s var(--ease); }
+.motion .journey__fig:not(.is-active) { opacity: 0; transform: scale(0.97); }
+.journey__fig .bp-svg { --bp-w: 0.8; --bp-t: 1.4s; }
+.journey__tag { position: absolute; left: 16px; top: 14px; font-family: var(--f-head); font-weight: 500; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal-hi); }
+html:not(.motion) .journey__tag { display: none; }
+.journey__copy .h2 { margin-bottom: 18px; }
+.journey__copy .lede { margin-bottom: 28px; font-size: 1.02rem; }
+.journey__gates { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 28px; }
+.journey__gates li { position: relative; display: grid; gap: 4px; padding-top: 16px; font-family: var(--f-head); }
+.journey__gates li::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line-2); }
+.journey__gates li::after { content: ''; position: absolute; left: 0; top: 0; height: 2px; width: 100%; background: var(--teal); box-shadow: 0 0 10px var(--teal); transform: scaleX(0); transform-origin: left; transition: transform 0.6s var(--ease); }
+.journey__gates li.is-on::after, html:not(.motion) .journey__gates li::after { transform: scaleX(1); }
+.journey__gates span { font-size: 11px; letter-spacing: 0.14em; color: var(--muted); }
+.journey__gates b { font-size: 14px; font-weight: 600; color: var(--muted); transition: color 0.4s; }
+.journey__gates li.is-on b { color: var(--ink); }
+.journey__steps { display: grid; min-height: 230px; }
+.motion .journey__step { grid-area: 1 / 1; transition: opacity 0.5s var(--ease), transform 0.6s var(--ease); }
+.motion .journey__step:not(.is-active) { opacity: 0; transform: translateY(14px); pointer-events: none; }
+html:not(.motion) .journey__step + .journey__step { margin-top: 32px; }
+.journey__n { font-family: var(--f-head); font-weight: 500; font-size: 12px; letter-spacing: 0.1em; color: var(--teal-hi); margin-bottom: 6px; }
+.journey__title { font-size: clamp(1.8rem, 3vw, 2.6rem); margin-bottom: 14px; }
+.journey__rows > div { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.4; }
+.journey__rows dt { font-family: var(--f-head); font-weight: 600; font-size: 14px; color: var(--ink); }
+.journey__rows dd { margin: 0; color: var(--ink-2); }
+.journey__rows dd.journey__grant { font-family: var(--f-head); font-weight: 600; color: var(--teal-hi); text-align: right; white-space: nowrap; }
+.journey__foot { margin: 22px 0 0; max-width: 60ch; }
+html:not(.motion) .journey__fig + .journey__fig { display: none; }
 
 /* 03 · Fundamentals: one board in three cards. */
 .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
@@ -386,7 +396,6 @@ html:not(.motion) .lamp .h3 { color: var(--ink); }
    Responsive
    ========================================================================== */
 @media (max-width: 1100px) {
-  .callout__text span { display: none; }
 }
 @media (max-height: 820px) and (min-width: 761px) {
   .scrollcue { display: none; }
@@ -399,18 +408,18 @@ html:not(.motion) .lamp .h3 { color: var(--ink); }
 }
 @media (max-width: 899px) {
   .nav__links { display: none; }
-  .lamps { grid-template-columns: 1fr; gap: 56px; }
-  .lamps__rail { top: 0; bottom: 0; left: 50%; right: auto; width: 1px; height: auto; }
-  .lamps__rail span { transform-origin: top; }
-  .lamp__bulb { margin-bottom: 20px; }
-  .lamp > *:not(.lamp__bulb) { position: relative; background: var(--bg); padding-inline: 8px; }
   .doors__grid, .faq__wrap { grid-template-columns: 1fr; }
   .faq__head { position: static; }
   .problems { grid-template-columns: 1fr; grid-template-rows: none; }
   .problem:first-child { grid-row: auto; min-height: 380px; }
   .problem { min-height: 300px; }
   .head--split { grid-template-columns: 1fr; }
-  .steps4 { grid-template-columns: 1fr 1fr; row-gap: 48px; }
+  .forces { grid-template-columns: 1fr; gap: 48px; }
+  .forces__rail { display: none; }
+  .journey__grid { grid-template-columns: 1fr; gap: 20px; }
+  .motion .journey__sticky { align-items: flex-start; padding-top: calc(var(--nav-h) + 12px); }
+  .journey__copy .lede, .journey__copy .h2 + .lede { display: none; }
+  .journey__steps { min-height: 210px; }
   .cards3, .brackets { grid-template-columns: 1fr; }
   .value__grid, .finale__panel { grid-template-columns: 1fr; }
 }
@@ -422,23 +431,18 @@ html:not(.motion) .lamp .h3 { color: var(--ink); }
   .nav__logo img { width: 112px; }
 
   .hero { left: 22px; right: 22px; width: auto; top: calc(var(--nav-h) + 28px); translate: none; }
-  .core__fig { width: 70vw; top: 56%; }
-  .callout__text { width: 25vw; }
-  .callout--l .callout__text { padding-right: 6px; }
-  .callout--r .callout__text { padding-left: 6px; }
-  .callout__text b { font-size: 10.5px; line-height: 1.25; }
+  .city__shade { background: linear-gradient(180deg, rgba(3, 12, 22, 0.95) 0%, rgba(3, 12, 22, 0.85) 55%, rgba(3, 12, 22, 0.3) 80%); }
+  .city .bp-svg { --cw: 190vw; }
+  .journey__copy .h2 { font-size: 1.8rem; margin-bottom: 14px; }
+  .journey__gates { margin-bottom: 16px; }
   .dwg__ruler { display: none; }
-  html:not(.motion) .scene--intro .sticky { grid-template-columns: 1fr; }
-  html:not(.motion) .core__labels { grid-template-columns: 1fr; }
-  .hero__headline { font-size: clamp(2.2rem, 10.5vw, 3.4rem); }
+    .hero__headline { font-size: clamp(2.2rem, 10.5vw, 3.4rem); }
   .hero__sub { font-size: 1rem; margin: 18px 0 22px; }
   .facts > div { padding: 0 12px; }
   .facts dd { font-size: 1.05rem; }
   .facts dt { font-size: 10px; letter-spacing: 0.12em; }
 
   .door { --cut: 16px; }
-  .steps4 { grid-template-columns: 1fr; }
-  .step4__fig { margin-right: 0; }
   .stats6 > div { padding: 24px 14px 24px 0; }
   .stats6 > div:nth-child(even) { padding-left: 14px; }
   .finale__cards { grid-template-columns: 1fr; }

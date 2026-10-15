@@ -74,21 +74,21 @@ navy grid paper, built at build time from real solids with correct hidden lines
 iso kit, MIT). Each figure draws itself in like a pen, back to front, then its
 fills settle in.
 
-1. **Hero.** An engineering-drawing frame (registration corners, rulers, title
-   block with a TRL counter) around the Trilight core: a six-layer hardware
-   stack beside the headline. On scroll it moves to centre and explodes into
-   its layers, each with its callout.
-2. **The ladder.** Four steps of one product, a field sensor node: a pencil
-   sketch (Idea), a simulation wireframe (Model), a breadboard (Prototype) and
-   three qualified units with all three lights on (Product). Each draws in as
-   it arrives and its review-gate arrow lights.
+1. **Hero · the circuit city.** A dense board drawn in isometric line art,
+   components standing like buildings round an empty socket. On scroll the
+   copy clears, a hand with tweezers seats the Trilight chip, the copper lights
+   out from the socket, and the camera dives into the chip.
+2. **The ladder (pinned).** The drawing on the left grows from a pencil sketch
+   of a drone (Idea) to its simulation wireframe (Model), the bare prototype
+   with its flight-controller chip (Prototype) and the finished drone with a
+   robotic rover (Product); the step on the right changes with it.
 3. **Fundamentals.** One sense → decide → act board framed in three cards:
-   signal pulses run along the copper from the sensor to the MCU to the motor
-   driver, and the motor pulley turns.
-4. **Sections.** Three lamps on a beam, the field build beside the numbers,
-   brand-octagon doors, bracket cards, problem photos with detection boxes.
-5. **Closing.** The finished unit draws in above the last call to action,
-   followed by the Demo Day program finale.
+   signal pulses run along the copper and the motor pulley turns.
+4. **The three forces.** One drawing per light: Build (a second identical unit
+   and its BOM/SOP/QA sheet), Test (a rover on a roller rig), Deploy (a drone
+   delivering parcels). Each light, and the LED in its drawing, turns on in turn.
+5. **Closing.** The finished drone and rover draw in above the last call to
+   action, followed by the Demo Day program finale.
 
 - `prefers-reduced-motion` and no-JS get a static, fully drawn, readable page.
 - Figure text (callouts, alt text) lives in `src/content.ts` (`anatomy`, `loop`, `ladder`, `value`).
@@ -97,8 +97,9 @@ fills settle in.
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `src/blueprint/`: the figures, as code. `core.ts` (hero stack), `board.ts`
-  (the loop cards), `ladder.ts` (stage figures), `parts.ts` (ICs,
+- `src/blueprint/`: the figures, as code. `hero.ts` (circuit city, chip and
+  hand), `journey.ts` (ladder stages and the three forces), `vehicles.ts`
+  (drone and rover), `board.ts` (the loop cards), `ladder.ts` (field node), `parts.ts` (ICs,
   passives, headers, jumpers), `blueprint.css` (palette and draw-on).
 - `public/img/`: the problem photos were generated for this page with Magnific
   (Seedream). They're illustrative, not photos of real people or places.

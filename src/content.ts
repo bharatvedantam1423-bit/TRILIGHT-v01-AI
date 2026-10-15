@@ -7,7 +7,6 @@
  *    other is kept as `alt`. Headlines are used verbatim.
  *  - Section bodies, cards and stats: the Figma low-fidelity skeleton the copy
  *    doc's section images were taken from ("Website v3 (Physical AI)").
- *  - Hero callouts: the chip-architecture reference supplied with the brief.
  *  - FAQ answers and grant figures: the TRL8 program document
  *    (docs/TRL8-program.md).
  * Edit here, rebuild, and every section updates.
@@ -34,28 +33,12 @@ export const hero = {
   headline: 'Turn Your Ideas Into Real-world Products',
   alt: 'Take Your Idea All the Way to the Real World',
   sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
+  figureLabel:
+    'An isometric blueprint of a dense circuit board, its components standing like a city round an empty socket. A hand with tweezers places the Trilight chip in the socket and the board powers up.',
   stats: [
     { value: 'Up to ₹5 Lakh', label: 'Grant Per Team' },
     { value: '8', label: 'Stages' },
     { value: 'April 2027', label: 'Demo Day' },
-  ],
-};
-
-/**
- * The exploded core in the hero. Callout text is from the chip-architecture
- * reference image, top layer first. `side` places the callout in the
- * exploded view.
- */
-export const anatomy = {
-  figureLabel:
-    'An isometric blueprint of a hardware core, exploded into six layers: protective core shield, processing matrix, signal routing grid, neural logic array, power distribution layer and hardware interface base.',
-  layers: [
-    { id: 'shield', side: 'l', name: 'Protective Core Shield', text: 'A durable upper casing that protects the internal architecture while maintaining thermal balance and structural stability.' },
-    { id: 'die', side: 'r', name: 'Processing Matrix', text: 'The central compute layer responsible for executing millions of operations with ultra-low latency.' },
-    { id: 'routing', side: 'r', name: 'Signal Routing Grid', text: 'A high-density circuit network that enables rapid communication between processing units and memory channels.' },
-    { id: 'logic', side: 'l', name: 'Neural Logic Array', text: 'Optimized pathways designed for intelligent workloads, predictive computation, and parallel task execution.' },
-    { id: 'power', side: 'r', name: 'Power Distribution Layer', text: 'Stabilizes voltage flow across the chip to ensure efficient energy delivery and consistent performance.' },
-    { id: 'base', side: 'l', name: 'Hardware Interface Base', text: 'The foundational connection layer that links the microchip directly with the motherboard and surrounding hardware ecosystem.' },
   ],
 };
 
@@ -70,29 +53,29 @@ export const ladder = {
   body: 'Every arrow is a Technology Readiness Review. Clear it with evidence and the next level, and its grant, unlocks.',
   groups: <LadderGroup[]>[
     {
-      id: 'idea', step: '01 · Explorer → TRL 1–2', title: 'Idea', figure: 'trl12',
-      figureLabel: 'Pencil sketch of a sensor node on graph paper, with a pencil beside it',
+      id: 'idea', step: '01 · Explorer → TRL 1–2', title: 'Idea', figure: 'idea',
+      figureLabel: 'A pencil sketch of a quadcopter drone on graph paper, marked v0.1?',
       rows: [
         { level: 'Explorer', text: 'Learn the basics, solo' },
         { level: 'TRL 1–2', text: 'Problem, team of 3–5, proposal' },
       ],
     },
     {
-      id: 'model', step: '02 · TRL 3', title: 'Model', figure: 'trl3',
-      figureLabel: 'Wireframe simulation model of the sensor node, with dimensions',
+      id: 'model', step: '02 · TRL 3', title: 'Model', figure: 'model',
+      figureLabel: 'The same drone as a simulation wireframe on a grid, with its 120 span',
       rows: [{ level: 'TRL 3', text: 'Working simulation' }],
     },
     {
-      id: 'prototype', step: '03 · TRL 4 → 5', title: 'Prototype', figure: 'trl4',
-      figureLabel: 'Blueprint of a breadboard prototype: a dev board, a sensor and jumper wires',
+      id: 'prototype', step: '03 · TRL 4 → 5', title: 'Prototype', figure: 'prototype',
+      figureLabel: 'The drone as a bare prototype: frame, motors, speed controllers and a flight-controller chip on the bench',
       rows: [
         { level: 'TRL 4', text: 'Breadboard that senses, decides, acts', grant: '₹30K' },
         { level: 'TRL 5', text: 'Proof of concept at a host site', grant: '₹70K' },
       ],
     },
     {
-      id: 'product', step: '04 · TRL 6 → 8', title: 'Product', figure: 'trl8',
-      figureLabel: 'Blueprint of three qualified sensor nodes on a test rack, all status lights on',
+      id: 'product', step: '04 · TRL 6 → 8', title: 'Product', figure: 'product',
+      figureLabel: 'The finished drone flying over its landing pad, with a robotic rover beside it',
       rows: [
         { level: 'TRL 6', text: 'Golden sample, real users', grant: '₹1.5L' },
         { level: 'TRL 7', text: 'First paying customer', grant: '₹2.5L' },
@@ -124,9 +107,12 @@ export const lights = {
   kicker: 'Why it’s called Trilight',
   headline: 'The Three Forces that Power TRILIGHT',
   items: [
-    { n: '01', name: 'Build', text: 'An outside team can build a second unit from your SOP, BOM and QA checks.' },
-    { n: '02', name: 'Test', text: 'A complete, qualified system that holds up in the field, not just on your bench.' },
-    { n: '03', name: 'Deploy', text: 'Multiple paying customers, or a signed contract to scale.' },
+    { id: 'build', n: '01', name: 'Build', text: 'An outside team can build a second unit from your SOP, BOM and QA checks.',
+      figureLabel: 'A flight-controller board beside its identical second unit, with the BOM, SOP and QA sheet' },
+    { id: 'test', n: '02', name: 'Test', text: 'A complete, qualified system that holds up in the field, not just on your bench.',
+      figureLabel: 'A robotic rover running on a roller test rig, cabled to a test box showing its trace' },
+    { id: 'deploy', n: '03', name: 'Deploy', text: 'Multiple paying customers, or a signed contract to scale.',
+      figureLabel: 'A delivery drone lowering a parcel onto a landing pad, beside parcels already delivered' },
   ],
 };
 

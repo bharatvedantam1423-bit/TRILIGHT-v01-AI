@@ -60,6 +60,9 @@
 /* Wireframe stage: no fills at all, it is a simulation. */
 .bp-svg--wire .iso-fill, .bp-svg--wire .iso-shade, .bp-svg--wire .iso-top { fill: none; }
 
+/* The second, identical unit in the Build drawing: drawn as an outline copy. */
+.bp-ghost .iso-edge, .bp-ghost .iso-crease { stroke-dasharray: 4 3; }
+
 /* Pencil: the sketch strokes wobble like a hand-drawn line. */
 .bp-sketch { filter: url(#bp-pencil); }
 .bp-svg--sketch .iso-line[data-tone="hi"] { stroke: #eaf6ff; }

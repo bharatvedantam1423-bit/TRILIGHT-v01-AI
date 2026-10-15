@@ -9,10 +9,10 @@
  * Every illustration is an isometric blueprint drawn in src/blueprint/.
  */
 import {
-  site, nav as navLinks, hero, anatomy, ladder, loop, lights, value, doors, register, problems, faq, closing, finale, footer as foot,
+  site, nav as navLinks, hero, ladder, loop, lights, value, doors, register, problems, faq, closing, finale, footer as foot,
 } from './content';
 import * as bp from './blueprint';
-import { CORE_W, CORE_H } from './blueprint/core';
+import { HERO_W, HERO_H } from './blueprint/hero';
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -72,13 +72,18 @@ function drawingFrame(markSvg: string) {
     </div>`;
 }
 
-/* 1 · Hero: the copy beside the core, which comes apart on scroll. */
+/*
+ * 1 · Hero: the copy over the circuit city. On scroll the copy clears, a hand
+ * seats the chip, the board powers up and the camera dives into the chip.
+ */
 function intro(markSvg: string) {
-  const fig = bp.core(anatomy.figureLabel);
-  const data = { w: CORE_W, h: CORE_H, shift: fig.centreShift, layers: fig.info };
+  const fig = bp.heroScene(hero.figureLabel);
+  const data = { w: HERO_W, h: HERO_H, lift: fig.lift, centre: fig.centre };
   return `
 <section class="scene scene--intro bp-grid" id="top" aria-labelledby="hero-title">
   <div class="sticky">
+    <div class="city" data-city>${fig.svg}</div>
+    <div class="city__shade" aria-hidden="true"></div>
     ${drawingFrame(markSvg)}
 
     <div class="hero" data-hero>
@@ -88,43 +93,52 @@ function intro(markSvg: string) {
       <dl class="facts" aria-label="Key facts">${hero.stats.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>
     </div>
 
-    <figure class="core" data-core>
-      <div class="core__fig" data-core-fig>${fig.svg}</div>
-      <ol class="core__labels" data-core-labels>
-        ${anatomy.layers.map((l) => `<li class="callout callout--${l.side}" data-callout="${l.id}"><span class="callout__text"><b>${esc(l.name)}</b><span>${esc(l.text)}</span></span><i class="callout__line"></i></li>`).join('')}
-      </ol>
-      <script type="application/json" data-core-data>${JSON.stringify(data)}</script>
-    </figure>
-
+    <script type="application/json" data-city-data>${JSON.stringify(data)}</script>
     <p class="scrollcue" aria-hidden="true"><span></span>Scroll</p>
+    <div class="dive" aria-hidden="true"></div>
   </div>
 </section>`;
 }
 
-/* 2 · The ladder: four steps from idea to product; every arrow is a review. */
+/*
+ * 2 · The ladder: pinned. The drawing on the left grows from a sketch into a
+ * finished drone; the step on the right changes with it. Every arrow between
+ * steps is a Technology Readiness Review.
+ */
 function ladderSection() {
-  const last = ladder.groups.length - 1;
+  const groups = ladder.groups;
   return `
-<section class="section ladder" id="ladder" aria-labelledby="ladder-title">
-  <div class="wrap">
-    ${head(ladder.kicker, ladder.headline, 'ladder-title', ladder.body)}
-    <ol class="steps4" data-ladder>
-      ${ladder.groups
-        .map(
-          (g, i) => `
-      <li class="step4" data-step4>
-        <div class="step4__fig">${bp.stage(g.figure, g.figureLabel)}</div>
-        <div class="step4__gate" aria-hidden="true"><span class="step4__line"></span>${i < last ? `<span class="step4__node">${right}</span>` : ''}</div>
-        <p class="step4__n">${esc(g.step)}</p>
-        <h3 class="h3">${esc(g.title)}</h3>
-        <dl class="step4__rows">
-          ${g.rows.map((r) => `<div><dt>${esc(r.level)}</dt><dd>${esc(r.text)}</dd>${r.grant ? `<dd class="step4__grant">${esc(r.grant)}</dd>` : ''}</div>`).join('')}
-        </dl>
-      </li>`,
-        )
-        .join('')}
-    </ol>
-    <p class="fine ladder__foot">${esc(ladder.footnote)}</p>
+<section class="journey" id="ladder" aria-labelledby="ladder-title">
+  <div class="journey__sticky">
+    <div class="wrap journey__grid">
+      <div class="journey__stage" aria-hidden="true">
+        ${groups.map((g, i) => `<div class="journey__fig${i === 0 ? ' is-active' : ''}" data-journey-fig>${bp.journey(g.figure, g.figureLabel)}</div>`).join('')}
+        <span class="journey__tag" data-journey-tag>${esc(groups[0]!.step)}</span>
+      </div>
+      <div class="journey__copy">
+        ${label(ladder.kicker)}
+        <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
+        <p class="lede">${esc(ladder.body)}</p>
+        <ol class="journey__gates" aria-hidden="true">
+          ${groups.map((g, i) => `<li class="${i === 0 ? 'is-on' : ''}" data-journey-gate><span>${String(i + 1).padStart(2, '0')}</span><b>${esc(g.title)}</b></li>`).join('')}
+        </ol>
+        <div class="journey__steps">
+          ${groups
+            .map(
+              (g, i) => `
+          <div class="journey__step${i === 0 ? ' is-active' : ''}" data-journey-step>
+            <p class="journey__n">${esc(g.step)}</p>
+            <h3 class="journey__title">${esc(g.title)}</h3>
+            <dl class="journey__rows">
+              ${g.rows.map((r) => `<div><dt>${esc(r.level)}</dt><dd>${esc(r.text)}</dd>${r.grant ? `<dd class="journey__grant">${esc(r.grant)}</dd>` : ''}</div>`).join('')}
+            </dl>
+          </div>`,
+            )
+            .join('')}
+        </div>
+        <p class="fine journey__foot">${esc(ladder.footnote)}</p>
+      </div>
+    </div>
   </div>
 </section>`;
 }
@@ -151,20 +165,21 @@ function loopSection() {
 </section>`;
 }
 
-/* 4 · The three forces: three lamps on one beam. */
+/* 4 · The three forces: one drawing per light; each light turns on as you reach it. */
 function lightsSection() {
   return `
 <section class="section lights bp-grid" id="lights" aria-labelledby="lights-title">
   <div class="wrap">
     ${head(lights.kicker, lights.headline, 'lights-title', undefined, true)}
-    <ol class="lamps" data-lamps>
-      <li class="lamps__rail" aria-hidden="true"><span data-lamp-beam></span></li>
+    <ol class="forces" data-lamps>
+      <li class="forces__rail" aria-hidden="true"><span data-lamp-beam></span></li>
       ${lights.items
         .map(
           (l, i) => `
-      <li class="lamp" data-lamp="${i}">
-        <span class="lamp__bulb" aria-hidden="true"><i></i></span>
-        <p class="lamp__n">Light ${l.n}</p>
+      <li class="force" data-lamp="${i}">
+        <span class="force__light" aria-hidden="true"><i></i></span>
+        <div class="force__fig">${bp.force(l.id, l.figureLabel)}</div>
+        <p class="force__n">Light ${l.n}</p>
         <h3 class="h3">${esc(l.name)}</h3>
         <p class="muted">${esc(l.text)}</p>
       </li>`,
@@ -288,7 +303,7 @@ function closingSection() {
   return `
 <section class="closing bp-grid" id="join" aria-labelledby="closing-title">
   <div class="closing__inner">
-    <div class="closing__fig" data-closing-fig>${bp.stage('trl6', 'Blueprint of the finished sensor node: closed enclosure, antenna and status light')}</div>
+    <div class="closing__fig" data-closing-fig>${bp.journey('product', 'The finished drone flying over its landing pad, with a robotic rover beside it')}</div>
     <h2 id="closing-title" class="closing__title">${esc(closing.headline)}</h2>
     ${cta('closing', 'btn--lg')}
   </div>

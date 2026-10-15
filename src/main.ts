@@ -95,89 +95,71 @@ ScrollTrigger.create({
 /* ------------------------------------------------------------ motion scenes */
 
 
-type CoreData = {
-  w: number;
-  h: number;
-  shift: number;
-  layers: { id: string; lift: [number, number]; left: [number, number]; right: [number, number] }[];
-};
+type CityData = { w: number; h: number; lift: [number, number]; centre: [number, number] };
 
 /** Adds `is-drawn` to a blueprint figure: its lines draw in, then fills settle. */
 const draw = (svg: Element | null | undefined) => svg?.classList.add('is-drawn');
 
 /**
- * The hero blueprint. The core draws itself in on load beside the headline;
- * on scroll the copy steps aside, the core moves to centre and comes apart
- * into its six layers, and each layer's callout runs out to it.
+ * The hero. The circuit city draws itself in on load behind the copy. On
+ * scroll the copy clears, a hand brings the chip in and seats it, the copper
+ * lights out from the socket, and the camera dives into the chip.
  */
 function introScene() {
   const q = gsap.utils.selector(intro);
-  const fig = $('[data-core-fig]', intro)!;
-  const svg = $('svg', fig)!;
-  const data = JSON.parse($('[data-core-data]', intro)!.textContent ?? '{}') as CoreData;
-  const groups = new Map(data.layers.map((l) => [l.id, $(`[data-layer="${l.id}"]`, svg)!]));
-  const callouts = $$('[data-callout]', intro);
-  const labels = $('[data-core-labels]', intro)!;
-  const state = { e: 0, show: 0 };
-  const phone = () => window.matchMedia('(max-width: 760px)').matches;
-
-  // Layer offsets (viewBox units) for an explode amount e: lifted apart, and
-  // re-centred so the assembled stack sits in the middle of the drawing.
-  const offset = (lift: [number, number], e: number) => lift[1] * e + data.shift * (1 - e);
-
-  function layout() {
-    const e = state.e;
-    data.layers.forEach((l) => groups.get(l.id)?.setAttribute('transform', `translate(0 ${offset(l.lift, e).toFixed(2)})`));
-    const box = labels.getBoundingClientRect();
-    const r = svg.getBoundingClientRect();
-    const k = r.width / data.w;
-    const pad = phone() ? 8 : Math.max(24, box.width * 0.04);
-    callouts.forEach((c, i) => {
-      const l = data.layers.find((x) => x.id === c.dataset.callout)!;
-      const left = c.classList.contains('callout--l');
-      const [px, py] = left ? l.left : l.right;
-      const x = r.left - box.left + px * k;
-      const y = r.top - box.top + (py + offset(l.lift, e)) * k;
-      c.style.top = `${y}px`;
-      if (left) { c.style.left = `${pad}px`; c.style.width = `${Math.max(0, x - pad)}px`; }
-      else { c.style.left = `${x}px`; c.style.width = `${Math.max(0, box.width - pad - x)}px`; }
-      // Callouts arrive top layer first, once the stack has opened up.
-      const t = gsap.utils.clamp(0, 1, state.show * 1.6 - i * 0.12);
-      c.style.opacity = String(t);
-    });
-  }
+  const svg = $<SVGSVGElement>('[data-city] svg', intro)!;
+  const data = JSON.parse($('[data-city-data]', intro)!.textContent ?? '{}') as CityData;
+  const chip = $('[data-hero-chip]', svg)!;
+  const hand = $('[data-hero-hand]', svg)!;
+  // Drop: 1 = held up at lift height, 0 = seated. Out: the hand pulling away.
+  const state = { drop: 2.2, out: 0, power: 0 };
+  const apply = () => {
+    const [lx, ly] = data.lift;
+    const t = `translate(${(lx * state.drop).toFixed(2)} ${(ly * state.drop).toFixed(2)})`;
+    chip.setAttribute('transform', t);
+    hand.setAttribute('transform', `translate(${(lx * state.drop + 260 * state.out).toFixed(2)} ${(ly * state.drop - 420 * state.out).toFixed(2)})`);
+    svg.style.setProperty('--power', state.power.toFixed(3));
+    svg.style.setProperty('--power-on', state.power > 0.01 ? '1' : '0');
+  };
+  apply();
+  gsap.set(svg, { transformOrigin: `${((data.centre[0] / data.w) * 100).toFixed(2)}% ${((data.centre[1] / data.h) * 100).toFixed(2)}%` });
 
   gsap.timeline({ defaults: { duration: 1.2, ease: 'power3.out' } })
     .from(q('.dwg__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.1)
-    .from(q('.dwg__ruler, .dwg__tag, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
+    .from(q('.dwg__ruler, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
     .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
-  window.setTimeout(() => draw(svg), 250);
+  window.setTimeout(() => draw(svg), 200);
 
   const mm = gsap.matchMedia();
   mm.add({ phone: '(max-width: 760px)', wide: '(min-width: 761px)' }, (ctx) => {
     const isPhone = ctx.conditions?.phone;
-    // Beside the copy on desktop; faint behind it on a phone.
-    // GSAP owns the transform, so the centring lives in xPercent/yPercent.
-    gsap.set(fig, { xPercent: -50, yPercent: -50 });
     gsap.set(q('[data-hero]'), { yPercent: isPhone ? 0 : -46 });
-    gsap.set(fig, isPhone ? { x: 0, scale: 0.9, autoAlpha: 0.35 } : { x: () => window.innerWidth * 0.2, scale: 0.92, autoAlpha: 1 });
+    // The city sits right of the copy on desktop, under it on a phone.
+    gsap.set(svg, isPhone ? { x: 0, y: () => window.innerHeight * 0.18, scale: 1 } : { x: () => window.innerWidth * 0.2, y: 0, scale: 0.92 });
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: { trigger: intro, start: 'top top', end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true },
-      onUpdate: layout,
+      onUpdate: apply,
     });
-    tl.to(q('[data-hero]'), { autoAlpha: 0, x: isPhone ? 0 : -60, y: isPhone ? -40 : 0, duration: 1 }, 0)
+    tl.to(q('[data-hero]'), { autoAlpha: 0, x: isPhone ? 0 : -60, y: isPhone ? -40 : 0, duration: 0.9 }, 0)
       .to(q('.scrollcue'), { autoAlpha: 0, duration: 0.4 }, 0)
-      .to(fig, { x: 0, scale: 1, autoAlpha: 1, duration: 1.2, ease: 'power2.inOut' }, 0.2)
-      .to(state, { e: 1, duration: 2.2, ease: 'power2.inOut' }, 1.2)
-      .to(state, { show: 1, duration: 1.2 }, 2.2)
-      .to({}, { duration: 1 }, 3.6)
-      .to(q('[data-core-labels]'), { autoAlpha: 0, duration: 0.6 }, 4.4)
-      .to(fig, { autoAlpha: 0, scale: 0.94, duration: 0.6 }, 4.5);
-    layout();
+      .to(q('.city__shade'), { autoAlpha: 0, duration: 1 }, 0.1)
+      .to(svg, { x: 0, y: 0, scale: isPhone ? 1.25 : 1.05, duration: 1.3, ease: 'power2.inOut' }, 0.2)
+      // The hand brings the chip in from above, pauses over the socket, seats it.
+      .to(hand, { opacity: 1, duration: 0.3 }, 0.8)
+      .to(state, { drop: 0.35, duration: 1.4, ease: 'power2.out' }, 0.8)
+      .to(state, { drop: 0, duration: 0.8, ease: 'power1.inOut' }, 2.4)
+      .to(state, { out: 1, duration: 0.9, ease: 'power2.in' }, 3.3)
+      .to(hand, { opacity: 0, duration: 0.4 }, 3.8)
+      // Power-up: the copper lights out from the socket.
+      .to(state, { power: 1, duration: 1.1 }, 3.4)
+      // The dive into the chip, then a cut to the ladder.
+      .to(q('.dwg'), { autoAlpha: 0, duration: 0.4 }, 4.6)
+      .to(svg, { scale: isPhone ? 12 : 9, duration: 1.6, ease: 'power3.in' }, 4.7)
+      .to(q('.dive'), { opacity: 1, duration: 0.5 }, 5.9);
+    apply();
     return () => tl.scrollTrigger?.kill();
   });
-  window.addEventListener('resize', layout);
 }
 
 /**
@@ -212,42 +194,54 @@ function loopScene() {
 }
 
 /**
- * The ladder: each step draws in as it arrives, and its review gate lights
- * once the drawing is done. Steps that share a row (desktop) run left to
- * right; stacked steps (phone) each go as they scroll into view.
+ * The ladder, pinned: as you scroll the drawing on the left grows into the
+ * next stage (sketch → model → prototype → product) and the step on the
+ * right changes with it. Each gate lights as its stage arrives.
  */
 function ladderScene() {
   const sec = $('#ladder');
   if (!sec) return;
-  const steps = $$('[data-step4]', sec);
-  steps.forEach((step) => ScrollTrigger.create({
-    trigger: step, start: 'top 80%', once: true,
-    onEnter: () => {
-      const row = steps.filter((s) => s.offsetTop === step.offsetTop);
-      const delay = row.indexOf(step) * 450;
-      window.setTimeout(() => { draw($('svg', step)); step.classList.add('is-lit'); }, delay);
-    },
-  }));
+  const figs = $$('[data-journey-fig]', sec);
+  const steps = $$('[data-journey-step]', sec);
+  const gates = $$('[data-journey-gate]', sec);
+  const tag = $('[data-journey-tag]', sec);
+  const tags = steps.map((s) => $('.journey__n', s)?.textContent ?? '');
+  let current = -1;
+  const show = (i: number) => {
+    if (i === current) return;
+    current = i;
+    figs.forEach((f, j) => f.classList.toggle('is-active', j === i));
+    steps.forEach((s, j) => s.classList.toggle('is-active', j === i));
+    gates.forEach((g, j) => g.classList.toggle('is-on', j <= i));
+    if (tag) tag.textContent = tags[i] ?? '';
+    draw($('svg', figs[i]));
+  };
+  show(0);
+  ScrollTrigger.create({
+    trigger: sec, start: 'top top', end: 'bottom bottom',
+    onUpdate: (self) => show(Math.min(figs.length - 1, Math.floor(self.progress * figs.length * 0.999))),
+  });
 }
 
 function lampsScene() {
   const sec = $('#lights');
   const list = $('[data-lamps]');
   const beam = $('[data-lamp-beam]');
-  if (!sec || !list || !beam) return;
+  if (!sec || !list) return;
   const lamps = $$('[data-lamp]', list);
-  const vertical = () => window.matchMedia('(max-width: 899px)').matches;
   ScrollTrigger.create({
     trigger: list,
     start: 'top 72%',
-    end: 'bottom 45%',
+    end: 'bottom 55%',
     scrub: 0.4,
     onUpdate: (self) => {
       const p = self.progress;
-      gsap.set(beam, vertical() ? { scaleY: p, scaleX: 1 } : { scaleX: p, scaleY: 1 });
+      if (beam) gsap.set(beam, { scaleX: p });
       const on = p > 0.9 ? 3 : p > 0.45 ? 2 : p > 0.02 ? 1 : 0;
-      lamps.forEach((l, i) => l.classList.toggle('is-on', i < on));
-      sec.classList.toggle('is-done', on === 3);
+      lamps.forEach((l, i) => {
+        l.classList.toggle('is-on', i < on);
+        if (i < on) draw($('svg', l));
+      });
     },
   });
 }
@@ -292,7 +286,7 @@ function ticker() {
 
 function pointerParallax() {
   // The drawing tilts a few pixels toward the pointer, like paper under a lamp.
-  const fig = $('[data-core-fig] svg', intro);
+  const fig = $('[data-city]', intro);
   if (!fig) return;
   const x = gsap.quickTo(fig, 'x', { duration: 1, ease: 'power3.out' });
   const y = gsap.quickTo(fig, 'y', { duration: 1, ease: 'power3.out' });

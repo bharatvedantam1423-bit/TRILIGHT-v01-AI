@@ -54,8 +54,8 @@ const centred = (cx: number, cy: number, w: number, d: number, r = 0.6): Plan =>
  */
 export function ic(
   c: Ctx,
-  { cx, cy, z, w, d, h = 3, pins = 8, sides = 4, mark = '', lit = false, markSize = 2.2 }:
-  { cx: number; cy: number; z: number; w: number; d: number; h?: number; pins?: number; sides?: 2 | 4; mark?: string; lit?: boolean; markSize?: number },
+  { cx, cy, z, w, d, h = 3, pins = 8, sides = 4, mark = '', lit = false, markSize = 2.2, leadsOn = 'x', markAlong = 'x' }:
+  { cx: number; cy: number; z: number; w: number; d: number; h?: number; pins?: number; sides?: 2 | 4; mark?: string; lit?: boolean; markSize?: number; leadsOn?: 'x' | 'y'; markAlong?: 'x' | 'y' },
 ) {
   const back: { at: Point3; svg: string }[] = [];
   const front: { at: Point3; svg: string }[] = [];
@@ -65,14 +65,14 @@ export function ic(
   };
   const pitch = (n: number, span: number) => Array.from({ length: n }, (_, i) => -span / 2 + (span / (n - 1)) * i);
   const L = 3.4;
-  pitch(pins, d - 4).forEach((o) => { lead(cx - w / 2 - L / 2 + 0.4, cy + o, L, 0.9); lead(cx + w / 2 + L / 2 - 0.4, cy + o, L, 0.9); });
-  if (sides === 4) pitch(pins, w - 4).forEach((o) => { lead(cx + o, cy - d / 2 - L / 2 + 0.4, 0.9, L); lead(cx + o, cy + d / 2 + L / 2 - 0.4, 0.9, L); });
+  if (sides === 4 || leadsOn === 'x') pitch(pins, d - 4).forEach((o) => { lead(cx - w / 2 - L / 2 + 0.4, cy + o, L, 0.9); lead(cx + w / 2 + L / 2 - 0.4, cy + o, L, 0.9); });
+  if (sides === 4 || leadsOn === 'y') pitch(pins, w - 4).forEach((o) => { lead(cx + o, cy - d / 2 - L / 2 + 0.4, 0.9, L); lead(cx + o, cy + d / 2 + L / 2 - 0.4, 0.9, L); });
   const body = centred(cx, cy, w, d, 0.8);
   return [
     c.sorted(back),
     c.box(body, z + 0.4, h, { tone: 'hi', crease: 'lo', lit }, 3, 0.6),
     c.L(k.ring(cx - w / 2 + 2.6, cy - d / 2 + 2.6, 0.9, z + 0.4 + h, c.P, 14), { tone: 'mid' }),
-    mark ? c.engrave(mark, cx, cy + markSize * 0.35, z + 0.4 + h, markSize, 'mid', 'middle') : '',
+    mark ? c.engrave(mark, markAlong === 'x' ? cx : cx - markSize * 0.35, markAlong === 'x' ? cy + markSize * 0.35 : cy, z + 0.4 + h, markSize, 'mid', 'middle', markAlong) : '',
     c.sorted(front),
   ].join('');
 }
@@ -105,40 +105,79 @@ export function header(c: Ctx, x0: number, y: number, z: number, count: number, 
   return c.box(carrier, z, 3, { tone: 'lo' }, 2, 0.4) + c.sorted(out);
 }
 
-/** A jumper wire arcing between two points on a board, with its two plugs. */
-export function jumper(c: Ctx, a: Point3, b: Point3, lift: number, tone: Tone = 'mid') {
-  const pts: Point3[] = [];
-  for (let i = 0; i <= 24; i++) {
-    const t = i / 24;
-    pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t + 4 * lift * t * (1 - t)]);
-  }
-  return [
-    c.post(a[0], a[1], 1.4, a[2], 4, { tone: 'mid', crease: 'none' }, 12),
-    c.post(b[0], b[1], 1.4, b[2], 4, { tone: 'mid', crease: 'none' }, 12),
-    `<path class="iso-line bp-cable" data-tone="${tone}" d="${c.path3(pts.map(([x, y, z]) => [x, y, z + 4] as Point3))}"/>`,
-  ].join('');
-}
-
 /** A mounting hole: plated ring with a dark bore. */
 export function hole(c: Ctx, x: number, y: number, z: number, r = 3) {
   return c.L(k.ring(x, y, r, z, c.P, 24), { tone: 'mid' }) + c.L(k.ring(x, y, r * 0.55, z, c.P, 20), { tone: 'lo' });
 }
 
-/** Wireframe of a box: visible edges solid, hidden edges dashed. */
-export function wireBox(c: Ctx, plan: Plan, z0: number, z1: number, tone: Tone = 'hi') {
-  const { x, y, w, d } = plan;
-  const xs = [x, x + w];
-  const ys = [y, y + d];
-  const [vx, vy] = k.towardViewer(c.P);
-  const hiddenX = vx > 0 ? x : x + w; // the far face along x
-  const hiddenY = vy > 0 ? y : y + d;
-  const solid: string[] = [];
-  const dashed: string[] = [];
-  const seg = (p: Point3, q: Point3, hidden: boolean) => (hidden ? dashed : solid).push(k.segment(p, q, c.P));
-  for (const zz of [z0, z1]) {
-    for (const yy of ys) seg([x, yy, zz], [x + w, yy, zz], zz === z0 && yy === hiddenY);
-    for (const xx of xs) seg([xx, y, zz], [xx, y + d, zz], zz === z0 && xx === hiddenX);
+/** Convex hull of screen points (monotone chain), counter-clockwise. */
+export function hull(points: [number, number][]) {
+  const p = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o: [number, number], a: [number, number], b: [number, number]) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower: [number, number][] = [];
+  for (const q of p) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2]!, lower[lower.length - 1]!, q) <= 0) lower.pop();
+    lower.push(q);
   }
-  for (const xx of xs) for (const yy of ys) seg([xx, yy, z0], [xx, yy, z1], xx === hiddenX && yy === hiddenY);
-  return c.L(dashed.join(''), { tone: 'lo', dashed: true }) + c.L(solid.join(''), { tone });
+  const upper: [number, number][] = [];
+  for (const q of [...p].reverse()) {
+    while (upper.length >= 2 && cross(upper[upper.length - 2]!, upper[upper.length - 1]!, q) <= 0) upper.pop();
+    upper.push(q);
+  }
+  return [...lower.slice(0, -1), ...upper.slice(0, -1)];
+}
+
+/**
+ * A round part lying on its side: a wheel, roller or barrel whose axis runs
+ * along x or y. Hull for the silhouette, the cap that faces the viewer, a hub
+ * and a few tread lines on the visible side.
+ */
+export function drum(
+  c: Ctx,
+  [cx, cy, cz]: Point3,
+  r: number,
+  w: number,
+  axis: 'x' | 'y',
+  { tone = 'hi', hub = 0.42, treads = 0, lit = false }: { tone?: Tone; hub?: number; treads?: number; lit?: boolean } = {},
+) {
+  const N = 40;
+  const ring = (o: number, rr: number): Point3[] =>
+    Array.from({ length: N }, (_, i) => {
+      const a = (i / N) * Math.PI * 2;
+      return axis === 'y'
+        ? [cx + rr * Math.cos(a), cy + o, cz + rr * Math.sin(a)]
+        : [cx + o, cy + rr * Math.cos(a), cz + rr * Math.sin(a)];
+    });
+  const [vx, vy] = k.towardViewer(c.P);
+  const near = (axis === 'y' ? vy : vx) > 0 ? w / 2 : -w / 2;
+  const capPts = ring(near, r);
+  const all = [...ring(-w / 2, r), ...capPts].map(c.at);
+  const outline = k.pathOf(hull(all), true);
+  const cap = k.pathOf(capPts.map(c.at), true);
+  const hubD = hub > 0 ? k.pathOf(ring(near, r * hub).map(c.at), true) : '';
+  const tread: string[] = [];
+  for (let i = 0; i < treads; i++) {
+    const a = (i / treads) * Math.PI * 2;
+    const p = (o: number): Point3 => axis === 'y'
+      ? [cx + r * Math.cos(a), cy + o, cz + r * Math.sin(a)]
+      : [cx + o, cy + r * Math.cos(a), cz + r * Math.sin(a)];
+    // Only lines on the half of the tyre that faces up toward the camera.
+    if (Math.sin(a) < -0.2) continue;
+    tread.push(k.pathOf([c.at(p(-w / 2)), c.at(p(w / 2))]));
+  }
+  return `<g class="iso-solid"${lit ? ' data-lit=""' : ''}><path class="iso-fill" d="${outline}"/><path class="iso-shade" data-shade="1" d="${outline}"/><path class="iso-top" d="${cap}"/>`
+    + `${tread.length ? `<path class="iso-line" data-tone="faint" d="${tread.join('')}"/>` : ''}`
+    + `${hubD ? `<path class="iso-line" data-tone="mid" d="${hubD}"/>` : ''}`
+    + `<path class="iso-line iso-crease" data-tone="lo" d="${cap}"/><path class="iso-line iso-edge" data-tone="${tone}" d="${outline}"/></g>`;
+}
+
+/** A bar of any floor direction: rectangle from a to b, `w` wide, extruded. */
+export function bar(c: Ctx, a: [number, number], b: [number, number], w: number, z: number, h: number, style?: k.SolidStyle) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const px = (-dy / len) * (w / 2);
+  const py = (dx / len) * (w / 2);
+  const ring: [number, number][] = [[a[0] + px, a[1] + py], [b[0] + px, b[1] + py], [b[0] - px, b[1] - py], [a[0] - px, a[1] - py]];
+  return c.S(k.extrude(ring, z, h, c.P), style);
 }

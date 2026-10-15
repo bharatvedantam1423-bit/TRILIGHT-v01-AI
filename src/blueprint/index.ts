@@ -7,9 +7,10 @@
  * hide the lines behind them. Without JavaScript, or with reduced motion,
  * the figures are simply drawn.
  */
-import { coreFigure } from './core';
 import { loopCard } from './board';
 import { stageFigure } from './ladder';
+import { heroFigure } from './hero';
+import { journeyFigure, forceFigure } from './journey';
 
 const BUCKETS = 10;
 
@@ -22,15 +23,23 @@ export function drawable(svg: string) {
   });
 }
 
-export function core(label: string) {
-  const f = coreFigure(label);
-  return { ...f, svg: drawable(f.svg) };
-}
-
 export function loop(stage: 'sense' | 'decide' | 'act', label: string) {
   return drawable(loopCard(stage, label));
 }
 
 export function stage(id: string, label: string) {
   return drawable(stageFigure(id, label));
+}
+
+export function heroScene(label: string) {
+  const f = heroFigure(label);
+  return { ...f, svg: drawable(f.svg) };
+}
+
+export function journey(id: string, label: string) {
+  return drawable(journeyFigure(id, label));
+}
+
+export function force(id: string, label: string) {
+  return drawable(forceFigure(id, label));
 }
