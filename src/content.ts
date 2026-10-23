@@ -40,54 +40,71 @@ export const hero = {
     'An isometric blueprint of a dense circuit board, its components standing like a city round an empty socket. A hand with tweezers places the Trilight chip in the socket and the board powers up.',
   stats: [
     { value: 'Up to ₹5 Lakh', label: 'Grant Per Team' },
+    { value: '₹3 Cr', label: 'Grant Pool' },
     { value: '8', label: 'Stages' },
     { value: 'April 2027', label: 'Demo Day' },
   ],
 };
 
 /* 2 · The ladder --------------------------------------------------------- */
-export type LadderRow = { level: string; text: string; grant?: string };
-export type LadderGroup = { id: string; step: string; title: string; figure: string; figureLabel: string; rows: LadderRow[] };
+export type Stage = {
+  id: string;
+  phase: 'Pre-entry' | 'Foundation' | 'Execution';
+  level: string;
+  title: string;
+  /** What a team builds or proves to clear the stage (program doc, Table 1). */
+  proof: string;
+  /** Indicative time (program doc, "How long it takes"). */
+  time: string;
+  /** Grant unlocked on entry (program doc, Table 2). */
+  grant: string | null;
+  /** A drawing id (src/blueprint/journey.ts) or a photo in /public/img. */
+  figure: { kind: 'drawing' | 'photo'; src: string; label: string };
+};
 
 export const ladder = {
   kicker: 'The ladder',
   headline: 'Earn Your Way to a Real Product',
   alt: 'See How Far Your Ideas Can Go',
   body: 'Every arrow is a Technology Readiness Review. Clear it with evidence and the next level, and its grant, unlocks.',
-  groups: <LadderGroup[]>[
-    {
-      id: 'idea', step: '01 · Explorer → TRL 1–2', title: 'Idea', figure: 'idea',
-      figureLabel: 'A pencil sketch of a quadcopter drone on graph paper, marked v0.1?',
-      rows: [
-        { level: 'Explorer', text: 'Learn the basics, solo' },
-        { level: 'TRL 1–2', text: 'Problem, team of 3–5, proposal' },
-      ],
-    },
-    {
-      id: 'model', step: '02 · TRL 3', title: 'Model', figure: 'model',
-      figureLabel: 'The same drone as a simulation wireframe on a grid, with its 120 span',
-      rows: [{ level: 'TRL 3', text: 'Working simulation' }],
-    },
-    {
-      id: 'prototype', step: '03 · TRL 4 → 5', title: 'Prototype', figure: 'prototype',
-      figureLabel: 'The drone as a bare prototype: frame, motors, speed controllers and a flight-controller chip on the bench',
-      rows: [
-        { level: 'TRL 4', text: 'Breadboard that senses, decides, acts', grant: '₹30K' },
-        { level: 'TRL 5', text: 'Proof of concept at a host site', grant: '₹70K' },
-      ],
-    },
-    {
-      id: 'product', step: '04 · TRL 6 → 8', title: 'Product', figure: 'product',
-      figureLabel: 'The finished drone flying over its landing pad, with a robotic rover beside it',
-      rows: [
-        { level: 'TRL 6', text: 'Golden sample, real users', grant: '₹1.5L' },
-        { level: 'TRL 7', text: 'First paying customer', grant: '₹2.5L' },
-        { level: 'TRL 8', text: 'Qualified, repeatable, sold', grant: 'Tri-Light' },
-      ],
-    },
+  stages: <Stage[]>[
+    { id: 'explorer', phase: 'Pre-entry', level: 'Explorer', title: 'Learn the basics',
+      proof: 'Hardware & AIoT 101 and Computational Thinking, solo. Clear the Checkpoints.',
+      time: '4–6 weeks', grant: null,
+      figure: { kind: 'drawing', src: 'learn', label: 'An open course notebook with a circuit schematic and the sense, decide, act loop, beside an LED, a resistor and an ultrasonic sensor' } },
+    { id: 'trl12', phase: 'Foundation', level: 'TRL 1–2', title: 'Idea',
+      proof: 'Form a team of 3–5, pick a real problem and submit a proposal that passes the AI-scored evaluation.',
+      time: '4–6 weeks', grant: null,
+      figure: { kind: 'drawing', src: 'idea', label: 'A pencil sketch of a quadcopter drone on graph paper, marked v0.1?' } },
+    { id: 'trl3', phase: 'Foundation', level: 'TRL 3', title: 'Model',
+      proof: 'A working simulation: 3D models and software that prove the idea can work.',
+      time: '6–10 weeks', grant: null,
+      figure: { kind: 'photo', src: 'stage-trl3', label: 'CAD and simulation software showing 3D models, stress maps and flow analysis of hardware parts' } },
+    { id: 'trl4', phase: 'Foundation', level: 'TRL 4', title: 'Prototype',
+      proof: 'A breadboard prototype that closes the sense–decide–act loop, tested in the lab.',
+      time: '2–3 months', grant: '₹30K',
+      figure: { kind: 'photo', src: 'stage-trl4', label: 'A breadboard prototype with a microcontroller, regulator, wires and lit LEDs' } },
+    { id: 'trl5', phase: 'Execution', level: 'TRL 5', title: 'Proof of concept',
+      proof: 'Validated at a real host site: your circuit on Zero PCB, inside an enclosure.',
+      time: '3–4 months', grant: '₹70K',
+      figure: { kind: 'photo', src: 'stage-trl5', label: 'A hand-built circuit board inside an open plastic enclosure beside its lid' } },
+    { id: 'trl6', phase: 'Execution', level: 'TRL 6', title: 'Golden sample',
+      proof: 'A custom PCB and enclosure, tested with real users: 5 for B2B, 20 for B2C.',
+      time: '3–6 months', grant: '₹1.5L',
+      figure: { kind: 'photo', src: 'stage-trl6', label: 'A custom PCB mounted on standoffs inside a metal enclosure with a panel connector' } },
+    { id: 'trl7', phase: 'Execution', level: 'TRL 7', title: 'First customer',
+      proof: 'A beta product built to certification standards, and a customer who pays for it.',
+      time: '3–6 months', grant: '₹2.5L',
+      figure: { kind: 'photo', src: 'stage-trl7', label: 'An exploded view of a wearable device: cover, gasket, battery, main PCB, shielding, sensor and adhesive patch' } },
+    { id: 'trl8', phase: 'Execution', level: 'TRL 8', title: 'Qualified product',
+      proof: 'Everything combined: a qualified system, multiple paying customers, and a build an outside team can repeat.',
+      time: '6–9 months', grant: 'Tri-Light',
+      figure: { kind: 'photo', src: 'stage-trl8', label: 'Finished sensor units being assembled and tested on a bench, ready to ship' } },
   ],
   footnote:
-    'Grants unlock as you enter TRL 4 to 7, up to ₹5L per team. Paid to vendors or reimbursed against invoices, never as cash.',
+    'Grants unlock as you enter TRL 4 to 7, up to ₹5L per team. Paid to vendors or reimbursed against invoices, never as cash. Times are indicative.',
+  more: 'Get Full Details',
+  moreHref: '/program.html',
 };
 
 /* 3 · Fundamentals (the loop) ------------------------------------------- */

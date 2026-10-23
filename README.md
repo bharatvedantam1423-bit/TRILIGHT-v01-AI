@@ -79,9 +79,13 @@ fills settle in.
    copy clears, a hand with tweezers seats the Trilight chip, the copper lights
    out from the socket. Before that, a soft beam rises from the empty socket. The static board
    is prerendered to images (see below), so scrolling only moves pictures.
-2. **The ladder (pinned).** Title on top; the drawing on the left grows from a
-   pencil sketch of a drone to its wireframe model, the bare prototype and the
-   finished drone with a rover, while the one active step reads on the right.
+2. **The ladder (carousel).** All eight stages, Explorer to TRL 8, one at a
+   time: prev/next buttons, the stage rail, arrow keys or a swipe. Each stage
+   shows its picture (line drawings for Explorer and TRL 1–2, reference photos
+   for TRL 3–8 in `public/img/stage-*.webp`) with what to prove, time and grant.
+   "Get Full Details" opens `/program.html`, generated from
+   `docs/TRL8-program.md` on every build (`scripts/build-doc.mjs`), with a
+   Download PDF button.
 3. **Fundamentals.** One sense → decide → act board framed in three cards.
 4. **The three forces.** One drawing per light (Build, Test, Deploy), drawn
    with the scroll position itself; each light turns on as its drawing completes.

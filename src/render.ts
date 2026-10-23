@@ -122,50 +122,58 @@ function intro(markSvg: string) {
 }
 
 /*
- * 2 · The ladder: pinned. The title sits on top; below it the drawing grows on
- * the left while the step changes on the right. One thing moves at a time.
+ * 2 · The ladder: one stage at a time. Prev/next buttons, the stage rail,
+ * arrow keys or a swipe move left to right through all eight stages; the
+ * picture and the details change together. Without JS it's a scrollable row.
  */
 function ladderSection() {
-  const groups = ladder.groups;
-  const n = groups.length;
+  const st = ladder.stages;
+  const n = st.length;
+  const pad = (i: number) => String(i).padStart(2, '0');
+  const media = (s: (typeof st)[number], i: number) =>
+    s.figure.kind === 'photo'
+      ? `<img src="/img/${s.figure.src}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
+      : bp.journey(s.figure.src, s.figure.label).replace('<svg', `<svg data-stage-draw="${i}"`);
+  const chev = (dir: 'prev' | 'next') =>
+    `<svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="${dir === 'prev' ? 'M12.5 4.5 7 10l5.5 5.5' : 'M7.5 4.5 13 10l-5.5 5.5'}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   return `
-<section class="journey" id="ladder" aria-labelledby="ladder-title">
-  <div class="journey__sticky">
-    <div class="wrap">
-      <header class="journey__head">
-        <div>
-          ${label(ladder.kicker)}
-          <h2 id="ladder-title" class="h2">${esc(ladder.headline)}</h2>
-        </div>
-        <p class="lede">${esc(ladder.body)}</p>
-      </header>
-      <div class="journey__grid">
-        <div class="journey__left">
-          <div class="journey__stage" aria-hidden="true">
-            ${groups.map((g, i) => `<div class="journey__fig${i === 0 ? ' is-active' : ''}" data-journey-fig>${bp.journey(g.figure, g.figureLabel)}</div>`).join('')}
-          </div>
-          <ol class="journey__gates" aria-hidden="true">
-            ${groups.map((g, i) => `<li class="${i === 0 ? 'is-on' : ''}" data-journey-gate><b>${esc(g.title)}</b></li>`).join('')}
-          </ol>
-        </div>
-        <div class="journey__steps">
-          ${groups
-            .map(
-              (g, i) => `
-          <div class="journey__step${i === 0 ? ' is-active' : ''}" data-journey-step>
-            <p class="journey__count"><b>${String(i + 1).padStart(2, '0')}</b> / ${String(n).padStart(2, '0')}</p>
-            <h3 class="journey__title">${esc(g.title)}</h3>
-            <p class="journey__n">${esc(g.step)}</p>
-            <dl class="journey__rows">
-              ${g.rows.map((r) => `<div><dt>${esc(r.level)}</dt><dd>${esc(r.text)}</dd>${r.grant ? `<dd class="journey__grant">${esc(r.grant)}</dd>` : ''}</div>`).join('')}
+<section class="section ladder2" id="ladder" aria-labelledby="ladder-title" data-ladder>
+  <div class="wrap">
+    ${head(ladder.kicker, ladder.headline, 'ladder-title', ladder.body)}
+    <ol class="rail" role="tablist" aria-label="Stages">
+      ${st.map((s, i) => `<li role="presentation"><button type="button" role="tab" class="rail__tab${i === 0 ? ' is-on' : ''}" aria-selected="${i === 0}" aria-controls="stage-${s.id}" data-goto="${i}"><span>${pad(i + 1)}</span><b>${esc(s.level)}</b></button></li>`).join('')}
+    </ol>
+    <div class="slides" data-slides tabindex="0" aria-roledescription="carousel" aria-label="The eight stages">
+      <div class="slides__track" data-track>
+        ${st
+          .map(
+            (s, i) => `
+        <article class="slide${i === 0 ? ' is-active' : ''}" id="stage-${s.id}" role="tabpanel" aria-label="${esc(s.level)}: ${esc(s.title)}" data-slide>
+          <div class="slide__media slide__media--${s.figure.kind}">${media(s, i)}</div>
+          <div class="slide__body">
+            <p class="slide__count"><b>${pad(i + 1)}</b> / ${pad(n)} · ${esc(s.phase)}</p>
+            <p class="slide__level">${esc(s.level)}</p>
+            <h3 class="slide__title">${esc(s.title)}</h3>
+            <p class="slide__proof">${esc(s.proof)}</p>
+            <dl class="slide__facts">
+              <div><dt>Time</dt><dd>${esc(s.time)} <small>indicative</small></dd></div>
+              <div><dt>Grant</dt><dd>${s.grant ? `<b>${esc(s.grant)}</b>` : '<span class="muted">—</span>'}</dd></div>
             </dl>
-          </div>`,
-            )
-            .join('')}
-          <p class="fine journey__foot">${esc(ladder.footnote)}</p>
-        </div>
+          </div>
+        </article>`,
+          )
+          .join('')}
       </div>
     </div>
+    <div class="ladder2__foot">
+      <div class="ladder2__nav">
+        <button type="button" class="navbtn" data-prev aria-label="Previous stage">${chev('prev')}</button>
+        <span class="ladder2__progress" aria-hidden="true"><i data-progress></i></span>
+        <button type="button" class="navbtn" data-next aria-label="Next stage">${chev('next')}</button>
+      </div>
+      <a class="btn btn--ghost" href="${esc(ladder.moreHref)}" target="_blank" rel="noopener" data-section="ladder-details"><span>${esc(ladder.more)}</span>${arrow}</a>
+    </div>
+    <p class="fine ladder2__note">${esc(ladder.footnote)}</p>
   </div>
 </section>`;
 }

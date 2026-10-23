@@ -22,6 +22,57 @@ const c = ctx(P);
 const circle = (ctr: Point3, r: number, n = 28): Point3[] =>
   Array.from({ length: n + 1 }, (_, i) => [ctr[0] + r * Math.cos((i / n) * Math.PI * 2), ctr[1] + r * Math.sin((i / n) * Math.PI * 2), ctr[2]]);
 
+/**
+ * Explorer: learning the basics. An open course notebook: a circuit schematic
+ * on the left page, the sense → decide → act loop on the right, and the first
+ * parts beside it (an LED, a resistor, an ultrasonic sensor).
+ */
+function learn() {
+  const z = 0.8;
+  const left: Plan = { x: -128, y: -96, w: 120, d: 170, r: 1 };
+  const right: Plan = { x: -4, y: -96, w: 120, d: 170, r: 1 };
+  const out: string[] = [c.halo({ x: -128, y: -96, w: 244, d: 170, r: 2 }, 0)];
+  out.push(c.box({ x: -132, y: -100, w: 252, d: 178, r: 3 }, -3, 3, { tone: 'lo', crease: 'faint' }, 3));
+  for (const pg of [left, right]) {
+    out.push(c.box(pg, 0, z, { tone: 'mid', crease: 'none' }, 2));
+    const rules: string[] = [];
+    for (let y = pg.y + 12; y < pg.y + pg.d; y += 12) rules.push(k.lineOnTop([pg.x + 6, y], [pg.x + pg.w - 6, y], z, P));
+    out.push(c.L(rules.join(''), { tone: 'faint' }));
+  }
+  out.push(c.L(k.lineOnTop([-6, -96], [-6, 74], z, P), { tone: 'lo' }));
+  const on = (pts: [number, number][], closed = false) => k.onTop(pts, z, P, closed);
+  // Left page: battery, resistor and LED in one loop.
+  const sch: string[] = [];
+  sch.push(on([[-110, -60], [-30, -60], [-30, 40], [-110, 40], [-110, 6]]));
+  sch.push(on([[-110, -26], [-110, -60]]));
+  sch.push(on([[-118, -26], [-102, -26]]), on([[-114, -18], [-106, -18]]), on([[-110, -18], [-110, 6]]));
+  const zig: [number, number][] = [[-30, -40]];
+  for (let i = 0; i < 6; i++) zig.push([-30 + (i % 2 ? -6 : 6), -36 + i * 5]);
+  zig.push([-30, -6]);
+  sch.push(on(zig));
+  sch.push(on([[-78, 32], [-62, 40], [-78, 48]], true), on([[-62, 32], [-62, 48]]));
+  sch.push(on([[-70, 26], [-64, 20]]), on([[-64, 26], [-58, 20]]));
+  out.push(`<g class="bp-sketch">${c.L(sch.join(''), { tone: 'hi' })}</g>`);
+  out.push(c.engrave('HW & AIoT 101', left.x + 8, left.y + 10, z, 6, 'mid'));
+  // Right page: the loop as a flowchart.
+  const box = (x: number, y: number) => on([[x, y], [x + 34, y], [x + 34, y + 20], [x, y + 20]], true);
+  const flow = [box(40, -70), box(40, -20), box(40, 30), on([[57, -50], [57, -20]]), on([[57, 0], [57, 30]]), on([[74, 40], [96, 40], [96, -60], [74, -60]])];
+  flow.push(on([[53, -26], [57, -20], [61, -26]]), on([[53, 24], [57, 30], [61, 24]]), on([[80, -64], [74, -60], [80, -56]]));
+  out.push(`<g class="bp-sketch">${c.L(flow.join(''), { tone: 'hi' })}</g>`);
+  out.push(c.engrave('SENSE', 45, -58, z, 5, 'mid'), c.engrave('DECIDE', 43, -8, z, 5, 'mid'), c.engrave('ACT', 50, 42, z, 5, 'mid'));
+  out.push(c.engrave('CHECKPOINT ✓', right.x + 8, right.y + 10, z, 6, 'hi'));
+  // First parts on the bench.
+  const parts = [
+    { at: [96, 100, 0] as Point3, svg: c.box({ x: 70, y: 90, w: 52, d: 22, r: 2 }, 0, 3, { tone: 'mid', crease: 'lo' }, 3, 0.5)
+      + c.post(84, 101, 8, 3, 8, { tone: 'hi', crease: 'lo' }, 22) + c.post(108, 101, 8, 3, 8, { tone: 'hi', crease: 'lo' }, 22)
+      + c.L(k.ring(84, 101, 4.5, 11, P, 18) + k.ring(108, 101, 4.5, 11, P, 18), { tone: 'mid' }) },
+    { at: [20, 104, 0] as Point3, svg: c.post(20, 104, 4, 0, 3, { tone: 'mid' }, 18) + c.post(20, 104, 3.2, 3, 9, { tone: 'hi', crease: 'lo', lit: true }, 18) },
+    { at: [-40, 104, 0] as Point3, svg: smd(c, -40, 104, 0, 'x', 14, 5, 4) },
+  ];
+  out.push(c.sorted(parts));
+  return out.join('');
+}
+
 function idea() {
   const sheet: Plan = { x: -130, y: -110, w: 250, d: 200, r: 1 };
   const z = 0.8;
@@ -107,7 +158,7 @@ function product() {
   return out.join('');
 }
 
-const journey: Record<string, () => string> = { idea, model, prototype, product };
+const journey: Record<string, () => string> = { learn, idea, model, prototype, product };
 
 export function journeyFigure(id: string, label: string) {
   const build = journey[id];
@@ -116,7 +167,7 @@ export function journeyFigure(id: string, label: string) {
     width: JOURNEY_W,
     height: JOURNEY_H,
     label,
-    className: `bp-svg bp-draw${id === 'idea' ? ' bp-svg--sketch' : ''}${id === 'model' ? ' bp-svg--wire' : ''}`,
+    className: `bp-svg bp-draw${id === 'idea' || id === 'learn' ? ' bp-svg--sketch' : ''}${id === 'model' ? ' bp-svg--wire' : ''}`,
     body: build(),
   });
 }

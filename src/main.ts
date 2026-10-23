@@ -203,41 +203,52 @@ function loopScene() {
 }
 
 /**
- * The ladder, pinned: as you scroll the drawing on the left grows into the
- * next stage (sketch → model → prototype → product) and the step on the
- * right changes with it. Each gate lights as its stage arrives.
+ * The ladder carousel: one stage in view. Buttons, the stage rail, arrow keys
+ * and swipes move between stages; a drawing draws itself the first time its
+ * stage is shown.
  */
 function ladderScene() {
-  const sec = $('#ladder');
+  const sec = $('[data-ladder]');
   if (!sec) return;
-  const figs = $$('[data-journey-fig]', sec);
-  const steps = $$('[data-journey-step]', sec);
-  const gates = $$('[data-journey-gate]', sec);
-  const tag = $('[data-journey-tag]', sec);
-  const tags = steps.map((s) => $('.journey__n', s)?.textContent ?? '');
-  let current = -1;
-  const show = (i: number) => {
-    if (i === current) return;
-    current = i;
-    figs.forEach((f, j) => f.classList.toggle('is-active', j === i));
-    steps.forEach((s, j) => s.classList.toggle('is-active', j === i));
-    gates.forEach((g, j) => g.classList.toggle('is-on', j <= i));
-    if (tag) tag.textContent = tags[i] ?? '';
-    draw($('svg', figs[i]));
+  const track = $('[data-track]', sec)!;
+  const slides = $$('[data-slide]', sec);
+  const tabs = $$<HTMLButtonElement>('[data-goto]', sec);
+  const prev = $<HTMLButtonElement>('[data-prev]', sec)!;
+  const next = $<HTMLButtonElement>('[data-next]', sec)!;
+  const bar = $('[data-progress]', sec);
+  let i = 0;
+  const go = (to: number, focusTab = false) => {
+    i = Math.max(0, Math.min(slides.length - 1, to));
+    track.style.transform = `translate3d(${-i * 100}%, 0, 0)`;
+    slides.forEach((s, j) => { s.classList.toggle('is-active', j === i); s.toggleAttribute('inert', j !== i); });
+    tabs.forEach((t, j) => { t.classList.toggle('is-on', j === i); t.classList.toggle('is-past', j < i); t.setAttribute('aria-selected', String(j === i)); });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    if (bar) bar.style.transform = `scaleX(${(i + 1) / slides.length})`;
+    draw($('svg', slides[i]));
+    if (focusTab) tabs[i]?.focus();
+    tabs[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
   };
-  show(0);
-  ScrollTrigger.create({
-    trigger: sec, start: 'top top', end: 'bottom bottom',
-    onUpdate: (self) => show(Math.min(figs.length - 1, Math.floor(self.progress * figs.length * 0.999))),
+  sec.classList.add('is-carousel');
+  prev.addEventListener('click', () => go(i - 1));
+  next.addEventListener('click', () => go(i + 1));
+  tabs.forEach((t, j) => t.addEventListener('click', () => go(j)));
+  sec.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(i + 1, document.activeElement?.hasAttribute('data-goto')); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(i - 1, document.activeElement?.hasAttribute('data-goto')); }
   });
+  let x0: number | null = null;
+  track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+  track.addEventListener('pointerup', (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1));
+  });
+  ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: () => go(i) });
+  go(0);
 }
 
-/**
- * The three forces draw with the scroll, not after it: each drawing's --d
- * follows the scroll position, and its light turns on as the drawing completes.
- * Side by side (desktop) they go left to right; stacked (phone) each follows
- * its own card.
- */
 function lampsScene() {
   const list = $('[data-lamps]');
   if (!list) return;
