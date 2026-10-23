@@ -62,7 +62,7 @@ Sections, in the doc's order: 1 Hero · 2 The ladder · 3 Fundamentals (the loop
 
 ## Analytics
 
-`src/analytics.ts` pushes funnel events to `window.dataLayer`, ready for GTM or GA4. A/B test: the ladder auto-advances for half of visitors (`trl8_ab_assign {test: ladder_autoplay, variant}`; force with `?ladder=auto` or `?ladder=manual`).
+`src/analytics.ts` pushes funnel events to `window.dataLayer`, ready for GTM or GA4. The ladder carousel reports each stage it shows as `trl8_ladder_stage {stage, by}` (`by`: auto, tab, button, key, swipe, slide).
 `trl8_page_view`, `trl8_cta_click {section}`, `trl8_scroll_depth {section}`,
 `trl8_login_success`, `trl8_platform_redirect`.
 
@@ -75,7 +75,7 @@ end of each headline in a quieter ink, set by `tone` in `src/content.ts`) and a
 folder-tab cut on framed pictures. Two sections are deep navy (`#041322`): the
 three forces panel and the closing, where the blueprint drawings live.
 
-**Type.** DM Sans for everything (headlines at weight 500, tight tracking) and
+**Type.** Inter for everything (headlines at weight 500, tight tracking) and
 JetBrains Mono for labels, both from Google Fonts. One type scale in
 `src/styles.css` (`--fs-*`); nothing sets its own size.
 
@@ -85,15 +85,26 @@ hero stack unfolds on load; sections reveal as they scroll in.
 `prefers-reduced-motion` and no-JS get a static, fully drawn page.
 
 1. **Hero.** Four stacked plates in isometric line art (`src/blueprint/stack.ts`),
-   TRL 1–2 at the bottom to TRL 8 on top with the Trilight mark, and a level ruler.
+   TRL 1–2 at the bottom to TRL 8 on top, and a level ruler. On load the stack
+   unfolds, a hand with tweezers (`public/img/hero/hand-light.webp`, the line
+   drawing recoloured for the light page) brings the Trilight chip in and seats
+   it; the top plate lights out from the chip, the ruler climbs to TRL 8 and
+   signals run down the stack. Every 7s the hand comes back and taps the chip.
    The four key facts sit below in dashed boxes.
-2. **The ladder.** All eight stages in a list beside one stage at a time:
-   picture, what to prove, time and grant. Prev/next, arrow keys or a swipe; the
-   autoplay A/B test (`?ladder=auto|manual`) still runs. "Get Full Details" opens
-   `/program.html`, generated from `docs/TRL8-program.md` on every build.
+2. **The ladder.** An auto-advancing carousel after Zaro's: the current stage
+   large in the middle (its photo slowly zooming), neighbours peeking in at the
+   sides, every 4.5s the next one slides in, looping without end. The rail of
+   eight stages above fills while it waits. Rail, prev/next, arrow keys, swipes
+   or a click on a side slide move it by hand; it pauses only off-screen.
+   "Get Full Details" opens `/program.html`, generated from
+   `docs/TRL8-program.md` on every build.
 3. **Fundamentals.** Three cards (Sense, Decide, Act) that follow one example,
-   a smoke alarm. Each shows a photo when `public/img/loop/<id>.webp` exists,
-   else its blueprint drawing.
+   a smoke alarm. Each photo (`public/img/loop/<id>.webp`) carries an animated
+   line-art overlay (`src/blueprint/overlays.ts`): sensing rings and the smoke
+   traced into the vents with a ppm reading that counts up; the chip bracketed
+   with a signal into it and a burnt-toast-or-fire readout; the spray cone, the
+   valve tagged open and the phone calling the fire brigade. The overlays are
+   placed on these exact photos: move them if a photo changes.
 4. **The three forces.** A navy panel: Build, Test and Deploy light one after
    another, and each force's drawing draws in.
 5. **What it takes, Doors, Who can join, Problems, FAQ**, then the navy

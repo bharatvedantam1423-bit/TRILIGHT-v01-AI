@@ -59,6 +59,9 @@ is dropped in, each card shows its blueprint drawing.
 
 Export as WebP (quality ~80, under ~300 KB), drop into `public/img/loop/`, rebuild.
 
+Each photo has a line-art overlay placed on it (`src/blueprint/overlays.ts`,
+in the photo's own 1254 px coordinates). If you swap a photo, move its overlay.
+
 ## Door photos (`public/img/doors/standard.webp`, `fasttrack.webp`, 16:9)
 
 All images above are supplied (October 2026); originals in `assets/originals/`.

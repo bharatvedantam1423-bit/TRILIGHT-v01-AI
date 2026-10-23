@@ -89,8 +89,8 @@ $$<HTMLAnchorElement>('a[href^="#"]:not([data-register])').forEach((a) => {
     let pastHero = false;
     let atClose = false;
     const sync = () => bar.classList.toggle('is-visible', pastHero && !atClose);
-    new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe(heroEl);
-    new IntersectionObserver(([e]) => { atClose = e.isIntersecting || e.boundingClientRect.top < 0; sync(); }).observe(closingEl);
+    new IntersectionObserver((es) => { const e = es[es.length - 1]; pastHero = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe(heroEl);
+    new IntersectionObserver((es) => { const e = es[es.length - 1]; atClose = e.isIntersecting || e.boundingClientRect.top < 0; sync(); }).observe(closingEl);
   }
 }
 
@@ -105,13 +105,29 @@ $$<HTMLAnchorElement>('a[href^="#"]:not([data-register])').forEach((a) => {
 /** Draws a blueprint figure in (its lines, then its fills), then lights it. */
 const draw = (host: Element | null | undefined) => {
   if (!host) return;
-  const svg = host.matches('svg') ? host : $('svg.bp-svg', host);
+  const svg = host.matches('svg') ? host : $('svg.bp-svg, svg.ov', host);
   svg?.classList.add('is-drawn');
+  if (svg?.matches('.ov')) $$('[data-count]', svg).forEach((n) => countUp(n, 900, 1300));
   window.setTimeout(() => host.classList.add('is-live'), 1600);
 };
 
+/** Counts a number up from zero, e.g. a sensor reading. */
+function countUp(el: Element, delay: number, ms: number) {
+  const to = Number(el.getAttribute('data-count')) || 0;
+  el.textContent = '0';
+  window.setTimeout(() => {
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const p = Math.min(1, (now - t0) / ms);
+      el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, delay);
+}
+
 if (reduceMotion) {
-  $$('[data-draw]').forEach((el) => { $('svg.bp-svg', el)?.classList.add('is-drawn'); el.classList.add('is-live'); });
+  $$('[data-draw]').forEach((el) => { $('svg.bp-svg, svg.ov', el)?.classList.add('is-drawn'); el.classList.add('is-live'); });
 } else {
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
@@ -126,111 +142,91 @@ if (reduceMotion) {
 
 /* ----------------------------------------------------------------- ladder */
 /*
- * One stage at a time. The list, prev/next, arrow keys and swipes move
- * between the eight stages; picture and details change together.
+ * The ladder carousel moves on its own: every few seconds the next stage
+ * slides to the middle. The rail, prev/next, arrow keys, swipes and a click
+ * on a side slide move it by hand, and the countdown starts again from there.
+ * The slides exist three times over, so it can always slide forward: after
+ * it passes the end of the middle copy it quietly jumps back into it.
  */
+const AUTO_MS = 4500;
 function ladderScene() {
   const sec = $('[data-ladder]');
   if (!sec) return;
+  const vp = $('[data-viewport]', sec)!;
+  const trackEl = $('[data-track]', sec)!;
+  const slides = $$('[data-slide]', sec);
   const tabs = $$<HTMLButtonElement>('[data-goto]', sec);
-  const stages = $$('[data-stage]', sec);
-  const prev = $<HTMLButtonElement>('[data-prev]', sec)!;
-  const next = $<HTMLButtonElement>('[data-next]', sec)!;
-  const list = $('.ladder__list', sec);
-  let i = 0;
+  const rail = $('.lrail', sec);
+  const n = tabs.length;
+  let p = n; // index into all slides; the middle copy is n … 2n-1
+  const k = () => ((p % n) + n) % n;
 
-  const go = (to: number, focusTab = false) => {
-    i = Math.max(0, Math.min(stages.length - 1, to));
-    stages.forEach((s, j) => {
-      const on = j === i;
-      s.hidden = !on;
-      s.classList.toggle('is-on', on);
-    });
+  const place = (animate = true) => {
+    vp.classList.toggle('no-anim', !animate);
+    const el = slides[p];
+    const x = vp.clientWidth / 2 - (el.offsetLeft + el.offsetWidth / 2);
+    trackEl.style.transform = `translate3d(${x}px, 0, 0)`;
+    slides.forEach((s, j) => s.classList.toggle('is-on', j === p));
     tabs.forEach((t, j) => {
-      t.classList.toggle('is-on', j === i);
-      t.classList.toggle('is-past', j < i);
-      t.setAttribute('aria-selected', String(j === i));
-      t.tabIndex = j === i ? 0 : -1;
+      t.classList.toggle('is-on', j === k());
+      t.classList.toggle('is-past', j < k());
+      t.setAttribute('aria-selected', String(j === k()));
+      t.tabIndex = j === k() ? 0 : -1;
     });
-    prev.disabled = i === 0;
-    next.disabled = i === stages.length - 1;
-    draw($('.stage__media', stages[i]));
-    if (focusTab) tabs[i].focus();
-    // Keep the active tab in view in the phone's sideways list, without moving the page.
-    if (list && list.scrollWidth > list.clientWidth) {
-      const t = tabs[i];
-      list.scrollTo({ left: t.offsetLeft - (list.clientWidth - t.offsetWidth) / 2, behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (!animate) { void trackEl.offsetWidth; vp.classList.remove('no-anim'); }
+    if (rail && rail.scrollWidth > rail.clientWidth) {
+      const t = tabs[k()];
+      rail.scrollTo({ left: t.offsetLeft - (rail.clientWidth - t.offsetWidth) / 2, behavior: reduceMotion ? 'auto' : 'smooth' });
     }
   };
-
-  prev.addEventListener('click', () => go(i - 1));
-  next.addEventListener('click', () => go(i + 1));
-  tabs.forEach((t, j) => t.addEventListener('click', () => { go(j); track('ladder_stage', { stage: j + 1, by: 'tab' }); }));
-  sec.addEventListener('keydown', (e) => {
-    const onTab = document.activeElement?.hasAttribute('data-goto') ?? false;
-    if (e.key === 'ArrowRight' || (onTab && e.key === 'ArrowDown')) { e.preventDefault(); go(i + 1, onTab); }
-    if (e.key === 'ArrowLeft' || (onTab && e.key === 'ArrowUp')) { e.preventDefault(); go(i - 1, onTab); }
-  });
-  const stageBox = $('.ladder__stage', sec)!;
-  let x0: number | null = null;
-  stageBox.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
-  stageBox.addEventListener('pointerup', (e) => {
-    if (x0 === null) return;
-    const dx = e.clientX - x0;
-    x0 = null;
-    if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1));
+  // Back into the middle copy once a slide past either end has settled.
+  trackEl.addEventListener('transitionend', (e) => {
+    if (e.target !== trackEl || (p >= n && p < 2 * n)) return;
+    p = n + k();
+    place(false);
   });
 
-  go(0);
-  if (!reduceMotion) autoplay(sec, () => i, (to) => go(to), stages.length, [prev, next, ...tabs, stageBox]);
-}
-
-/**
- * A/B test: does the ladder advance on its own? Variant from ?ladder=auto or
- * ?ladder=manual, else a 50/50 assignment remembered per browser. Reported as
- * trl8_ab_assign {test, variant}; stage views as trl8_ladder_stage.
- */
-const AUTO_MS = 5000;
-function ladderVariant(): 'auto' | 'manual' {
-  const q = new URLSearchParams(location.search).get('ladder');
-  if (q === 'auto' || q === 'manual') return q;
-  try {
-    const kept = localStorage.getItem('trl8_ab_ladder');
-    if (kept === 'auto' || kept === 'manual') return kept;
-    const v = Math.random() < 0.5 ? 'auto' : 'manual';
-    localStorage.setItem('trl8_ab_ladder', v);
-    return v;
-  } catch {
-    return 'auto';
-  }
-}
-
-function autoplay(sec: HTMLElement, at: () => number, go: (to: number) => void, count: number, controls: Element[]) {
-  const variant = ladderVariant();
-  track('ab_assign', { test: 'ladder_autoplay', variant });
-  if (variant !== 'auto') return;
-  sec.classList.add('is-auto');
-  sec.style.setProperty('--auto-ms', `${AUTO_MS}ms`);
   let timer = 0;
   let visible = false;
-  let hovering = false;
-  let stopped = false;
-  // Restarting the active step's fill keeps the countdown honest.
   const restartFill = () => { sec.classList.remove('is-ticking'); void sec.offsetWidth; sec.classList.add('is-ticking'); };
   const schedule = () => {
     window.clearTimeout(timer);
     sec.classList.remove('is-ticking');
-    if (stopped || !visible || hovering || document.hidden) return;
+    if (reduceMotion || !visible || document.hidden) return;
     restartFill();
-    timer = window.setTimeout(() => { go((at() + 1) % count); track('ladder_stage', { stage: at() + 1, by: 'auto' }); schedule(); }, AUTO_MS);
+    timer = window.setTimeout(() => { p += 1; place(); track('ladder_stage', { stage: k() + 1, by: 'auto' }); schedule(); }, AUTO_MS);
   };
-  // Any hand on the controls ends autoplay: the reader has taken over.
-  controls.forEach((c) => c.addEventListener('pointerdown', () => { stopped = true; schedule(); }));
-  sec.addEventListener('keydown', () => { stopped = true; schedule(); });
-  sec.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovering = true; schedule(); } });
-  sec.addEventListener('pointerleave', () => { hovering = false; schedule(); });
+  const move = (to: number, by: string) => { p = to; place(); track('ladder_stage', { stage: k() + 1, by }); schedule(); };
+
+  $('[data-prev]', sec)?.addEventListener('click', () => move(p - 1, 'button'));
+  $('[data-next]', sec)?.addEventListener('click', () => move(p + 1, 'button'));
+  tabs.forEach((t, j) => t.addEventListener('click', () => move(n + j, 'tab')));
+  let swiped = false;
+  slides.forEach((s, j) => s.addEventListener('click', () => { if (!swiped && j !== p) move(j, 'slide'); swiped = false; }));
+  sec.addEventListener('keydown', (e) => {
+    const onTab = document.activeElement?.hasAttribute('data-goto') ?? false;
+    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    move(p + step, 'key');
+    if (onTab) tabs[k()].focus();
+  });
+  let x0: number | null = null;
+  vp.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+  vp.addEventListener('pointerup', (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0;
+    x0 = null;
+    swiped = Math.abs(dx) > 40;
+    if (swiped) move(p + (dx < 0 ? 1 : -1), 'swipe');
+  });
   document.addEventListener('visibilitychange', schedule);
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; schedule(); }, { threshold: 0.35 }).observe($('.ladder__frame', sec)!);
+  new IntersectionObserver((es) => { visible = es[es.length - 1].isIntersecting; schedule(); }, { threshold: 0.3 }).observe(vp);
+  window.addEventListener('resize', () => place(false));
+  document.fonts?.ready.then(() => place(false));
+
+  sec.style.setProperty('--auto-ms', `${AUTO_MS}ms`);
+  place(false);
 }
 
 /* ------------------------------------------------------------ three lights */

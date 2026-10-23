@@ -18,6 +18,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import * as bp from './blueprint';
 import { stackFigure } from './blueprint/stack';
+import { loopOverlay } from './blueprint/overlays';
 
 /** True when an optional asset has been dropped into /public. */
 const hasAsset = (path: string) => existsSync(resolve(__dirname, '../public', path));
@@ -100,13 +101,39 @@ function heroSection(markSvg: string) {
 }
 
 /* -------------------------------------------------------------- 2 ladder */
+/*
+ * An auto-advancing carousel, after Zaro's: the current stage large in the
+ * middle, its neighbours peeking in at the sides. It loops through all eight
+ * stages on its own; the rail above shows where it is and how long until the
+ * next. The slides are rendered three times so the loop never runs out; the
+ * outer copies are hidden from assistive tech and, without JS, from view.
+ */
 function ladderSection() {
   const st = ladder.stages;
   // public/img/ladder/<id>.webp is the stage's photo; the drawing is the fallback.
-  const media = (s: (typeof st)[number]) =>
+  const media = (s: (typeof st)[number], lazy: boolean) =>
     hasAsset(`img/ladder/${s.id}.webp`)
-      ? `<img src="/img/ladder/${s.id}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
+      ? `<img src="/img/ladder/${s.id}.webp" alt="${lazy ? '' : esc(s.figure.label)}" loading="${lazy ? 'lazy' : 'eager'}" decoding="async">`
       : bp.journey(s.figure.src, s.figure.label);
+  const slide = (s: (typeof st)[number], i: number, copy: number) => {
+    const real = copy === 1;
+    return `
+      <article class="cslide${real ? '' : ' is-clone'}"${real ? ` id="stage-${s.id}" role="tabpanel" aria-labelledby="tab-${s.id}"` : ' aria-hidden="true" inert'} data-slide="${i}">
+        <p class="kicker"><i aria-hidden="true"></i>${esc(s.level)}${s.grant ? ` · ${esc(s.grant)}` : ''}</p>
+        <div class="cslide__media">
+          ${media(s, !real || i > 1)}
+          <p class="cslide__label">${esc(s.title)}.</p>
+        </div>
+        <div class="cslide__body">
+          <p class="cslide__proof">${esc(s.proof)}</p>
+          <dl class="cslide__facts">
+            <div><dt>Stage</dt><dd>${pad(i + 1)} / ${pad(st.length)} · ${esc(s.phase)}</dd></div>
+            <div><dt>Time</dt><dd>${esc(s.time)}</dd></div>
+            <div><dt>Grant</dt><dd>${s.grant ? `<b>${esc(s.grant)}</b>` : '—'}</dd></div>
+          </dl>
+        </div>
+      </article>`;
+  };
   return `
 <section class="sec sec--tint ladder" id="ladder" aria-labelledby="ladder-title" data-ladder>
   <div class="rail">
@@ -114,51 +141,37 @@ function ladderSection() {
       ${head('ladder-title', ladder)}
       ${details('btn--ghost', 'ladder-details')}
     </div>
-    <div class="ladder__frame" data-reveal>
-      <ol class="ladder__list" role="tablist" aria-label="Stages">
-        ${st.map((s, i) => `
-        <li role="presentation">
-          <button type="button" role="tab" class="step${i === 0 ? ' is-on' : ''}" id="tab-${s.id}" aria-selected="${i === 0}" aria-controls="stage-${s.id}" data-goto="${i}">
-            <span class="step__n">${pad(i + 1)}</span>
-            <span class="step__lvl">${esc(s.level)}</span>
-            <span class="step__title">${esc(s.title)}</span>
-            <span class="step__grant">${s.grant ? esc(s.grant) : '—'}</span>
-            <i class="step__fill" aria-hidden="true"></i>
-          </button>
-        </li>`).join('')}
-      </ol>
-      <div class="ladder__stage">
-        ${st.map((s, i) => `
-        <article class="stage${i === 0 ? ' is-on' : ''}" id="stage-${s.id}" role="tabpanel" aria-labelledby="tab-${s.id}" data-stage${i === 0 ? '' : ' hidden'}>
-          <div class="stage__media tab-cut">
-            ${media(s)}
-            <p class="stage__label"><span>${esc(s.level)}</span>${esc(s.title)}.</p>
-          </div>
-          <div class="stage__body">
-            <p class="stage__count">${pad(i + 1)} / ${pad(st.length)} · ${esc(s.phase)}</p>
-            <p class="stage__proof">${esc(s.proof)}</p>
-            <dl class="stage__facts">
-              <div><dt>Time</dt><dd>${esc(s.time)} <small>indicative</small></dd></div>
-              <div><dt>Grant</dt><dd>${s.grant ? `<b>${esc(s.grant)}</b>` : '<span class="dim">—</span>'}</dd></div>
-            </dl>
-          </div>
-        </article>`).join('')}
-        <div class="ladder__ctrl">
-          <button type="button" class="sq" data-prev aria-label="Previous stage"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3.5M7.5 4l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg></button>
-          <button type="button" class="sq" data-next aria-label="Next stage">${arrow}</button>
-        </div>
-      </div>
+    <ol class="lrail" role="tablist" aria-label="Stages">
+      ${st.map((s, i) => `
+      <li role="presentation">
+        <button type="button" role="tab" class="ltab${i === 0 ? ' is-on' : ''}" id="tab-${s.id}" aria-selected="${i === 0}" aria-controls="stage-${s.id}" data-goto="${i}">
+          <span class="ltab__n">${pad(i + 1)}</span><span class="ltab__lvl">${esc(s.level)}</span>
+          <i class="ltab__fill" aria-hidden="true"></i>
+        </button>
+      </li>`).join('')}
+    </ol>
+  </div>
+  <div class="carousel" data-viewport aria-roledescription="carousel" aria-label="The eight stages">
+    <div class="carousel__track" data-track>
+      ${[0, 1, 2].map((copy) => st.map((s, i) => slide(s, i, copy)).join('')).join('')}
     </div>
+  </div>
+  <div class="rail ladder__foot">
     <p class="fine ladder__note">${esc(ladder.footnote)}</p>
+    <div class="ladder__ctrl">
+      <button type="button" class="sq" data-prev aria-label="Previous stage"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3.5M7.5 4l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg></button>
+      <button type="button" class="sq" data-next aria-label="Next stage">${arrow}</button>
+    </div>
   </div>
 </section>`;
 }
 
 /* -------------------------------------------------------- 3 fundamentals */
 function loopSection() {
+  // The photo with its line-art overlay; the blueprint drawing if the photo is missing.
   const media = (c: (typeof loop.items)[number]) =>
     hasAsset(`img/loop/${c.id}.webp`)
-      ? `<img src="/img/loop/${c.id}.webp" alt="${esc(c.photoAlt)}" loading="lazy" decoding="async">`
+      ? `<img src="/img/loop/${c.id}.webp" alt="${esc(c.photoAlt)}" loading="lazy" decoding="async">${loopOverlay(c.id)}`
       : bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel);
   return `
 <section class="sec loop" id="loop" aria-labelledby="loop-title">
