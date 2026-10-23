@@ -112,11 +112,11 @@ export const loop = {
   headline: 'Fundamentals That Matters While You Build',
   items: [
     { id: 'sense', n: '01', name: 'Sense', text: 'Your own hardware reads the world. Sensing can’t be borrowed.',
-      figureLabel: 'A soil-moisture probe pushed into dark soil, wired to a small sensor board' },
+      figureLabel: 'A smoke detector on a ceiling, its cover open, drawing smoke into its sensing chamber as its status light glows' },
     { id: 'decide', n: '02', name: 'Decide', text: 'AI decides, on the device or in the cloud. Your call.',
-      figureLabel: 'A microcontroller board with a lit status LED and glowing traces' },
+      figureLabel: 'The smoke detector’s circuit board, signals glowing from the smoke sensor into its microcontroller' },
     { id: 'act', n: '03', name: 'Act', text: 'Move something, or tell someone exactly what to do.',
-      figureLabel: 'A solenoid valve wired to a relay board, bursting water as it opens' },
+      figureLabel: 'A ceiling sprinkler spraying water onto a fire while the detector’s alarm light glows and a phone lights up with an emergency call' },
   ],
 };
 
