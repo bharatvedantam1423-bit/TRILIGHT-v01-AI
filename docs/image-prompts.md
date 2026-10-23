@@ -1,5 +1,8 @@
 # Image prompts
 
+> The ladder photos keep the dark lab style below (they sit in dark frames).
+> The Fundamentals photos use the light editorial style in their own section.
+
 Generate each image, export as **WebP** (or PNG and convert), and drop it into
 `public/img/` with the file name shown. Rebuild; the site picks it up and
 replaces the current picture. No code changes.
@@ -29,13 +32,32 @@ node) so the eight images read as one product growing up.
 | `stage-trl7.webp` | Exploded view of the finished device floating in a row: top cover, gasket, battery, main PCB, sensor, base, all aligned and evenly spaced against a dark background. Built to certification standards. |
 | `stage-trl8.webp` | Several identical finished sensor units in a neat row on an assembly bench, one being tested with a probe, packed boxes behind them. Qualified, repeatable, ready to ship. |
 
-## Fundamentals cards (`public/img/loop-<id>.webp`, 5:4, 1500×1200)
+## Fundamentals cards: the smoke alarm (`public/img/loop-<id>.webp`, 1:1)
+
+The three cards in "Fundamentals That Matters While You Build" follow one
+worked example: a smoke alarm that **senses** smoke, **decides** whether it is
+a real fire, and **acts** (sprinklers on, fire brigade called). Until a photo
+is dropped in, each card shows its blueprint drawing.
+
+### Style (append to all three prompts)
+
+> Editorial documentary photograph, 35mm film look (soft Kodak Portra
+> colour), natural daylight from a window, muted cool-neutral palette (off-white
+> walls, grey concrete, pale wood) with one small touch of teal (#00B6B4) on
+> the hardware. Gentle film grain, shallow depth of field, calm and real, not
+> staged, nobody looking at the camera. Subject in the lower two-thirds of the
+> frame. Keep the top-left corner plain and slightly darker (a white title
+> sits there) and the top-right corner empty (the card's folder tab cuts it
+> away). No text, no logos, no watermarks, no UI. Square 1:1, at least
+> 1600×1600 px.
 
 | File | Prompt |
 |---|---|
-| `loop-sense.webp` | Macro of a soil-moisture and temperature sensor probe pushed into dark soil, its cable leading to a small board; droplets on the probe. Hardware reading the world. |
-| `loop-decide.webp` | Macro of a microcontroller board with a lit status LED, its chip in sharp focus, a faint teal glow of data traces across the PCB. The decision being made. |
-| `loop-act.webp` | A small irrigation solenoid valve opening with a burst of water, wired to a relay board, motion frozen. Something real happens. |
+| `loop-sense.webp` | A white ceiling-mounted smoke detector on a plain ceiling in an Indian college hostel corridor, seen from slightly below. A thin wisp of grey smoke curls up into its vents and its small red indicator light glows. Hardware reading the world. |
+| `loop-decide.webp` | Macro of the same smoke detector opened up: its round circuit board with a small microcontroller chip in sharp focus, a tiny teal status LED lit, the optical smoke chamber beside it and a faint haze of smoke drifting across. The moment the device decides: burnt toast, or a real fire? |
+| `loop-act.webp` | A ceiling fire sprinkler head bursting into a wide spray of water, droplets frozen mid-air, in the same corridor in soft daylight. In the lower corner, out of focus, a phone screen glows with an outgoing call (no readable text). The system acting: water on, help called. |
+
+Export as WebP (quality ~80, under ~300 KB), drop into `public/img/`, rebuild.
 
 ## Door photos (`public/img/door-standard.webp`, `door-fasttrack.webp`, 16:9)
 

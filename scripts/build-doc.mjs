@@ -25,37 +25,41 @@ const html = `<!doctype html>
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=Raleway:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
-:root{--bg:#030c16;--card:#06121f;--ink:#eef5f8;--ink2:#c3ced5;--muted:#8b9aa5;--line:rgba(205,225,235,.12);--teal:#33dcd9;color-scheme:dark}
+:root{--bg:#f7f7f4;--card:#eeeee9;--ink:#0c1720;--ink2:#3d4a54;--muted:#879097;--line:rgba(12,23,32,.12);--teal:#007a78;color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink2);font:16px/1.7 Raleway,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px max(20px,calc((100vw - 860px)/2));background:rgba(3,12,22,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-header img{width:116px;display:block}
-header nav{display:flex;gap:10px}
-.b{font:600 12px/1 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);text-decoration:none;border:1px solid rgba(51,220,217,.5);padding:11px 14px;background:none;cursor:pointer}
-.b:hover{background:var(--teal);color:#011213}
-main{max-width:860px;margin:0 auto;padding:48px 20px 96px}
-h1,h2,h3{font-family:Inter,sans-serif;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
-h1{font-size:clamp(2rem,4vw,2.8rem);margin:0 0 12px}
-h2{font-size:1.6rem;margin:64px 0 16px;padding-top:24px;border-top:1px solid var(--line)}
-h3{font-size:1.15rem;margin:36px 0 10px}
+body{margin:0;background:var(--bg);color:var(--ink2);font:16px/1.7 'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px max(20px,calc((100vw - 860px)/2));background:rgba(252,252,250,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header img{width:112px;display:block}
+header nav{display:flex;gap:8px}
+.b{display:inline-flex;align-items:center;height:36px;font:500 14px/1 'DM Sans',sans-serif;color:var(--ink);text-decoration:none;border:1px solid rgba(12,23,32,.22);padding:0 12px;background:none;cursor:pointer}
+.b:hover{border-color:var(--ink)}
+.b--ink{background:var(--ink);color:#f7f7f4;border-color:var(--ink)}
+.b--ink:hover{background:#1d2b36}
+main{max-width:860px;margin:0 auto;padding:56px 20px 96px}
+h1,h2,h3{font-family:'DM Sans',sans-serif;font-weight:500;color:var(--ink);letter-spacing:-.022em;line-height:1.12;text-wrap:balance}
+h1{font-size:clamp(2.2rem,4.4vw,3.2rem);margin:0 0 14px}
+h2{font-size:1.75rem;margin:64px 0 16px;padding-top:28px;border-top:1px solid var(--line)}
+h3{font-size:1.2rem;margin:36px 0 10px}
+p,li{text-wrap:pretty}
 a{color:var(--teal)}
 strong{color:var(--ink);font-weight:600}
 table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px;display:block;overflow-x:auto}
 th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
-th{font:600 12px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-blockquote{margin:22px 0;padding:16px 20px;background:var(--card);border-left:2px solid var(--teal);color:var(--ink2)}
+th{font:400 11px 'JetBrains Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+blockquote{margin:22px 0;padding:16px 20px;background:var(--card);border-left:2px solid #00b6b4;color:var(--ink2)}
 blockquote p{margin:.3em 0}
-pre{background:var(--card);padding:16px;overflow-x:auto;border:1px solid var(--line);font-size:13px}
+pre{background:var(--card);padding:16px;overflow-x:auto;border:1px solid var(--line);font:13px 'JetBrains Mono',monospace}
 hr{display:none}
+::selection{background:#8fe3e0}
 @media print{header{display:none}body{background:#fff;color:#222}h1,h2,h3,strong{color:#000}th,td{border-color:#ccc}blockquote,pre{background:#f4f6f8}a{color:#0b5ca9}}
 </style>
 </head>
 <body>
 <header>
-  <a href="/"><img src="/brand/wordmark-light.svg" alt="Trilight, back to the site" width="116" height="26"></a>
-  <nav><button class="b" onclick="window.print()">Download PDF</button><a class="b" href="/#register">Join the Program</a></nav>
+  <a href="/"><img src="/brand/wordmark-dark.svg" alt="Trilight, back to the site" width="112" height="25"></a>
+  <nav><button class="b" onclick="window.print()">Download PDF</button><a class="b b--ink" href="/#register">Join the Program</a></nav>
 </header>
 <main>
 ${body}

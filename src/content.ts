@@ -20,8 +20,13 @@ export const site = {
   cta: 'Join the Program',
 };
 
-/** Top bar: one link beside the call to action. */
-export const nav = [{ href: '#demo-day', label: 'Demo Day' }];
+/** Top bar links, beside the call to action. */
+export const nav = [
+  { href: '#ladder', label: 'The ladder' },
+  { href: '#loop', label: 'The loop' },
+  { href: '#demo-day', label: 'Demo Day' },
+  { href: '#faq', label: 'FAQ' },
+];
 
 /** Footer links (labels from the Figma skeleton header). */
 export const footerNav = [
@@ -37,7 +42,7 @@ export const hero = {
   alt: 'Take Your Idea All the Way to the Real World',
   sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   figureLabel:
-    'An isometric blueprint of a dense circuit board, its components standing like a city round an empty socket. A hand with tweezers places the Trilight chip in the socket and the board powers up.',
+    'Four plates stacked in an isometric line drawing, one per step of the ladder from TRL 1–2 at the bottom to TRL 8 on top, with the Trilight mark on the top plate and a level ruler beside them.',
   stats: [
     { value: 'Up to ₹5 Lakh', label: 'Grant Per Team' },
     { value: '₹3 Cr', label: 'Grant Pool' },
@@ -65,6 +70,8 @@ export type Stage = {
 export const ladder = {
   kicker: 'The ladder',
   headline: 'Earn Your Way to a Real Product',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'to a Real Product',
   alt: 'See How Far Your Ideas Can Go',
   stages: <Stage[]>[
     { id: 'explorer', phase: 'Pre-entry', level: 'Explorer', title: 'Learn the basics',
@@ -109,13 +116,26 @@ export const ladder = {
 /* 3 · Fundamentals (the loop) ------------------------------------------- */
 export const loop = {
   kicker: 'The loop every project must close',
+  /** The worked example the three photos follow. */
+  example: 'Example: a smoke alarm that senses, decides and acts',
   headline: 'Fundamentals That Matters While You Build',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'While You Build',
   items: [
     { id: 'sense', n: '01', name: 'Sense', text: 'Your own hardware reads the world. Sensing can’t be borrowed.',
+      story: ['Smoke rises.', 'The sensor smells it first.'],
+      parts: ['Smoke sensor', 'Heat sensor', 'Flame IR'],
+      photoAlt: 'A ceiling smoke detector with a thin trail of smoke drifting into it, its red light blinking',
       figureLabel: 'Blueprint of an optical sensor breakout on its pin header, wired into the board' },
     { id: 'decide', n: '02', name: 'Decide', text: 'AI decides, on the device or in the cloud. Your call.',
+      story: ['Burnt toast,', 'or a real fire?'],
+      parts: ['Microcontroller', 'Edge AI', 'Cloud'],
+      photoAlt: 'The open smoke detector’s circuit board, its microcontroller lit, weighing up what the sensor read',
       figureLabel: 'Blueprint of a microcontroller with its crystal and capacitors, signals running in and out' },
     { id: 'act', n: '03', name: 'Act', text: 'Move something, or tell someone exactly what to do.',
+      story: ['Sprinklers on.', 'Fire brigade called.'],
+      parts: ['Sprinkler valve', 'Siren', 'Emergency call'],
+      photoAlt: 'A ceiling fire sprinkler bursting into spray while a phone beside it dials the fire brigade',
       figureLabel: 'Blueprint of a motor driver, screw terminal and geared motor whose pulley turns' },
   ],
 };
@@ -124,6 +144,8 @@ export const loop = {
 export const lights = {
   kicker: 'Why it’s called Trilight',
   headline: 'The Three Forces that Power TRILIGHT',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'that Power TRILIGHT',
   items: [
     { id: 'build', n: '01', name: 'Build', text: 'An outside team can build a second unit from your SOP, BOM and QA checks.',
       figureLabel: 'A flight-controller board beside its identical second unit, with the BOM, SOP and QA sheet' },
@@ -138,6 +160,8 @@ export const lights = {
 export const value = {
   kicker: 'What it really takes',
   headline: 'Know What It Takes to Build Beyond Prototype',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'Build Beyond Prototype',
   lines: ['Hardware is hard.', 'That’s the point.'],
   body: 'Your first prototype will probably fail. So will the third. Trilight doesn’t reward the best pitch; it rewards the team that keeps fixing, testing and showing evidence until the thing works in the real world.',
   figureLabel: 'Blueprint of a custom circuit board in an open enclosure at a field site, wired to a soil probe',
@@ -154,9 +178,12 @@ export const value = {
 /* 6 · Doors --------------------------------------------------------------- */
 export const doors = {
   headline: 'NIATians, Find Your Way Into TRILIGHT',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'Into TRILIGHT',
   items: [
     {
       name: 'Standard Door',
+      tag: 'Start here',
       points: ['Learn the basics of hardware and AIoT', 'Clear checkpoints'],
       note: 'The score against your evaluation will decide your entry',
       // Photo slot: drop /public/img/door-standard.webp in and it replaces the drawing.
@@ -165,6 +192,7 @@ export const doors = {
     },
     {
       name: 'Fastrack Door',
+      tag: 'TRL 4+ prototype',
       points: ['Showcase your working prototype and get a direct entry to the program'],
       note: null,
       image: 'door-fasttrack', figure: 'prototype',
@@ -177,6 +205,8 @@ export const doors = {
 export const register = {
   kicker: 'Who can join',
   headline: 'Start Building on Your Terms at Your Pace',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'at Your Pace',
   steps: [
     { name: 'Any batch, any branch', text: 'Log in with your NIAT learning portal account.' },
     { name: 'Solo first, then a team', text: 'Explore alone, then form a team of 3–5 at TRL 1–2.' },
@@ -188,6 +218,8 @@ export const register = {
 export const problems = {
   kicker: 'Problems around you',
   headline: 'You are Surrounded by Problems, Spot One & Fix It!',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'Spot One & Fix It!',
   alt: 'Fix the Problems Hiding in Plain Sight',
   items: [
     {
@@ -221,6 +253,8 @@ export const problems = {
 /** Questions from the Figma skeleton; answers from docs/TRL8-program.md §10. */
 export const faq = {
   headline: 'Have Questions Before You Build?',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'Before You Build?',
   note: 'Still unsure? Ask the program team from your dashboard after you join.',
   items: [
     {
@@ -257,6 +291,8 @@ export const faq = {
 /* 10 · CTA and the program finale ---------------------------------------- */
 export const closing = {
   headline: 'Come, Make Your Ideas Real with TRILIGHT',
+  /** Words from here on are set in the quieter ink (two-tone headline). */
+  tone: 'with TRILIGHT',
   // Video slot: drop /public/video/closing.mp4 (and closing-poster.webp) in and
   // it replaces the drawn robot-arm scene.
   video: 'closing',

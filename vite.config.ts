@@ -6,6 +6,10 @@ import { renderBody, meta } from './src/render';
 // The brand mark is inlined (not an <img>) so the scroll scenes can animate it.
 const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8')
   .replace('<svg ', '<svg class="mark" role="presentation" focusable="false" ');
+// The footer's oversized wordmark is inlined so CSS can set its colour.
+const wordmarkSvg = readFileSync(resolve(__dirname, 'public/brand/wordmark-light.svg'), 'utf8')
+  .replace(/<\?xml[^>]*>/, '')
+  .replace('<svg ', '<svg class="wordmark" focusable="false" ');
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
@@ -24,7 +28,7 @@ export default defineConfig(({ mode }) => {
           handler(html, ctx) {
             if (!ctx.filename.endsWith('index.html')) return html;
             return html
-              .replace('<!--@body-->', renderBody({ markSvg }))
+              .replace('<!--@body-->', renderBody({ markSvg, wordmarkSvg }))
               .replaceAll('%TRL8_TITLE%', meta.title)
               .replaceAll('%TRL8_DESC%', meta.description)
               .replaceAll('%TRL8_OG_IMAGE%', `${siteUrl}/og.jpg`)

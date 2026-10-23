@@ -66,34 +66,38 @@ Sections, in the doc's order: 1 Hero · 2 The ladder · 3 Fundamentals (the loop
 `trl8_page_view`, `trl8_cta_click {section}`, `trl8_scroll_depth {section}`,
 `trl8_login_success`, `trl8_platform_redirect`.
 
-## Motion and performance
+## Design, motion and performance
 
-Every illustration is an isometric **blueprint**: hardware drawn as line art on
-navy grid paper, built at build time from real solids with correct hidden lines
-(`src/blueprint/`, using the vendored [Anatomy](https://github.com/wheresryan22/anatomy)
-iso kit, MIT). Each figure draws itself in like a pen, back to front, then its
-fills settle in.
+**Look.** Light editorial pages modelled on zaro.ai: warm off-white paper
+(`#f7f7f4`), Trilight ink (`#0c1720`), blue and teal as the only colours,
+hairline rules, square buttons, mono uppercase labels, two-tone headlines (the
+end of each headline in a quieter ink, set by `tone` in `src/content.ts`) and a
+folder-tab cut on framed pictures. Two sections are deep navy (`#041322`): the
+three forces panel and the closing, where the blueprint drawings live.
 
-1. **Hero · the circuit city.** A dense board in isometric line art,
-   components standing like buildings round an empty socket. On scroll the
-   copy clears, a hand with tweezers seats the Trilight chip, the copper lights
-   out from the socket. Before that, a soft beam rises from the empty socket. The static board
-   is prerendered to images (see below), so scrolling only moves pictures.
-2. **The ladder (carousel).** All eight stages, Explorer to TRL 8, one at a
-   time: prev/next buttons, the stage rail, arrow keys or a swipe. Each stage
-   shows its picture (line drawings for Explorer and TRL 1–2, reference photos
-   for TRL 3–8 in `public/img/stage-*.webp`) with what to prove, time and grant.
-   "Get Full Details" opens `/program.html`, generated from
-   `docs/TRL8-program.md` on every build (`scripts/build-doc.mjs`), with a
-   Download PDF button.
-3. **Fundamentals.** One sense → decide → act board framed in three cards.
-4. **The three forces.** One drawing per light (Build, Test, Deploy), drawn
-   with the scroll position itself; each light turns on as its drawing completes.
-5. **Closing.** Two robot arms either side of a glass block with the Trilight
-   logo; as you scroll in they wake into pose and the left arm lights the block.
+**Type.** DM Sans for everything (headlines at weight 500, tight tracking) and
+JetBrains Mono for labels, both from Google Fonts. One type scale in
+`src/styles.css` (`--fs-*`); nothing sets its own size.
 
-- `prefers-reduced-motion` and no-JS get a static, fully drawn, readable page.
-- Figure text (callouts, alt text) lives in `src/content.ts` (`anatomy`, `loop`, `ladder`, `value`).
+**Motion.** Native scrolling, no animation library. Text sharpens out of a light
+blur and rises a few pixels (one easing, `cubic-bezier(.16, 1, .3, 1)`); the
+hero stack unfolds on load; sections reveal as they scroll in.
+`prefers-reduced-motion` and no-JS get a static, fully drawn page.
+
+1. **Hero.** Four stacked plates in isometric line art (`src/blueprint/stack.ts`),
+   TRL 1–2 at the bottom to TRL 8 on top with the Trilight mark, and a level ruler.
+   The four key facts sit below in dashed boxes.
+2. **The ladder.** All eight stages in a list beside one stage at a time:
+   picture, what to prove, time and grant. Prev/next, arrow keys or a swipe; the
+   autoplay A/B test (`?ladder=auto|manual`) still runs. "Get Full Details" opens
+   `/program.html`, generated from `docs/TRL8-program.md` on every build.
+3. **Fundamentals.** Three cards (Sense, Decide, Act) that follow one example,
+   a smoke alarm. Each shows a photo when `public/img/loop-<id>.webp` exists,
+   else its blueprint drawing.
+4. **The three forces.** A navy panel: Build, Test and Deploy light one after
+   another, and each force's drawing draws in.
+5. **What it takes, Doors, Who can join, Problems, FAQ**, then the navy
+   closing CTA, the Demo Day finale and the footer with the oversized wordmark.
 
 ## Assets
 
@@ -104,17 +108,16 @@ Image prompts and file names: `docs/image-prompts.md`.
 | File | Replaces |
 |---|---|
 | `public/img/door-standard.webp`, `public/img/door-fasttrack.webp` | The drawings on the two doors (16:9) |
-| `public/video/closing.mp4` (+ optional `closing-poster.webp`) | The drawn robot-arm stage in the closing section (plays muted, looped, in view) |
+| `public/img/loop-sense.webp`, `loop-decide.webp`, `loop-act.webp` | The drawings on the three Fundamentals cards (1:1, smoke-alarm example) |
 
-**Hero board images.** `public/img/hero-base(-sm).webp` and `hero-front(-sm).webp`
-are rendered from `src/blueprint/hero.ts`. After changing the board, run
-`node scripts/render-hero.mjs` (needs Playwright with Chromium and Python Pillow).
-The hand is `public/img/hand.webp`, a cut-out of the supplied line drawing.
+**Old hero board.** `src/blueprint/hero.ts`, `scripts/render-hero.mjs` and
+`public/img/hero-*.webp` / `hand.webp` belong to the previous circuit-city hero
+and are no longer on the page.
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
-- `src/blueprint/`: the figures, as code. `hero.ts` (circuit city and chip),
-  `robots.ts` (closing stage), `journey.ts` (ladder stages and the three forces), `vehicles.ts`
+- `src/blueprint/`: the figures, as code. `stack.ts` (hero plates),
+  `journey.ts` (ladder stages and the three forces), `vehicles.ts`
   (drone and rover), `board.ts` (the loop cards), `ladder.ts` (field node), `parts.ts` (ICs,
   passives, headers, jumpers), `blueprint.css` (palette and draw-on).
 - `public/img/`: the problem photos were generated for this page with Magnific
