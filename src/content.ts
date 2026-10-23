@@ -35,7 +35,6 @@ export const footerNav = [
 export const hero = {
   headline: 'Turn Your Hardware Ideas Into Real-world Products',
   alt: 'Take Your Idea All the Way to the Real World',
-  sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   figureLabel:
     'An isometric blueprint of a dense circuit board, its components standing like a city round an empty socket. A hand with tweezers places the Trilight chip in the socket and the board powers up.',
   stats: [

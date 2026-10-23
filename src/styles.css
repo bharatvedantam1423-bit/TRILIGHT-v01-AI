@@ -30,7 +30,6 @@
   --fs-h3: clamp(1.2rem, 1.55vw, 1.4rem);
   --fs-num: clamp(1.6rem, 2.3vw, 2rem);
   --fs-lede: clamp(1.02rem, 1.2vw, 1.12rem);
-  --fs-hero-sub: clamp(0.95rem, 1.05vw, 1.02rem);
   --fs-body: 1rem;
   --fs-small: 0.875rem;
   --fs-label: 0.75rem;
@@ -150,7 +149,7 @@ ol, ul, dl, dd { margin: 0; padding: 0; list-style: none; }
 .hero__headline, .closing__title { font-family: var(--f-head); font-weight: 800; font-size: var(--fs-display); line-height: 0.98; letter-spacing: -0.04em; color: var(--ink); text-wrap: balance; }
 .closing__title { font-size: var(--fs-h2); font-weight: 600; line-height: 1.08; letter-spacing: -0.032em; }
 .nowrap { white-space: nowrap; }
-.hero__sub { font-size: var(--fs-hero-sub); color: var(--ink-2); max-width: 32em; margin: 28px 0 34px; }
+.hero__cta { margin-top: 36px; }
 .facts { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; margin: 40px 0 0; font-family: var(--f-head); }
 .facts > div { display: flex; flex-direction: column-reverse; gap: 6px; padding: 0 clamp(18px, 2.4vw, 32px); }
 .facts > div:first-child { padding-left: 0; }
@@ -195,7 +194,6 @@ html:not(.motion) .city__hand { display: none; }
 /* Vignette: the board fades into the paper at the edges, bright at the centre. */
 .city::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 62% 64% at 50% 52%, transparent 38%, rgba(3, 10, 18, 0.55) 72%, rgba(3, 10, 18, 0.92) 100%); }
 .hero__headline { text-shadow: 0 2px 30px rgba(3, 10, 18, 0.8); }
-.hero__sub { color: var(--ink); opacity: 0.86; }
 /* Nothing in the stage shows until the board image has loaded and revealed. */
 .motion .city__layer, .motion .city__live { visibility: hidden; }
 .motion .hero { translate: none; }
@@ -494,12 +492,12 @@ html:not(.js) .ladder2__nav { display: none; }
 }
 @media (max-height: 820px) and (min-width: 761px) {
   .scrollcue { display: none; }
-  .hero__sub { margin: 22px 0 26px; }
+  .hero__cta { margin-top: 26px; }
   .facts { margin-top: 22px; }
 }
 @media (max-height: 760px) and (min-width: 761px) {
   .hero__headline { font-size: clamp(2.2rem, 4.2vw, 3.4rem); }
-  .hero__sub { margin: 16px 0 20px; }
+  .hero__cta { margin-top: 20px; }
   .facts { margin-top: 18px; }
   .btn--lg { min-height: 50px; }
 }

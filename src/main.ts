@@ -125,7 +125,7 @@ function introScene() {
   gsap.timeline({ defaults: { duration: 1.2, ease: 'power3.out' } })
     .from(q('.dwg__c'), { autoAlpha: 0, scale: 1.6, duration: 0.9, stagger: 0.06 }, 0.1)
     .from(q('.dwg__ruler, .dwg__block'), { autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.4)
-    .from(q('.hero__headline, .hero__sub, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
+    .from(q('.hero__headline, .hero__cta, .facts'), { autoAlpha: 0, y: 26, duration: 1.1, stagger: 0.08 }, 0.3);
   // The board reveals only once its image is decoded; the chip, its copper and
   // the socket's light come in after it, never before.
   const baseImg = $<HTMLImageElement>('.city__layer img', stage);

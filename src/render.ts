@@ -110,7 +110,6 @@ function intro(markSvg: string) {
 
     <div class="hero" data-hero>
       <h1 id="hero-title" class="hero__headline">${esc(hero.headline).replace(/(\S+-\S+)/g, '<span class="nowrap">$1</span>')}</h1>
-      <p class="hero__sub">${esc(hero.sub)}</p>
       <div class="hero__cta">${cta('hero', 'btn--lg')}</div>
       <dl class="facts" aria-label="Key facts">${hero.stats.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join('')}</dl>
     </div>
