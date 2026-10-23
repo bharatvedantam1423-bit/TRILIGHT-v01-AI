@@ -350,7 +350,7 @@ function closingScene() {
   return robotStage(closing.sceneLabel);
 }
 
-/* 10 · CTA, then the program finale: Demo Day. */
+/* 10 · CTA. */
 function closingSection() {
   return `
 <section class="closing" id="join" aria-labelledby="closing-title">
@@ -359,8 +359,12 @@ function closingSection() {
     <h2 id="closing-title" class="closing__title">${esc(closing.headline)}</h2>
     ${cta('closing', 'btn--lg')}
   </div>
-</section>
+</section>`;
+}
 
+/* Program finale: Demo Day. Sits just above the FAQ. */
+function finaleSection() {
+  return `
 <section class="section finale" id="demo-day" aria-labelledby="finale-title">
   <div class="wrap">
     <h2 id="finale-title" class="finale__title">${esc(finale.title[0])} <span>${esc(finale.title[1])}</span></h2>
@@ -422,6 +426,7 @@ export function renderBody(opts: { markSvg: string }) {
     doorsSection(),
     registerSection(),
     problemsSection(),
+    finaleSection(),
     faqSection(),
     closingSection(),
     '</main>',
