@@ -301,7 +301,7 @@ html:not(.motion) .forces__rail span { transform: none; }
 
 /* 02 · The ladder: a carousel, one stage in view. */
 .ladder2 { position: relative; background: var(--bg-2); border-top: 1px solid var(--line); overflow: hidden; }
-.rail { display: grid; grid-template-columns: repeat(8, minmax(96px, 1fr)); gap: 6px; margin-bottom: 28px; overflow-x: auto; scrollbar-width: none; }
+.rail { position: relative; display: grid; grid-template-columns: repeat(8, minmax(96px, 1fr)); gap: 6px; margin-bottom: 28px; overflow-x: auto; scrollbar-width: none; }
 .rail::-webkit-scrollbar { display: none; }
 .rail__tab { position: relative; width: 100%; display: grid; gap: 4px; justify-items: start; padding: 14px 2px 6px; border: 0; background: none; cursor: pointer; text-align: left; font-family: var(--f-head); color: var(--muted); }
 .rail__tab::before, .rail__tab::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--line-2); }
@@ -551,5 +551,3 @@ html:not(.js) .ladder2__nav { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-/* The exploded view is wide with labels at both ends: show it whole. */
-.slide__media img[src*="stage-trl7"] { object-fit: contain; background: #fff; }

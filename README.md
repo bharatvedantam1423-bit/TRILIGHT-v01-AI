@@ -81,8 +81,8 @@ fills settle in.
    is prerendered to images (see below), so scrolling only moves pictures.
 2. **The ladder (carousel).** All eight stages, Explorer to TRL 8, one at a
    time: prev/next buttons, the stage rail, arrow keys or a swipe. Each stage
-   shows its picture (line drawings for Explorer and TRL 1–2, reference photos
-   for TRL 3–8 in `public/img/stage-*.webp`) with what to prove, time and grant.
+   shows its photo (`public/img/ladder/<stage>.webp`) with what to prove, time
+   and grant. A missing photo falls back to a blueprint drawing.
    "Get Full Details" opens `/program.html`, generated from
    `docs/TRL8-program.md` on every build (`scripts/build-doc.mjs`), with a
    Download PDF button.
@@ -103,13 +103,15 @@ Image prompts and file names: `docs/image-prompts.md`.
 
 | File | Replaces |
 |---|---|
-| `public/img/door-standard.webp`, `public/img/door-fasttrack.webp` | The drawings on the two doors (16:9) |
+| `public/img/doors/standard.webp`, `fasttrack.webp` | The door photos (16:9) |
+| `public/img/ladder/<stage>.webp` | Each ladder stage (4:3): explorer, trl12, trl3 … trl8 |
+| `public/img/loop/<step>.webp` | The Fundamentals cards (5:4): sense, decide, act |
 | `public/video/closing.mp4` (+ optional `closing-poster.webp`) | The drawn robot-arm stage in the closing section (plays muted, looped, in view) |
 
-**Hero board images.** `public/img/hero-base(-sm).webp` and `hero-front(-sm).webp`
+**Hero board images.** `public/img/hero/base(-sm).webp` and `front(-sm).webp`
 are rendered from `src/blueprint/hero.ts`. After changing the board, run
 `node scripts/render-hero.mjs` (needs Playwright with Chromium and Python Pillow).
-The hand is `public/img/hand.webp`, a cut-out of the supplied line drawing.
+The hand is `public/img/hero/hand.webp`, a cut-out of the supplied line drawing.
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
@@ -117,5 +119,6 @@ The hand is `public/img/hand.webp`, a cut-out of the supplied line drawing.
   `robots.ts` (closing stage), `journey.ts` (ladder stages and the three forces), `vehicles.ts`
   (drone and rover), `board.ts` (the loop cards), `ladder.ts` (field node), `parts.ts` (ICs,
   passives, headers, jumpers), `blueprint.css` (palette and draw-on).
-- `public/img/`: the problem photos were generated for this page with Magnific
+- `public/img/`: organised by section (`hero/`, `ladder/`, `loop/`, `doors/`,
+  `problems/`); full-size originals live in `assets/originals/`. The problem photos were generated for this page with Magnific
   (Seedream). They're illustrative, not photos of real people or places.

@@ -227,7 +227,12 @@ function ladderScene() {
     if (bar) bar.style.transform = `scaleX(${(i + 1) / slides.length})`;
     draw($('svg', slides[i]));
     if (focusTab) tabs[i]?.focus();
-    tabs[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    // Keep the active tab in view by scrolling the rail sideways only; never move the page.
+    const rail = tabs[i]?.closest('.rail') as HTMLElement | null;
+    const tab = tabs[i]?.parentElement;
+    if (rail && tab && rail.scrollWidth > rail.clientWidth) {
+      rail.scrollTo({ left: tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2, behavior: 'smooth' });
+    }
   };
   sec.classList.add('is-carousel');
   prev.addEventListener('click', () => go(i - 1));

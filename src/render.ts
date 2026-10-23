@@ -90,17 +90,17 @@ function intro(markSvg: string) {
   const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
   const layer = (name: string, cls: string, eager: boolean) => `
         <picture class="${cls}">
-          <source media="(max-width: 760px)" srcset="/img/${name}-sm.webp">
-          <img src="/img/${name}.webp" width="2600" height="2028" alt="" decoding="async" fetchpriority="${eager ? 'high' : 'low'}">
+          <source media="(max-width: 760px)" srcset="/img/hero/${name}-sm.webp">
+          <img src="/img/hero/${name}.webp" width="2600" height="2028" alt="" decoding="async" fetchpriority="${eager ? 'high' : 'low'}">
         </picture>`;
   return `
 <section class="scene scene--intro bp-grid" id="top" aria-labelledby="hero-title">
   <div class="sticky">
     <div class="city" data-city>
       <div class="city__stage" data-city-stage role="img" aria-label="${esc(hero.figureLabel)}">
-        ${layer('hero-base', 'city__layer', true)}
+        ${layer('base', 'city__layer', true)}
         ${fig.overlay}
-        ${layer('hero-front', 'city__layer', false)}
+        ${layer('front', 'city__layer', false)}
         <img class="city__hand" data-city-hand src="${HAND_IMG.src}" alt="" width="${HAND_IMG.w}" height="${HAND_IMG.h}" decoding="async" fetchpriority="low"
           style="left:${pct(fig.hand.left, HERO_W)};top:${pct(fig.hand.top, HERO_H)};width:${pct(fig.hand.width, HERO_W)}">
       </div>
@@ -130,10 +130,10 @@ function ladderSection() {
   const st = ladder.stages;
   const n = st.length;
   const pad = (i: number) => String(i).padStart(2, '0');
-  // A photo dropped in as public/img/stage-<id>.webp replaces the stage's picture.
+  // public/img/ladder/<id>.webp is the stage's photo; the drawing is the fallback.
   const media = (s: (typeof st)[number], i: number) =>
-    s.figure.kind === 'photo' || hasAsset(`img/stage-${s.id}.webp`)
-      ? `<img src="/img/${hasAsset(`img/stage-${s.id}.webp`) ? `stage-${s.id}` : s.figure.src}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
+    hasAsset(`img/ladder/${s.id}.webp`)
+      ? `<img src="/img/ladder/${s.id}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
       : bp.journey(s.figure.src, s.figure.label).replace('<svg', `<svg data-stage-draw="${i}"`);
   const chev = (dir: 'prev' | 'next') =>
     `<svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="${dir === 'prev' ? 'M12.5 4.5 7 10l5.5 5.5' : 'M7.5 4.5 13 10l-5.5 5.5'}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -190,7 +190,7 @@ function loopSection() {
         .map(
           (c) => `
       <li class="card3" data-reveal>
-        <div class="card3__fig">${hasAsset(`img/loop-${c.id}.webp`) ? `<img src="/img/loop-${c.id}.webp" alt="${esc(c.figureLabel)}" loading="lazy" decoding="async">` : bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel)}</div>
+        <div class="card3__fig">${hasAsset(`img/loop/${c.id}.webp`) ? `<img src="/img/loop/${c.id}.webp" alt="${esc(c.figureLabel)}" loading="lazy" decoding="async">` : bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel)}</div>
         <h3 class="card3__title"><span>${c.n}</span>${esc(c.name)}</h3>
         <p class="muted">${esc(c.text)}</p>
       </li>`,
