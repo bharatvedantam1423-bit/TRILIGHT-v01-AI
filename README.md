@@ -92,7 +92,7 @@ hero stack unfolds on load; sections reveal as they scroll in.
    autoplay A/B test (`?ladder=auto|manual`) still runs. "Get Full Details" opens
    `/program.html`, generated from `docs/TRL8-program.md` on every build.
 3. **Fundamentals.** Three cards (Sense, Decide, Act) that follow one example,
-   a smoke alarm. Each shows a photo when `public/img/loop-<id>.webp` exists,
+   a smoke alarm. Each shows a photo when `public/img/loop/<id>.webp` exists,
    else its blueprint drawing.
 4. **The three forces.** A navy panel: Build, Test and Deploy light one after
    another, and each force's drawing draws in.
@@ -107,12 +107,9 @@ Image prompts and file names: `docs/image-prompts.md`.
 
 | File | Replaces |
 |---|---|
-| `public/img/door-standard.webp`, `public/img/door-fasttrack.webp` | The drawings on the two doors (16:9) |
-| `public/img/loop-sense.webp`, `loop-decide.webp`, `loop-act.webp` | The drawings on the three Fundamentals cards (1:1, smoke-alarm example) |
-
-**Old hero board.** `src/blueprint/hero.ts`, `scripts/render-hero.mjs` and
-`public/img/hero-*.webp` / `hand.webp` belong to the previous circuit-city hero
-and are no longer on the page.
+| `public/img/doors/standard.webp`, `fasttrack.webp` | The door photos (16:9) |
+| `public/img/ladder/<stage>.webp` | Each ladder stage (4:3): explorer, trl12, trl3 … trl8 |
+| `public/img/loop/<step>.webp` | The Fundamentals cards (1:1): sense, decide, act |
 
 - `public/brand/`: logo, wordmark and mark taken as vectors straight from the
   Trilight Brand Guidelines PDF; favicon follows the guideline's favicon lockup.
@@ -120,5 +117,6 @@ and are no longer on the page.
   `journey.ts` (ladder stages and the three forces), `vehicles.ts`
   (drone and rover), `board.ts` (the loop cards), `ladder.ts` (field node), `parts.ts` (ICs,
   passives, headers, jumpers), `blueprint.css` (palette and draw-on).
-- `public/img/`: the problem photos were generated for this page with Magnific
+- `public/img/`: organised by section (`hero/`, `ladder/`, `loop/`, `doors/`,
+  `problems/`); full-size originals live in `assets/originals/`. The problem photos were generated for this page with Magnific
   (Seedream). They're illustrative, not photos of real people or places.

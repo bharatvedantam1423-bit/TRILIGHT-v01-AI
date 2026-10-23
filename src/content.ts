@@ -63,7 +63,7 @@ export type Stage = {
   time: string;
   /** Grant unlocked on entry (program doc, Table 2). */
   grant: string | null;
-  /** A drawing id (src/blueprint/journey.ts) or a photo in /public/img. */
+  /** Drawing fallback (src/blueprint/journey.ts) and the photo's alt text; the photo itself is /public/img/ladder/<id>.webp. */
   figure: { kind: 'drawing' | 'photo'; src: string; label: string };
 };
 
@@ -77,35 +77,35 @@ export const ladder = {
     { id: 'explorer', phase: 'Pre-entry', level: 'Explorer', title: 'Learn the basics',
       proof: 'Hardware & AIoT 101 and Computational Thinking, solo. Clear the Checkpoints.',
       time: '4–6 weeks', grant: null,
-      figure: { kind: 'drawing', src: 'learn', label: 'An open course notebook with a circuit schematic and the sense, decide, act loop, beside an LED, a resistor and an ultrasonic sensor' } },
+      figure: { kind: 'drawing', src: 'learn', label: 'An open notebook with hand-drawn circuit sketches and a sense, decide, act flow, beside a starter kit of a microcontroller, an ultrasonic sensor, LEDs and resistors' } },
     { id: 'trl12', phase: 'Foundation', level: 'TRL 1–2', title: 'Idea',
       proof: 'Form a team of 3–5, pick a real problem and submit a proposal that passes the AI-scored evaluation.',
       time: '4–6 weeks', grant: null,
-      figure: { kind: 'drawing', src: 'idea', label: 'A pencil sketch of a quadcopter drone on graph paper, marked v0.1?' } },
+      figure: { kind: 'drawing', src: 'idea', label: 'A team sketching a soil-sensor concept on paper, with sticky notes and a photo of dry farmland' } },
     { id: 'trl3', phase: 'Foundation', level: 'TRL 3', title: 'Model',
       proof: 'A working simulation: 3D models and software that prove the idea can work.',
       time: '6–10 weeks', grant: null,
-      figure: { kind: 'photo', src: 'stage-trl3', label: 'CAD and simulation software showing 3D models, stress maps and flow analysis of hardware parts' } },
+      figure: { kind: 'photo', src: '', label: 'A laptop showing a 3D CAD model of the sensor enclosure, exploded, beside its thermal simulation' } },
     { id: 'trl4', phase: 'Foundation', level: 'TRL 4', title: 'Prototype',
       proof: 'A breadboard prototype that closes the sense–decide–act loop, tested in the lab.',
       time: '2–3 months', grant: '₹30K',
-      figure: { kind: 'photo', src: 'stage-trl4', label: 'A breadboard prototype with a microcontroller, regulator, wires and lit LEDs' } },
+      figure: { kind: 'photo', src: '', label: 'A breadboard prototype with a soil probe, microcontroller and small display, being tested with a multimeter' } },
     { id: 'trl5', phase: 'Execution', level: 'TRL 5', title: 'Proof of concept',
       proof: 'Validated at a real host site: your circuit on Zero PCB, inside an enclosure.',
       time: '3–4 months', grant: '₹70K',
-      figure: { kind: 'photo', src: 'stage-trl5', label: 'A hand-built circuit board inside an open plastic enclosure beside its lid' } },
+      figure: { kind: 'photo', src: '', label: 'The hand-soldered circuit in an open enclosure on farm soil at dusk, wired to its soil probe' } },
     { id: 'trl6', phase: 'Execution', level: 'TRL 6', title: 'Golden sample',
       proof: 'A custom PCB and enclosure, tested with real users: 5 for B2B, 20 for B2C.',
       time: '3–6 months', grant: '₹1.5L',
-      figure: { kind: 'photo', src: 'stage-trl6', label: 'A custom PCB mounted on standoffs inside a metal enclosure with a panel connector' } },
+      figure: { kind: 'photo', src: '', label: 'Two golden-sample units: a custom green PCB in an open enclosure beside a closed one, with the soil probe' } },
     { id: 'trl7', phase: 'Execution', level: 'TRL 7', title: 'First customer',
       proof: 'A beta product built to certification standards, and a customer who pays for it.',
       time: '3–6 months', grant: '₹2.5L',
-      figure: { kind: 'photo', src: 'stage-trl7', label: 'An exploded view of a wearable device: cover, gasket, battery, main PCB, shielding, sensor and adhesive patch' } },
+      figure: { kind: 'photo', src: '', label: 'The finished sensor exploded into its parts: cover, gasket, battery, PCB, probe and base' } },
     { id: 'trl8', phase: 'Execution', level: 'TRL 8', title: 'Qualified product',
       proof: 'Everything combined: a qualified system, multiple paying customers, and a build an outside team can repeat.',
       time: '6–9 months', grant: 'Tri-Light',
-      figure: { kind: 'photo', src: 'stage-trl8', label: 'Finished sensor units being assembled and tested on a bench, ready to ship' } },
+      figure: { kind: 'photo', src: '', label: 'A row of finished soil sensors on a bench, one being tested, with packed boxes ready to ship' } },
   ],
   footnote:
     'Grants unlock as you enter TRL 4 to 7, up to ₹5L per team. Paid to vendors or reimbursed against invoices, never as cash. Times are indicative.',
@@ -125,17 +125,17 @@ export const loop = {
     { id: 'sense', n: '01', name: 'Sense', text: 'Your own hardware reads the world. Sensing can’t be borrowed.',
       story: ['Smoke rises.', 'The sensor smells it first.'],
       parts: ['Smoke sensor', 'Heat sensor', 'Flame IR'],
-      photoAlt: 'A ceiling smoke detector with a thin trail of smoke drifting into it, its red light blinking',
+      photoAlt: 'A smoke detector on a corridor ceiling drawing a thin trail of smoke into its vents, its red status light glowing',
       figureLabel: 'Blueprint of an optical sensor breakout on its pin header, wired into the board' },
     { id: 'decide', n: '02', name: 'Decide', text: 'AI decides, on the device or in the cloud. Your call.',
       story: ['Burnt toast,', 'or a real fire?'],
       parts: ['Microcontroller', 'Edge AI', 'Cloud'],
-      photoAlt: 'The open smoke detector’s circuit board, its microcontroller lit, weighing up what the sensor read',
+      photoAlt: 'The smoke detector opened up: its circuit board and microcontroller with a teal status light, beside the smoke chamber',
       figureLabel: 'Blueprint of a microcontroller with its crystal and capacitors, signals running in and out' },
     { id: 'act', n: '03', name: 'Act', text: 'Move something, or tell someone exactly what to do.',
       story: ['Sprinklers on.', 'Fire brigade called.'],
       parts: ['Sprinkler valve', 'Siren', 'Emergency call'],
-      photoAlt: 'A ceiling fire sprinkler bursting into spray while a phone beside it dials the fire brigade',
+      photoAlt: 'A ceiling sprinkler spraying water down a corridor while a phone nearby lights up with an emergency call',
       figureLabel: 'Blueprint of a motor driver, screw terminal and geared motor whose pulley turns' },
   ],
 };
@@ -186,8 +186,8 @@ export const doors = {
       tag: 'Start here',
       points: ['Learn the basics of hardware and AIoT', 'Clear checkpoints'],
       note: 'The score against your evaluation will decide your entry',
-      // Photo slot: drop /public/img/door-standard.webp in and it replaces the drawing.
-      image: 'door-standard', figure: 'idea',
+      // Photos in /public/img/doors/; the drawing shows if one is missing.
+      image: 'doors/standard', figure: 'idea',
       imageAlt: 'A student soldering a small sensor board at a lab bench, with a breadboard, sensor modules and a multimeter around her',
     },
     {
@@ -195,7 +195,7 @@ export const doors = {
       tag: 'TRL 4+ prototype',
       points: ['Showcase your working prototype and get a direct entry to the program'],
       note: null,
-      image: 'door-fasttrack', figure: 'prototype',
+      image: 'doors/fasttrack', figure: 'prototype',
       imageAlt: 'Three students presenting their working drone prototype and its live telemetry to a reviewer',
     },
   ],
@@ -223,7 +223,7 @@ export const problems = {
   alt: 'Fix the Problems Hiding in Plain Sight',
   items: [
     {
-      image: '/img/farm.webp',
+      image: '/img/problems/farm.webp',
       alt: 'A farmer watering dry, cracked soil with a pipe while a small soil sensor stands in the ground',
       label: 'IRRIGATION',
       reading: 'BY GUESSWORK',
@@ -231,7 +231,7 @@ export const problems = {
       idea: 'A soil sensor that says when to irrigate.',
     },
     {
-      image: '/img/clinic.webp',
+      image: '/img/problems/clinic.webp',
       alt: 'A nurse checking a patient’s vitals by hand in a small clinic',
       label: 'VITALS',
       reading: 'BY HAND',
@@ -239,7 +239,7 @@ export const problems = {
       idea: 'A monitor that flags who needs help.',
     },
     {
-      image: '/img/factory.webp',
+      image: '/img/problems/factory.webp',
       alt: 'An industrial motor and pump on a factory floor with a small sensor clamped to it',
       label: 'BEARING',
       reading: 'VIBRATION ↑',

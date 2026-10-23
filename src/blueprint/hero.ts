@@ -159,8 +159,8 @@ function chip(c: Ctx) {
     + c.engrave('TRL-08', 0, 16, Z + 7.4, 6.5, 'mid', 'middle');
 }
 
-/** The hand drawing (public/img/hand.webp): its size and where the tweezer tip is. */
-export const HAND_IMG = { src: '/img/hand.webp', w: 1254, h: 1254, tipX: 303, tipY: 1108 };
+/** The hand drawing (public/img/hero/hand.webp): its size and where the tweezer tip is. */
+export const HAND_IMG = { src: '/img/hero/hand.webp', w: 1254, h: 1254, tipX: 303, tipY: 1108 };
 
 /**
  * The hero in layers. The board never changes, so it ships as two prerendered

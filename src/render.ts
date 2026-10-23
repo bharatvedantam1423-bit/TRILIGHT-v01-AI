@@ -102,12 +102,11 @@ function heroSection(markSvg: string) {
 /* -------------------------------------------------------------- 2 ladder */
 function ladderSection() {
   const st = ladder.stages;
-  const media = (s: (typeof st)[number]) => {
-    const own = hasAsset(`img/stage-${s.id}.webp`);
-    return s.figure.kind === 'photo' || own
-      ? `<img src="/img/${own ? `stage-${s.id}` : s.figure.src}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
+  // public/img/ladder/<id>.webp is the stage's photo; the drawing is the fallback.
+  const media = (s: (typeof st)[number]) =>
+    hasAsset(`img/ladder/${s.id}.webp`)
+      ? `<img src="/img/ladder/${s.id}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
       : bp.journey(s.figure.src, s.figure.label);
-  };
   return `
 <section class="sec sec--tint ladder" id="ladder" aria-labelledby="ladder-title" data-ladder>
   <div class="rail">
@@ -158,8 +157,8 @@ function ladderSection() {
 /* -------------------------------------------------------- 3 fundamentals */
 function loopSection() {
   const media = (c: (typeof loop.items)[number]) =>
-    hasAsset(`img/loop-${c.id}.webp`)
-      ? `<img src="/img/loop-${c.id}.webp" alt="${esc(c.photoAlt)}" loading="lazy" decoding="async">`
+    hasAsset(`img/loop/${c.id}.webp`)
+      ? `<img src="/img/loop/${c.id}.webp" alt="${esc(c.photoAlt)}" loading="lazy" decoding="async">`
       : bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel);
   return `
 <section class="sec loop" id="loop" aria-labelledby="loop-title">
