@@ -130,16 +130,17 @@ function ladderSection() {
   const st = ladder.stages;
   const n = st.length;
   const pad = (i: number) => String(i).padStart(2, '0');
+  // A photo dropped in as public/img/stage-<id>.webp replaces the stage's picture.
   const media = (s: (typeof st)[number], i: number) =>
-    s.figure.kind === 'photo'
-      ? `<img src="/img/${s.figure.src}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
+    s.figure.kind === 'photo' || hasAsset(`img/stage-${s.id}.webp`)
+      ? `<img src="/img/${hasAsset(`img/stage-${s.id}.webp`) ? `stage-${s.id}` : s.figure.src}.webp" alt="${esc(s.figure.label)}" loading="lazy" decoding="async">`
       : bp.journey(s.figure.src, s.figure.label).replace('<svg', `<svg data-stage-draw="${i}"`);
   const chev = (dir: 'prev' | 'next') =>
     `<svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="${dir === 'prev' ? 'M12.5 4.5 7 10l5.5 5.5' : 'M7.5 4.5 13 10l-5.5 5.5'}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   return `
 <section class="section ladder2" id="ladder" aria-labelledby="ladder-title" data-ladder>
   <div class="wrap">
-    ${head(ladder.kicker, ladder.headline, 'ladder-title', ladder.body)}
+    ${head(ladder.kicker, ladder.headline, 'ladder-title')}
     <ol class="rail" role="tablist" aria-label="Stages">
       ${st.map((s, i) => `<li role="presentation"><button type="button" role="tab" class="rail__tab${i === 0 ? ' is-on' : ''}" aria-selected="${i === 0}" aria-controls="stage-${s.id}" data-goto="${i}"><span>${pad(i + 1)}</span><b>${esc(s.level)}</b></button></li>`).join('')}
     </ol>
@@ -183,13 +184,13 @@ function loopSection() {
   return `
 <section class="section loop bp-grid" id="loop" aria-labelledby="loop-title">
   <div class="wrap">
-    ${head(loop.kicker, loop.headline, 'loop-title', loop.body)}
+    ${head(loop.kicker, loop.headline, 'loop-title')}
     <ol class="cards3" data-loop>
       ${loop.items
         .map(
           (c) => `
       <li class="card3" data-reveal>
-        <div class="card3__fig">${bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel)}</div>
+        <div class="card3__fig">${hasAsset(`img/loop-${c.id}.webp`) ? `<img src="/img/loop-${c.id}.webp" alt="${esc(c.figureLabel)}" loading="lazy" decoding="async">` : bp.loop(c.id as 'sense' | 'decide' | 'act', c.figureLabel)}</div>
         <h3 class="card3__title"><span>${c.n}</span>${esc(c.name)}</h3>
         <p class="muted">${esc(c.text)}</p>
       </li>`,

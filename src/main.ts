@@ -247,6 +247,55 @@ function ladderScene() {
   });
   ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: () => go(i) });
   go(0);
+  autoplay(sec, () => i, (to) => go(to), slides.length, [prev, next, ...tabs, track]);
+}
+
+/**
+ * A/B test: does the ladder advance on its own? Variant from ?ladder=auto or
+ * ?ladder=manual, else a 50/50 assignment remembered per browser. Reported as
+ * trl8_ab_assign {test, variant}; stage views as trl8_ladder_stage.
+ */
+const AUTO_MS = 5000;
+function ladderVariant(): 'auto' | 'manual' {
+  const q = new URLSearchParams(location.search).get('ladder');
+  if (q === 'auto' || q === 'manual') return q;
+  try {
+    const kept = localStorage.getItem('trl8_ab_ladder');
+    if (kept === 'auto' || kept === 'manual') return kept;
+    const v = Math.random() < 0.5 ? 'auto' : 'manual';
+    localStorage.setItem('trl8_ab_ladder', v);
+    return v;
+  } catch {
+    return 'auto';
+  }
+}
+
+function autoplay(sec: HTMLElement, at: () => number, go: (to: number) => void, count: number, controls: Element[]) {
+  const variant = ladderVariant();
+  track('ab_assign', { test: 'ladder_autoplay', variant });
+  if (variant !== 'auto') return;
+  sec.classList.add('is-auto');
+  sec.style.setProperty('--auto-ms', `${AUTO_MS}ms`);
+  let timer = 0;
+  let visible = false;
+  let hovering = false;
+  let stopped = false;
+  // Restarting the active tab's fill keeps the countdown honest.
+  const restartFill = () => { sec.classList.remove('is-ticking'); void sec.offsetWidth; sec.classList.add('is-ticking'); };
+  const schedule = () => {
+    window.clearTimeout(timer);
+    sec.classList.remove('is-ticking');
+    if (stopped || !visible || hovering || document.hidden) return;
+    restartFill();
+    timer = window.setTimeout(() => { go((at() + 1) % count); track('ladder_stage', { stage: at() + 1, by: 'auto' }); schedule(); }, AUTO_MS);
+  };
+  // Any hand on the controls ends autoplay: the reader has taken over.
+  controls.forEach((c) => c.addEventListener('pointerdown', () => { stopped = true; schedule(); }));
+  sec.addEventListener('keydown', () => { stopped = true; schedule(); });
+  sec.addEventListener('pointerenter', () => { hovering = true; schedule(); });
+  sec.addEventListener('pointerleave', () => { hovering = false; schedule(); });
+  document.addEventListener('visibilitychange', schedule);
+  ScrollTrigger.create({ trigger: sec, start: 'top 60%', end: 'bottom 40%', onToggle: (self) => { visible = self.isActive; schedule(); } });
 }
 
 function lampsScene() {

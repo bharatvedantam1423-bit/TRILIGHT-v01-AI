@@ -62,7 +62,7 @@ Sections, in the doc's order: 1 Hero · 2 The ladder · 3 Fundamentals (the loop
 
 ## Analytics
 
-`src/analytics.ts` pushes funnel events to `window.dataLayer`, ready for GTM or GA4:
+`src/analytics.ts` pushes funnel events to `window.dataLayer`, ready for GTM or GA4. A/B test: the ladder auto-advances for half of visitors (`trl8_ab_assign {test: ladder_autoplay, variant}`; force with `?ladder=auto` or `?ladder=manual`).
 `trl8_page_view`, `trl8_cta_click {section}`, `trl8_scroll_depth {section}`,
 `trl8_login_success`, `trl8_platform_redirect`.
 
@@ -96,6 +96,8 @@ fills settle in.
 - Figure text (callouts, alt text) lives in `src/content.ts` (`anatomy`, `loop`, `ladder`, `value`).
 
 ## Assets
+
+Image prompts and file names: `docs/image-prompts.md`.
 
 **Optional media slots** (drop the file in and rebuild; nothing else to change):
 

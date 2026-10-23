@@ -33,7 +33,7 @@ export const footerNav = [
 
 /* 1 · Hero ------------------------------------------------------------- */
 export const hero = {
-  headline: 'Turn Your Ideas Into Real-world Products',
+  headline: 'Turn Your Hardware Ideas Into Real-world Products',
   alt: 'Take Your Idea All the Way to the Real World',
   sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   figureLabel:
@@ -66,7 +66,6 @@ export const ladder = {
   kicker: 'The ladder',
   headline: 'Earn Your Way to a Real Product',
   alt: 'See How Far Your Ideas Can Go',
-  body: 'Every arrow is a Technology Readiness Review. Clear it with evidence and the next level, and its grant, unlocks.',
   stages: <Stage[]>[
     { id: 'explorer', phase: 'Pre-entry', level: 'Explorer', title: 'Learn the basics',
       proof: 'Hardware & AIoT 101 and Computational Thinking, solo. Clear the Checkpoints.',
@@ -111,7 +110,6 @@ export const ladder = {
 export const loop = {
   kicker: 'The loop every project must close',
   headline: 'Fundamentals That Matters While You Build',
-  body: 'If it doesn’t read the real world and do something about it, it isn’t Physical AI yet.',
   items: [
     { id: 'sense', n: '01', name: 'Sense', text: 'Your own hardware reads the world. Sensing can’t be borrowed.',
       figureLabel: 'Blueprint of an optical sensor breakout on its pin header, wired into the board' },
