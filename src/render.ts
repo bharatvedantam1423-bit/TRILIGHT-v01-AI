@@ -87,7 +87,6 @@ function heroSection(markSvg: string) {
   <div class="rail hero__grid">
     <div class="hero__copy">
       <h1 id="hero-title" class="hero__title">${esc(hero.headline).replace(/(\S+-\S+)/g, '<span class="nowrap">$1</span>')}</h1>
-      <p class="hero__sub">${esc(hero.sub)}</p>
       <div class="hero__cta">${cta('hero')}${details('btn--ghost', 'hero-details')}</div>
     </div>
     <figure class="hero__fig">${stackFigure(markSvg, hero.figureLabel)}</figure>

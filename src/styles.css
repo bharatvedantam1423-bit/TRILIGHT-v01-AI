@@ -196,8 +196,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
 .hero { position: relative; padding-top: calc(var(--nav-h) + clamp(24px, 6vw, 72px)); }
 .hero__grid { display: grid; gap: 40px; align-items: center; padding-bottom: clamp(40px, 6vw, 72px); }
 .hero__title { font-size: var(--fs-hero); line-height: 1.01; letter-spacing: -0.038em; max-width: 9.6em; }
-.hero__sub { margin-top: 24px; font-size: var(--fs-lede); line-height: 1.6; color: var(--muted); letter-spacing: -0.008em; max-width: 30em; }
-.hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(32px, 3.4vw, 44px); }
 .hero__fig { margin: 0; max-width: 640px; justify-self: center; width: 100%; }
 @media (min-width: 1000px) {
   .hero__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); min-height: min(640px, calc(100svh - var(--nav-h) - 180px)); }
@@ -581,11 +580,10 @@ html:not(.js) .cslide__media { transform: none; opacity: 1; }
 /* ================================================================ motion
    One easing everywhere: a quick start and a long soft finish. Things arrive
    by sharpening out of a light blur and rising a few pixels. Nothing bounces. */
-.motion .hero__title, .motion .hero__sub, .motion .hero__cta, .motion .hero__facts {
+.motion .hero__title, .motion .hero__cta, .motion .hero__facts {
   animation: rise-in 0.8s var(--expo) both;
 }
-.motion .hero__sub { animation-delay: 0.08s; }
-.motion .hero__cta { animation-delay: 0.16s; }
+.motion .hero__cta { animation-delay: 0.12s; }
 .motion .hero__facts { animation-delay: 0.5s; }
 @keyframes rise-in { from { opacity: 0; filter: blur(8px); transform: translateY(18px); } }
 

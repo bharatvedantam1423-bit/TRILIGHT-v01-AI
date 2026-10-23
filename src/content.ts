@@ -22,8 +22,6 @@ export const site = {
 
 /** Top bar links, beside the call to action. */
 export const nav = [
-  { href: '#ladder', label: 'The ladder' },
-  { href: '#loop', label: 'The loop' },
   { href: '#demo-day', label: 'Demo Day' },
   { href: '#faq', label: 'FAQ' },
 ];
@@ -40,7 +38,6 @@ export const footerNav = [
 export const hero = {
   headline: 'Turn Your Hardware Ideas Into Real-world Products',
   alt: 'Take Your Idea All the Way to the Real World',
-  sub: 'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   figureLabel:
     'Four plates stacked in an isometric line drawing, one per step of the ladder from TRL 1–2 at the bottom to TRL 8 on top, with the Trilight mark on the top plate and a level ruler beside them.',
   stats: [
