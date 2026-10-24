@@ -83,7 +83,8 @@ fills settle in.
    time: prev/next buttons, the stage rail, arrow keys or a swipe. Each stage
    shows its photo (`public/img/ladder/<stage>.webp`) with what to prove, time
    and grant. A missing photo falls back to a blueprint drawing.
-   "Get Full Details" opens `/program.html`, generated from
+   "Full Journey" opens `public/docs/trilight-student-journey.pdf` when that
+   file is present; otherwise `/program.html`, generated from
    `docs/TRL8-program.md` on every build (`scripts/build-doc.mjs`), with a
    Download PDF button.
 3. **Fundamentals.** One sense → decide → act board framed in three cards.

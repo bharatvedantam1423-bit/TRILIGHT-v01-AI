@@ -20,8 +20,8 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TRL8 · The Trilight Program, in full</title>
-<meta name="description" content="The full TRL8 (Trilight) program document: stages, gates, grants, GRIT Miles, safety, FAQs, glossary and case studies.">
+<title>TRILIGHT · The Program, in full</title>
+<meta name="description" content="The full TRILIGHT program document: stages, gates, grants, GRIT Miles, safety, FAQs, glossary and case studies.">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

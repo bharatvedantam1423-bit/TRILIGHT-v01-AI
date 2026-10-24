@@ -67,15 +67,15 @@ export const ladder = {
   alt: 'See How Far Your Ideas Can Go',
   stages: <Stage[]>[
     { id: 'explorer', phase: 'Pre-entry', level: 'Explorer', title: 'Learn the basics',
-      proof: 'Hardware & AIoT 101 and Computational Thinking, solo. Clear the Checkpoints.',
+      proof: 'Learn Applied IoT, clear assessments, solo.',
       time: '4–6 weeks', grant: null,
       figure: { kind: 'drawing', src: 'learn', label: 'An open notebook with hand-drawn circuit sketches and a sense, decide, act flow, beside a starter kit of a microcontroller, an ultrasonic sensor, LEDs and resistors' } },
     { id: 'trl12', phase: 'Foundation', level: 'TRL 1–2', title: 'Idea',
-      proof: 'Form a team of 3–5, pick a real problem and submit a proposal that passes the AI-scored evaluation.',
+      proof: 'Form a team of 3–5, pick a real problem and submit a proposal that passes the AI-scored evaluation and human critic.',
       time: '4–6 weeks', grant: null,
       figure: { kind: 'drawing', src: 'idea', label: 'A team sketching a soil-sensor concept on paper, with sticky notes and a photo of dry farmland' } },
     { id: 'trl3', phase: 'Foundation', level: 'TRL 3', title: 'Model',
-      proof: 'A working simulation: 3D models and software that prove the idea can work.',
+      proof: 'Deep dive and learn hardware concepts, and build a working simulation, 3D model and software that prove the idea can work.',
       time: '6–10 weeks', grant: null,
       figure: { kind: 'photo', src: '', label: 'A laptop showing a 3D CAD model of the sensor enclosure, exploded, beside its thermal simulation' } },
     { id: 'trl4', phase: 'Foundation', level: 'TRL 4', title: 'Prototype',
@@ -101,7 +101,9 @@ export const ladder = {
   ],
   footnote:
     'Grants unlock as you enter TRL 4 to 7, up to ₹5L per team. Paid to vendors or reimbursed against invoices, never as cash. Times are indicative.',
-  more: 'Get Full Details',
+  more: 'Full Journey',
+  /** The Full Journey button opens the student journey PDF once it's in public/docs/; until then, the full-details page. */
+  journeyPdf: '/docs/trilight-student-journey.pdf',
   moreHref: '/program.html',
 };
 
@@ -142,10 +144,10 @@ export const value = {
   figureLabel: 'Blueprint of a custom circuit board in an open enclosure at a field site, wired to a soil probe',
   stats: [
     { value: '1–2 Year', label: 'from first idea to TRL 8, at your own pace' },
-    { value: '8', label: 'gates, each cleared by a panel of at least three reviewers' },
+    { value: '8', label: 'stages, cleared by a TRR Committee' },
     { value: 'Unlimited', label: 'retries. Fail, fix, resubmit.' },
     { value: '15 days', label: 'between team self-reviews' },
-    { value: '2×', label: 'mentor meetings a month, at least' },
+    { value: '2×', label: 'mentor meetings a month (virtual)' },
     { value: '₹5,00,000', label: 'max grant per team' },
   ],
 };
@@ -156,7 +158,7 @@ export const doors = {
   items: [
     {
       name: 'Standard Door',
-      points: ['Learn the basics of hardware and AIoT', 'Clear checkpoints'],
+      points: ['Learn Applied IoT', 'Clear assessments'],
       note: 'The score against your evaluation will decide your entry',
       // Photos in /public/img/doors/; the drawing shows if one is missing.
       image: 'doors/standard', figure: 'idea',
@@ -224,11 +226,11 @@ export const faq = {
   items: [
     {
       q: 'Do I need a hardware idea to join?',
-      a: 'No. Take a problem from the TRL8 problem bank or bring your own. It must solve a real problem and include real physical sensing.',
+      a: 'No. Take a problem from the TRILIGHT problem bank or bring your own. It must solve a real problem and include real physical sensing.',
     },
     {
       q: 'Do I need prior electronics experience?',
-      a: 'No. The Standard Door starts with Hardware & AIoT 101.',
+      a: 'No. The Standard Door starts with Applied IoT.',
     },
     {
       q: 'Is there a fee?',
@@ -248,7 +250,7 @@ export const faq = {
     },
     {
       q: 'Can I keep working on my project afterwards?',
-      a: 'Yes. TRL 9 is earned in the market, over years, after a team leaves the program. TRL8 takes a team to the point where that test can begin.',
+      a: 'Yes. TRL 9 is earned in the market, over years, after a team leaves the program. TRILIGHT takes a team to the point where that test can begin.',
     },
   ],
 };
@@ -277,5 +279,5 @@ export const finale = {
 };
 
 export const footer = {
-  line: 'A NxtWave Physical AI & Robotics Team program · © 2026',
+  line: 'An NIAT Initiative · © 2026',
 };

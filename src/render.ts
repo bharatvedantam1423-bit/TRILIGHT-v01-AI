@@ -171,7 +171,7 @@ function ladderSection() {
         <span class="ladder2__progress" aria-hidden="true"><i data-progress></i></span>
         <button type="button" class="navbtn" data-next aria-label="Next stage">${chev('next')}</button>
       </div>
-      <a class="btn btn--ghost" href="${esc(ladder.moreHref)}" target="_blank" rel="noopener" data-section="ladder-details"><span>${esc(ladder.more)}</span>${arrow}</a>
+      <a class="btn btn--ghost" href="${esc(hasAsset(ladder.journeyPdf.slice(1)) ? ladder.journeyPdf : ladder.moreHref)}" target="_blank" rel="noopener" data-section="ladder-details"><span>${esc(ladder.more)}</span>${arrow}</a>
     </div>
     <p class="fine ladder2__note">${esc(ladder.footnote)}</p>
   </div>
