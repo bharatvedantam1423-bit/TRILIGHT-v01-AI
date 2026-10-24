@@ -455,6 +455,8 @@ html:not(.js) .ladder2__nav { display: none; }
 .footer__inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
 .footer__brand img { width: 168px; margin-bottom: 16px; }
 .footer__brand .fine { margin: 0; }
+.footer__brand .fine a { color: var(--teal-hi); text-decoration: none; }
+.footer__brand .fine a:hover { text-decoration: underline; }
 .footer__links { display: flex; gap: 28px; flex-wrap: wrap; }
 .footer__links a { font-family: var(--f-head); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
 .footer__links a:hover { color: var(--teal-hi); }

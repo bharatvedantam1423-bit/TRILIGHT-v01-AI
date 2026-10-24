@@ -55,7 +55,7 @@ hr{display:none}
 <body>
 <header>
   <a href="/"><img src="/brand/wordmark-light.svg" alt="Trilight, back to the site" width="116" height="26"></a>
-  <nav><button class="b" onclick="window.print()">Download PDF</button><a class="b" href="/#register">Join the Program</a></nav>
+  <nav><button class="b" onclick="window.print()">Download PDF</button><a class="b" href="https://dashboard.trilight.niatindia.com/" target="_blank" rel="noopener">Join the Program</a></nav>
 </header>
 <main>
 ${body}

@@ -30,7 +30,7 @@ const right =
   '<svg class="i" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const cta = (section: string, extra = '', text = site.cta, icon = arrow) =>
-  `<a class="btn ${extra}" href="#register" data-register data-section="${section}"><span>${esc(text)}</span>${icon}</a>`;
+  `<a class="btn ${extra}" href="${esc(site.joinUrl)}" target="_blank" rel="noopener" data-register data-section="${section}"><span>${esc(text)}</span>${icon}</a>`;
 
 const label = (text: string) => `<p class="label"><span>${esc(text)}</span></p>`;
 
@@ -58,7 +58,7 @@ function navBar() {
     </a>
     <nav class="nav__links" aria-label="Sections">
       ${navLinks.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('')}
-      <a class="nav__cta" href="#register" data-register data-section="nav"><i class="nav__dot" aria-hidden="true"></i><span class="nav__cta-long">${esc(site.cta)}</span><span class="nav__cta-short" aria-hidden="true">Join</span>${arrow}</a>
+      <a class="nav__cta" href="${esc(site.joinUrl)}" target="_blank" rel="noopener" data-register data-section="nav"><i class="nav__dot" aria-hidden="true"></i><span class="nav__cta-long">${esc(site.cta)}</span><span class="nav__cta-short" aria-hidden="true">Join</span>${arrow}</a>
     </nav>
   </div>
 </header>`;
@@ -171,7 +171,7 @@ function ladderSection() {
         <span class="ladder2__progress" aria-hidden="true"><i data-progress></i></span>
         <button type="button" class="navbtn" data-next aria-label="Next stage">${chev('next')}</button>
       </div>
-      <a class="btn btn--ghost" href="${esc(hasAsset(ladder.journeyPdf.slice(1)) ? ladder.journeyPdf : ladder.moreHref)}" target="_blank" rel="noopener" data-section="ladder-details"><span>${esc(ladder.more)}</span>${arrow}</a>
+      <a class="btn btn--ghost" href="${esc(ladder.journeyUrl)}" target="_blank" rel="noopener" data-section="ladder-details"><span>${esc(ladder.more)}</span>${arrow}</a>
     </div>
     <p class="fine ladder2__note">${esc(ladder.footnote)}</p>
   </div>
@@ -392,7 +392,7 @@ function footer() {
   <div class="wrap footer__inner">
     <div class="footer__brand">
       <img src="/brand/logo-light.svg" alt="Trilight · Build · Test · Deploy" width="168" height="46" loading="lazy">
-      <p class="fine">${esc(foot.line)}</p>
+      <p class="fine">${esc(foot.line).replace('An NIAT Initiative', `An <a href="${esc(foot.niatUrl)}" target="_blank" rel="noopener">NIAT Initiative</a>`)}</p>
     </div>
     <nav class="footer__links" aria-label="Footer">
       ${footerNav.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('\n      ')}
@@ -400,16 +400,7 @@ function footer() {
   </div>
 </footer>
 
-<div class="mobile-cta" data-mobile-cta>${cta('sticky')}</div>
-
-<dialog class="dialog" id="reg-dialog" aria-labelledby="reg-dialog-title">
-  <form method="dialog">
-    <img src="/brand/mark.svg" alt="" width="64" height="36">
-    <h2 id="reg-dialog-title" class="h3">Joining opens soon.</h2>
-    <p class="muted">When it opens, you’ll log in here with your NxtWave learning portal credentials. Nothing to fill in, nothing to pay.</p>
-    <button class="btn" value="close"><span>Got it</span></button>
-  </form>
-</dialog>`;
+<div class="mobile-cta" data-mobile-cta>${cta('sticky')}</div>`;
 }
 
 export function renderBody(opts: { markSvg: string }) {

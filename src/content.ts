@@ -18,6 +18,8 @@ export const site = {
   description:
     'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   cta: 'Join the Program',
+  /** Every Join button goes here (TRILIGHT dashboard). */
+  joinUrl: 'https://dashboard.trilight.niatindia.com/',
 };
 
 /** Top bar: one link beside the call to action. */
@@ -102,9 +104,8 @@ export const ladder = {
   footnote:
     'Grants unlock as you enter TRL 4 to 7, up to ₹5L per team. Paid to vendors or reimbursed against invoices, never as cash. Times are indicative.',
   more: 'Full Journey',
-  /** The Full Journey button opens the student journey PDF once it's in public/docs/; until then, the full-details page. */
-  journeyPdf: '/docs/trilight-student-journey.pdf',
-  moreHref: '/program.html',
+  /** The Full Journey button: the TRILIGHT Student Journey PDF on Google Drive. */
+  journeyUrl: 'https://drive.google.com/file/d/1Iz1qba9AdnI0wLBO7yo-bS6nUEqP7RyH/view',
 };
 
 /* 3 · Fundamentals (the loop) ------------------------------------------- */
@@ -280,4 +281,5 @@ export const finale = {
 
 export const footer = {
   line: 'An NIAT Initiative · © 2026',
+  niatUrl: 'https://www.niatindia.com/',
 };

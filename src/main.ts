@@ -17,23 +17,13 @@ if (!reduceMotion) root.classList.add('motion');
 
 /* ---------------------------------------------------------------- register */
 
-const dialog = $<HTMLDialogElement>('#reg-dialog');
 const portalHref = registerUrl();
 
 $$<HTMLAnchorElement>('[data-register]').forEach((a) => {
+  // Portal SSO (VITE_PORTAL_LOGIN_URL) wins when configured; otherwise the
+  // dashboard link already in the markup.
   if (portalHref) a.href = portalHref;
-  a.addEventListener('click', (e) => {
-    track('cta_click', { section: a.dataset.section ?? 'unknown' });
-    if (portalHref) return;
-    // Portal login not wired yet: say so instead of faking a registration.
-    e.preventDefault();
-    if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
-    else window.alert('Registration opens soon. You’ll log in with your NxtWave learning portal credentials.');
-  });
-});
-
-dialog?.addEventListener('click', (e) => {
-  if (e.target === dialog) dialog.close();
+  a.addEventListener('click', () => track('cta_click', { section: a.dataset.section ?? 'unknown' }));
 });
 
 track('page_view', { path: location.pathname });
