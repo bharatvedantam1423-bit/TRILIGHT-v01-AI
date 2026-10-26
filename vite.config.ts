@@ -11,8 +11,8 @@ const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   // Canonical URL, share previews and the sitemap need the real public domain.
-  // VITE_SITE_URL wins; otherwise the TRILIGHT domain (never a *.vercel.app URL,
-  // which would split search ranking).
+  // VITE_SITE_URL wins; otherwise the TRILIGHT domain (never a hosting
+  // preview URL, which would split search ranking).
   const siteUrl = (env.VITE_SITE_URL || SITE_URL_DEFAULT).replace(/\/$/, '');
   const ids = { ga: env.VITE_GA_ID || undefined, gtm: env.VITE_GTM_ID || undefined };
   return {

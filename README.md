@@ -14,7 +14,7 @@ page against it.
 ## Branches
 
 - `main`: the final, live version. Replit deploys from here.
-- `claude/sharp-mccarthy-gvqes8`: an earlier design iteration, kept for reference.
+- `claude/litetheme`: an earlier design iteration, kept for reference.
 
 ## Run it
 
