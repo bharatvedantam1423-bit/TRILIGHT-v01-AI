@@ -1,5 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderBody } from './src/render';
 import { headTags, bodyStart, robotsTxt, sitemapXml, manifest, SITE_URL_DEFAULT } from './src/seo';
@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
   // proxy domains (*.replit.dev, *.replit.app, custom domains), so Vite's
   // host check is turned off, as in Replit's own Vite templates.
   return {
+    appType: 'mpa', // one real page; unknown paths get a 404, not the home page
     server: { host: '0.0.0.0', allowedHosts: true },
     preview: { host: '0.0.0.0', allowedHosts: true },
     plugins: [
@@ -41,6 +42,20 @@ export default defineConfig(({ mode }) => {
           this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(siteUrl) });
           this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(siteUrl, today) });
           this.emitFile({ type: 'asset', fileName: 'site.webmanifest', source: manifest() });
+        },
+        // When the built site is served with `vite preview` (Replit Autoscale),
+        // unknown paths get the site's own 404 page.
+        configurePreviewServer(server) {
+          return () => {
+            server.middlewares.use((req, res, next) => {
+              const path = decodeURIComponent((req.url ?? '/').split('?')[0]);
+              const file = path.endsWith('/') ? `${path}index.html` : path;
+              if (file.endsWith('.html') && existsSync(resolve(__dirname, 'dist', `.${file}`))) return next();
+              res.statusCode = 404;
+              res.setHeader('Content-Type', 'text/html; charset=utf-8');
+              res.end(readFileSync(resolve(__dirname, 'dist/404.html')));
+            });
+          };
         },
       },
     ],
