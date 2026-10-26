@@ -20,6 +20,24 @@ npm run preview    # serve the production build
 
 `dist/` is plain static files (HTML, CSS, JS, WebP). Host it on any static host or CDN.
 
+## Deploy on Replit
+
+The repo includes a `.replit` file, so an import from GitHub is ready to go:
+
+1. **Import:** Replit → Create → Import from GitHub → this repo (branch `claude/trl8-lab`).
+2. **Preview:** press **Run**. It installs packages and starts the dev server on port 5173.
+3. **Secrets:** under Tools → Secrets, add the `VITE_*` values you need
+   (`VITE_GA_ID`, `VITE_SITE_URL`, …; see the table below). They are baked in
+   at build time, so redeploy after changing them.
+4. **Deploy:** Deploy → **Static**. The build command (`npm ci && npm run build`)
+   and public directory (`dist`) are read from `.replit`.
+5. **Domain:** connect `trilight.niatindia.com` under Deployments → Settings →
+   Custom domain (Replit gives the DNS records to add).
+
+Unlike Vercel, Replit static hosting doesn't read `vercel.json`, so the
+long-cache headers for `/assets` and `/img` aren't applied. The site works
+the same; repeat visits just re-check images more often.
+
 ## Deploy on Vercel
 
 1. In Vercel: **Add New… → Project → Import** `TRILIGHT-v01-AI` from GitHub.
