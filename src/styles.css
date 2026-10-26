@@ -450,7 +450,7 @@ html:not(.js) .ladder2__nav { display: none; }
 .closing__inner { position: relative; z-index: 3; text-align: center; padding: clamp(28px, 4vw, 48px) var(--gutter) 0; max-width: 760px; }
 .closing__title { margin: 0 0 30px; }
 
-/* Footer, sticky CTA, dialog */
+/* Footer, sticky CTA */
 .footer { border-top: 1px solid var(--line); padding: 48px 0; }
 .footer__inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
 .footer__brand img { width: 168px; margin-bottom: 16px; }
@@ -469,29 +469,9 @@ html:not(.js) .ladder2__nav { display: none; }
   .footer { padding-bottom: 104px; }
 }
 
-.dialog { max-width: min(92vw, 440px); padding: 0; border: 1px solid rgba(0, 182, 180, 0.4); background: var(--bg-2); color: var(--ink); }
-.dialog::backdrop { background: rgba(2, 4, 7, 0.78); backdrop-filter: blur(4px); }
-.dialog form { padding: 34px; display: grid; justify-items: start; }
-.dialog img { width: 56px; margin-bottom: 20px; }
-.dialog p { margin-bottom: 24px; }
-
-/* Holding page (registered.html) */
-.holding { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; text-align: center; background: radial-gradient(ellipse at 50% 30%, var(--bg-3), var(--bg) 70%); }
-.holding__main { padding: 48px var(--gutter); max-width: 620px; display: grid; justify-items: center; }
-.holding__logo { width: 200px; margin-bottom: 48px; }
-.holding__lamp { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-2); margin-bottom: 28px; }
-.holding__lamp i { width: 24px; height: 24px; border-radius: 50%; background: #14212b; }
-.holding.is-ok .holding__lamp { border-color: var(--teal); box-shadow: 0 0 40px rgba(0, 182, 180, 0.5); }
-.holding.is-ok .holding__lamp i { background: var(--teal-hi); box-shadow: 0 0 20px var(--teal-hi); }
-.holding .h2 { margin-bottom: 16px; }
-.holding .lede { margin: 0 auto 26px; }
-.holding__back { margin-top: 32px; text-decoration: none; }
-
 /* ==========================================================================
    Responsive
    ========================================================================== */
-@media (max-width: 1100px) {
-}
 @media (max-height: 820px) and (min-width: 761px) {
   .scrollcue { display: none; }
   .hero__cta { margin-top: 26px; }

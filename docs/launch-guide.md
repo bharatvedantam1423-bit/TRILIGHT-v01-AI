@@ -45,7 +45,7 @@ A sitemap is a small list of the site's pages that you hand to Google, so it
 doesn't have to discover them on its own. The site creates it automatically on
 every build. Nothing to edit. Open these to see them:
 
-- `https://www.trilight.niatindia.com/sitemap.xml`: the list of pages (home page and the full program page).
+- `https://www.trilight.niatindia.com/sitemap.xml`: the list of pages (the home page).
 - `https://www.trilight.niatindia.com/robots.txt`: tells search engines they may read the site, and where the sitemap is.
 
 If both open in the browser, you're ready.

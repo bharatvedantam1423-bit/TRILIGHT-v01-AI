@@ -44,7 +44,6 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
-          registered: resolve(__dirname, 'registered.html'),
         },
       },
     },

@@ -10,3 +10,7 @@ uses the optimised WebP copies in `public/img/`.
 
 To replace one, put the new original here and export a WebP to the matching
 `public/img/` path (same file name). See `docs/image-prompts.md` for the prompts.
+
+`originals/unused/` holds three photos from the first upload that the page
+doesn't use (moisture probe, microcontroller, solenoid valve), kept in case a
+section needs them later.

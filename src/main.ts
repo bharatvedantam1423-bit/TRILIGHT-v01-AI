@@ -2,7 +2,6 @@ import './styles.css';
 import './blueprint/blueprint.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { registerUrl } from './config';
 import { track } from './analytics';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -17,12 +16,7 @@ if (!reduceMotion) root.classList.add('motion');
 
 /* ---------------------------------------------------------------- register */
 
-const portalHref = registerUrl();
-
 $$<HTMLAnchorElement>('[data-register]').forEach((a) => {
-  // Portal SSO (VITE_PORTAL_LOGIN_URL) wins when configured; otherwise the
-  // dashboard link already in the markup.
-  if (portalHref) a.href = portalHref;
   a.addEventListener('click', () => track('cta_click', { section: a.dataset.section ?? 'unknown' }));
 });
 

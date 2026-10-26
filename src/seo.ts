@@ -122,13 +122,12 @@ export function bodyStart(ids: { gtm?: string }) {
 }
 
 export function robotsTxt(url: string) {
-  return `User-agent: *\nAllow: /\nDisallow: /registered.html\n\nSitemap: ${url}/sitemap.xml\n`;
+  return `User-agent: *\nAllow: /\n\nSitemap: ${url}/sitemap.xml\n`;
 }
 
 export function sitemapXml(url: string, lastmod: string) {
   const pages = [
     { loc: `${url}/`, priority: '1.0', freq: 'weekly' },
-    { loc: `${url}/program.html`, priority: '0.6', freq: 'monthly' },
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">

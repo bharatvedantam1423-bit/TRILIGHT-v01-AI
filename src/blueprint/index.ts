@@ -8,7 +8,6 @@
  * the figures are simply drawn.
  */
 import { loopCard } from './board';
-import { stageFigure } from './ladder';
 import { heroLayers } from './hero';
 import { journeyFigure, forceFigure } from './journey';
 
@@ -25,10 +24,6 @@ export function drawable(svg: string) {
 
 export function loop(stage: 'sense' | 'decide' | 'act', label: string) {
   return drawable(loopCard(stage, label));
-}
-
-export function stage(id: string, label: string) {
-  return drawable(stageFigure(id, label));
 }
 
 export function heroScene() {
