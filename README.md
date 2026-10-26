@@ -105,7 +105,7 @@ Generated at build time from `src/seo.ts`:
 - Structured data (JSON-LD): Organization (NIAT), WebSite, WebPage,
   EducationalOccupationalProgram (TRILIGHT, free) and FAQPage (from the FAQ).
 - `robots.txt`, `sitemap.xml` and `site.webmanifest`; a `404.html` page.
-- Domain: `https://trilight.niatindia.com` by default; set `VITE_SITE_URL` if it differs.
+- Domain: `https://www.trilight.niatindia.com` by default; set `VITE_SITE_URL` if it differs.
 
 Step-by-step setup for Search Console and GA4: [`docs/launch-guide.md`](docs/launch-guide.md).
 

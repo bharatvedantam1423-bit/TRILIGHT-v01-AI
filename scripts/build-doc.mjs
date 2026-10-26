@@ -22,7 +22,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TRILIGHT · The Program, in full</title>
 <meta name="description" content="The full TRILIGHT program document: stages, gates, grants, GRIT Miles, safety, FAQs, glossary and case studies.">
-<link rel="canonical" href="https://trilight.niatindia.com/program.html">
+<link rel="canonical" href="https://www.trilight.niatindia.com/program.html">
 <meta name="robots" content="index, follow">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">

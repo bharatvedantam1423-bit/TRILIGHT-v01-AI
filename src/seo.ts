@@ -8,7 +8,7 @@
  */
 import { faq } from './content';
 
-export const SITE_URL_DEFAULT = 'https://trilight.niatindia.com';
+export const SITE_URL_DEFAULT = 'https://www.trilight.niatindia.com';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 

@@ -6,15 +6,34 @@ Two separate jobs, both done once:
 - **Part B: Google Analytics 4 (GA4).** Counts visitors and Join clicks.
 
 Before you start, check the address is right. The site assumes it lives at
-**https://trilight.niatindia.com**. If the live address is different, do step 0 first.
+**https://www.trilight.niatindia.com**. If the live address is different, do step 0 first.
 
 ---
 
-## Step 0 (only if the live address is NOT trilight.niatindia.com)
+## Step 0 (only if the live address is NOT www.trilight.niatindia.com)
 
 1. In Replit, open **Deployments → your deployment → Secrets** (or Tools → Secrets).
 2. Add `VITE_SITE_URL` = your real address, e.g. `https://www.example.com` (no slash at the end).
 3. Press **Redeploy**.
+
+---
+
+## Make the address work without "www" too
+
+Right now `www.trilight.niatindia.com` works but `trilight.niatindia.com`
+doesn't: the plain address has no DNS record, so browsers can't find it.
+People often type it without www, so fix this once:
+
+1. In Replit, open **Deployments → Settings → Link a domain** and add
+   `trilight.niatindia.com` (the plain one, as a second domain next to www).
+2. Replit shows two records, an **A record** and a **TXT record**
+   (`replit-verify=…`). Send both to the IT team that manages `niatindia.com`
+   and ask them to add them for `trilight.niatindia.com`.
+3. Wait until Replit shows the domain as **Verified** (minutes to a few hours).
+4. Test: open `https://trilight.niatindia.com` in a private window.
+
+Both addresses then show the same site. The page tells Google that the www
+address is the main one, so search ranking isn't split between them.
 
 ---
 
@@ -26,8 +45,8 @@ A sitemap is a small list of the site's pages that you hand to Google, so it
 doesn't have to discover them on its own. The site creates it automatically on
 every build. Nothing to edit. Open these to see them:
 
-- `https://trilight.niatindia.com/sitemap.xml`: the list of pages (home page and the full program page).
-- `https://trilight.niatindia.com/robots.txt`: tells search engines they may read the site, and where the sitemap is.
+- `https://www.trilight.niatindia.com/sitemap.xml`: the list of pages (home page and the full program page).
+- `https://www.trilight.niatindia.com/robots.txt`: tells search engines they may read the site, and where the sitemap is.
 
 If both open in the browser, you're ready.
 
@@ -36,6 +55,7 @@ If both open in the browser, you're ready.
 1. Go to **https://search.google.com/search-console** and sign in with the
    NIAT Google account that should own the site.
 2. Click **Add property** and choose **Domain**. Type `trilight.niatindia.com`
+   (without www; a Domain property covers both the www and plain addresses)
    and click Continue.
 3. Google shows a **TXT record** (a line starting with `google-site-verification=`).
    Copy it.
@@ -45,7 +65,7 @@ If both open in the browser, you're ready.
    try again; DNS can take time.
 6. In the left menu, open **Sitemaps**. In "Add a new sitemap", type
    `sitemap.xml` and click **Submit**. The status should become **Success**.
-7. In the top search bar, paste `https://trilight.niatindia.com/` and press
+7. In the top search bar, paste `https://www.trilight.niatindia.com/` and press
    Enter, then click **Request indexing**.
 
 Google usually lists the page within a few days. To check, search
@@ -73,7 +93,7 @@ find the site through Google and what they searched for.
    - Property name: `TRILIGHT Website`
    - Time zone: India, Currency: Indian Rupee → Next, fill the business details → **Create**.
 3. Choose platform **Web**.
-   - Website URL: `trilight.niatindia.com`
+   - Website URL: `www.trilight.niatindia.com`
    - Stream name: `TRILIGHT Website` → **Create stream**.
 4. Copy the **Measurement ID**. It looks like `G-XXXXXXXXXX`.
 5. In Replit: **Deployments → Secrets**, add
