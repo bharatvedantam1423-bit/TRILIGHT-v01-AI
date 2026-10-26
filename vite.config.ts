@@ -15,11 +15,12 @@ export default defineConfig(({ mode }) => {
   // preview URL, which would split search ranking).
   const siteUrl = (env.VITE_SITE_URL || SITE_URL_DEFAULT).replace(/\/$/, '');
   const ids = { ga: env.VITE_GA_ID || undefined, gtm: env.VITE_GTM_ID || undefined };
-  // Replit's workspace preview runs on *.replit.dev; Vite blocks unknown hosts.
-  const allowedHosts = ['localhost', '.replit.dev', '.repl.co'];
+  // Replit serves the dev preview and the published app through its own
+  // proxy domains (*.replit.dev, *.replit.app, custom domains), so Vite's
+  // host check is turned off, as in Replit's own Vite templates.
   return {
-    server: { allowedHosts },
-    preview: { allowedHosts },
+    server: { host: '0.0.0.0', allowedHosts: true },
+    preview: { host: '0.0.0.0', allowedHosts: true },
     plugins: [
       {
         name: 'trl8-static-render',
