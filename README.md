@@ -107,6 +107,8 @@ Generated at build time from `src/seo.ts`:
 - `robots.txt`, `sitemap.xml` and `site.webmanifest`; a `404.html` page.
 - Domain: `https://trilight.niatindia.com` by default; set `VITE_SITE_URL` if it differs.
 
+Step-by-step setup for Search Console and GA4: [`docs/launch-guide.md`](docs/launch-guide.md).
+
 After launch: add the domain in **Google Search Console**, submit
 `/sitemap.xml`, and request indexing of the home page. Check the share card
 with LinkedIn Post Inspector and the structured data with Google's Rich
