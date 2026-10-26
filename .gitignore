@@ -3,3 +3,11 @@ dist
 .env
 .env.local
 *.log
+*.tsbuildinfo
+# Screenshots and scratch files from editor tools
+/*.png
+/*.jpg
+.cache
+.local
+.upm
+.config
