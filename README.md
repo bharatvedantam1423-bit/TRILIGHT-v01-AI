@@ -46,7 +46,7 @@ The repo includes a `.replit` file, so an import from GitHub is ready to go:
 |---|---|
 | `VITE_SITE_URL` | Only if the domain changes. Defaults to `https://www.trilight.niatindia.com` (canonical link, share previews, sitemap). |
 | `VITE_GA_ID` | GA4 measurement ID (`G-XXXXXXXXXX`). Loads gtag; funnel events are sent as GA4 events. |
-| `VITE_GTM_ID` | Google Tag Manager container (`GTM-XXXXXXX`), if tags are managed in GTM instead. |
+| `VITE_GTM_ID` | Google Tag Manager container. Defaults to `GTM-PF5GKBN9` on production builds (skipped if `VITE_GA_ID` is set). |
 
 Links (Join, Full Journey, NIAT) live in `src/content.ts`: `site.joinUrl`,
 `ladder.journeyUrl`, `footer.niatUrl`. The website stores no student data.

@@ -9,6 +9,8 @@
 import { faq } from './content';
 
 export const SITE_URL_DEFAULT = 'https://www.trilight.niatindia.com';
+/** NIAT's Google Tag Manager container. VITE_GTM_ID overrides it. */
+export const GTM_ID_DEFAULT = 'GTM-PF5GKBN9';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 

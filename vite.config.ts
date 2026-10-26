@@ -2,19 +2,23 @@ import { defineConfig, loadEnv } from 'vite';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderBody } from './src/render';
-import { headTags, bodyStart, robotsTxt, sitemapXml, manifest, SITE_URL_DEFAULT } from './src/seo';
+import { headTags, bodyStart, robotsTxt, sitemapXml, manifest, SITE_URL_DEFAULT, GTM_ID_DEFAULT } from './src/seo';
 
 // The brand mark is inlined (not an <img>) so the scroll scenes can animate it.
 const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8')
   .replace('<svg ', '<svg class="mark" role="presentation" focusable="false" ');
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   // Canonical URL, share previews and the sitemap need the real public domain.
   // VITE_SITE_URL wins; otherwise the TRILIGHT domain (never a hosting
   // preview URL, which would split search ranking).
   const siteUrl = (env.VITE_SITE_URL || SITE_URL_DEFAULT).replace(/\/$/, '');
-  const ids = { ga: env.VITE_GA_ID || undefined, gtm: env.VITE_GTM_ID || undefined };
+  // GTM loads on production builds only, so local and preview runs don't count
+  // as visits. It is skipped when GA4 direct is set, so visits aren't counted twice.
+  const ga = env.VITE_GA_ID || undefined;
+  const gtm = env.VITE_GTM_ID || (command === 'build' && !ga ? GTM_ID_DEFAULT : undefined);
+  const ids = { ga, gtm };
   // Replit serves the dev preview and the published app through its own
   // proxy domains (*.replit.dev, *.replit.app, custom domains), so Vite's
   // host check is turned off, as in Replit's own Vite templates.
