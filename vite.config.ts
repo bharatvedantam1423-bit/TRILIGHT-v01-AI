@@ -1,7 +1,8 @@
 import { defineConfig, loadEnv } from 'vite';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { renderBody, meta } from './src/render';
+import { renderBody } from './src/render';
+import { headTags, bodyStart, robotsTxt, sitemapXml, manifest, SITE_URL_DEFAULT } from './src/seo';
 
 // The brand mark is inlined (not an <img>) so the scroll scenes can animate it.
 const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8')
@@ -9,12 +10,11 @@ const markSvg = readFileSync(resolve(__dirname, 'public/brand/mark.svg'), 'utf8'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
-  // Share previews (WhatsApp, LinkedIn, X) need an absolute image URL.
-  // VITE_SITE_URL wins; on Vercel the production domain is used automatically.
-  const siteUrl = (
-    env.VITE_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '')
-  ).replace(/\/$/, '');
+  // Canonical URL, share previews and the sitemap need the real public domain.
+  // VITE_SITE_URL wins; otherwise the TRILIGHT domain (never a *.vercel.app URL,
+  // which would split search ranking).
+  const siteUrl = (env.VITE_SITE_URL || SITE_URL_DEFAULT).replace(/\/$/, '');
+  const ids = { ga: env.VITE_GA_ID || undefined, gtm: env.VITE_GTM_ID || undefined };
   return {
     plugins: [
       {
@@ -24,12 +24,18 @@ export default defineConfig(({ mode }) => {
           handler(html, ctx) {
             if (!ctx.filename.endsWith('index.html')) return html;
             return html
-              .replace('<!--@body-->', renderBody({ markSvg }))
-              .replaceAll('%TRL8_TITLE%', meta.title)
-              .replaceAll('%TRL8_DESC%', meta.description)
-              .replaceAll('%TRL8_OG_IMAGE%', `${siteUrl}/og.jpg`)
-              .replaceAll('%TRL8_URL%', `${siteUrl}/`);
+              .replace('<!--@head-->', headTags(siteUrl, ids))
+              .replace('<!--@bodystart-->', bodyStart(ids))
+              .replace('<!--@body-->', renderBody({ markSvg }));
           },
+        },
+        // robots.txt, sitemap.xml and the web manifest are generated, so the
+        // domain and dates are always right.
+        generateBundle() {
+          const today = new Date().toISOString().slice(0, 10);
+          this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(siteUrl) });
+          this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(siteUrl, today) });
+          this.emitFile({ type: 'asset', fileName: 'site.webmanifest', source: manifest() });
         },
       },
     ],

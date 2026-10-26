@@ -58,7 +58,7 @@ function navBar() {
     </a>
     <nav class="nav__links" aria-label="Sections">
       ${navLinks.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join('')}
-      <a class="nav__cta" href="${esc(site.joinUrl)}" target="_blank" rel="noopener" data-register data-section="nav"><i class="nav__dot" aria-hidden="true"></i><span class="nav__cta-long">${esc(site.cta)}</span><span class="nav__cta-short" aria-hidden="true">Join</span>${arrow}</a>
+      <a class="nav__cta" href="${esc(site.joinUrl)}" target="_blank" rel="noopener" aria-label="${esc(site.cta)} (opens in a new tab)" data-register data-section="nav"><i class="nav__dot" aria-hidden="true"></i><span class="nav__cta-long">${esc(site.cta)}</span><span class="nav__cta-short" aria-hidden="true">Join</span>${arrow}</a>
     </nav>
   </div>
 </header>`;
@@ -148,7 +148,7 @@ function ladderSection() {
         ${st
           .map(
             (s, i) => `
-        <article class="slide${i === 0 ? ' is-active' : ''}" id="stage-${s.id}" role="tabpanel" aria-label="${esc(s.level)}: ${esc(s.title)}" data-slide>
+        <div class="slide${i === 0 ? ' is-active' : ''}" id="stage-${s.id}" role="tabpanel" aria-label="${esc(s.level)}: ${esc(s.title)}" data-slide>
           <div class="slide__media slide__media--${s.figure.kind}">${media(s, i)}</div>
           <div class="slide__body">
             <p class="slide__count"><b>${pad(i + 1)}</b> / ${pad(n)} · ${esc(s.phase)}</p>
@@ -160,7 +160,7 @@ function ladderSection() {
               <div><dt>Grant</dt><dd>${s.grant ? `<b>${esc(s.grant)}</b>` : '<span class="muted">—</span>'}</dd></div>
             </dl>
           </div>
-        </article>`,
+        </div>`,
           )
           .join('')}
       </div>
@@ -424,4 +424,3 @@ export function renderBody(opts: { markSvg: string }) {
   ].join('\n');
 }
 
-export const meta = { title: site.title, description: site.description };

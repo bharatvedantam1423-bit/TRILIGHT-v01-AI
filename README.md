@@ -62,9 +62,40 @@ Sections, in the doc's order: 1 Hero · 2 The ladder · 3 Fundamentals (the loop
 
 ## Analytics
 
-`src/analytics.ts` pushes funnel events to `window.dataLayer`, ready for GTM or GA4. A/B test: the ladder auto-advances for half of visitors (`trl8_ab_assign {test: ladder_autoplay, variant}`; force with `?ladder=auto` or `?ladder=manual`).
-`trl8_page_view`, `trl8_cta_click {section}`, `trl8_scroll_depth {section}`,
-`trl8_login_success`, `trl8_platform_redirect`.
+Set **one** of these in Vercel → Settings → Environment Variables, then redeploy:
+
+| Variable | What it does |
+|---|---|
+| `VITE_GA_ID` | GA4 measurement ID (`G-XXXXXXXXXX`). Loads gtag; page views are automatic, funnel events are sent as GA4 events. |
+| `VITE_GTM_ID` | Google Tag Manager container (`GTM-XXXXXXX`), if the team manages tags in GTM. Events arrive in the dataLayer. |
+
+Funnel events (`src/analytics.ts`): `trl8_page_view`, `trl8_cta_click {section}`
+(which Join button), `trl8_scroll_depth {section}`, `trl8_ab_assign {test, variant}`
+and `trl8_ladder_stage {stage, by}`. A/B test: the ladder auto-advances for half
+of visitors; force a variant with `?ladder=auto` or `?ladder=manual`.
+
+In GA4, mark `trl8_cta_click` as a **key event** (conversion) and register
+`section` and `variant` as custom dimensions to compare Join clicks by button
+and by A/B variant.
+
+## Search (SEO)
+
+Generated at build time from `src/seo.ts`:
+
+- Title, description, canonical URL, robots, Open Graph and X (Twitter) cards
+  with the share image `public/og.jpg` (1200×630).
+- Structured data (JSON-LD): Organization (NIAT), WebSite, WebPage,
+  EducationalOccupationalProgram (TRILIGHT, free) and FAQPage (from the FAQ).
+- `robots.txt`, `sitemap.xml` and `site.webmanifest`; a `404.html` page.
+- Domain: `https://trilight.niatindia.com` by default; set `VITE_SITE_URL` if it differs.
+
+After launch: add the domain in **Google Search Console**, submit
+`/sitemap.xml`, and request indexing of the home page. Check the share card
+with LinkedIn Post Inspector and the structured data with Google's Rich
+Results Test.
+
+Lighthouse (mobile, simulated slow 4G): SEO 100, Accessibility 100,
+Best Practices 100, Performance mid-80s.
 
 ## Motion and performance
 

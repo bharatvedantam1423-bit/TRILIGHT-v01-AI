@@ -455,10 +455,10 @@ html:not(.js) .ladder2__nav { display: none; }
 .footer__inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
 .footer__brand img { width: 168px; margin-bottom: 16px; }
 .footer__brand .fine { margin: 0; }
-.footer__brand .fine a { color: var(--teal-hi); text-decoration: none; }
+.footer__brand .fine a { color: var(--teal-hi); text-decoration: none; padding: 10px 0; }
 .footer__brand .fine a:hover { text-decoration: underline; }
-.footer__links { display: flex; gap: 28px; flex-wrap: wrap; }
-.footer__links a { font-family: var(--f-head); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
+.footer__links { display: flex; gap: 4px 28px; flex-wrap: wrap; }
+.footer__links a { display: inline-block; padding: 12px 0; font-family: var(--f-head); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
 .footer__links a:hover { color: var(--teal-hi); }
 
 .mobile-cta { display: none; }
@@ -537,7 +537,10 @@ html:not(.js) .ladder2__nav { display: none; }
   .facts { grid-template-columns: auto auto; row-gap: 18px; }
   .facts > div { padding: 0 16px; }
   .facts > div:nth-child(odd) { padding-left: 0; border-left: 0; }
-  .facts dt { font-size: 10px; letter-spacing: 0.12em; }
+  .facts dt { font-size: 11px; letter-spacing: 0.1em; }
+  .problem__det { left: auto; right: 16px; top: 18%; width: 46%; height: 26%; }
+  .problem:first-child .problem__det { left: auto; right: 16px; top: 22%; width: 46%; height: 24%; }
+  .problem__copy { padding: 18px 20px; }
 
   .door { --cut: 16px; }
   .finale__cards { grid-template-columns: 1fr; }
@@ -551,3 +554,4 @@ html:not(.js) .ladder2__nav { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+

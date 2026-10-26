@@ -14,7 +14,6 @@
 
 export const site = {
   name: 'Trilight',
-  title: 'Trilight · Turn Your Ideas Into Real-world Products',
   description:
     'With Trilight, take your hardware, robotics, or Physical AI idea from concept to a real-world product, and work towards getting your first paying customer.',
   cta: 'Join the Program',

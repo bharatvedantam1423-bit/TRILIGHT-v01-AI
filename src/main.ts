@@ -447,16 +447,19 @@ function pointerParallax() {
   });
 }
 
+// The hero and the ladder start right away; everything further down waits for
+// the browser to be idle, so the first screen paints and responds sooner.
+const idle = (fn: () => void) =>
+  typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 300);
+
 if (!reduceMotion) {
   introScene();
   ladderScene();
-  loopScene();
-  lampsScene();
-  closingScene();
-  finaleScene();
-  reveals();
   ticker();
-  if (finePointer) pointerParallax();
+  // One small task per scene, so no single long task blocks a tap.
+  const queue = [loopScene, lampsScene, closingScene, finaleScene, reveals, ...(finePointer ? [pointerParallax] : []), () => ScrollTrigger.refresh()];
+  const next = () => { const fn = queue.shift(); if (!fn) return; fn(); idle(next); };
+  idle(next);
 }
 
 // Fonts and lazy images change layout; re-measure scroll scenes once settled.
