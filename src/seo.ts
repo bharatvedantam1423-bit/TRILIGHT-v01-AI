@@ -20,7 +20,7 @@ export const seo = {
     'TRILIGHT is NIAT’s funded journey for students to take a hardware, robotics or Physical AI idea from concept to a real product. Grants up to ₹5 Lakh per team.',
   ogImageAlt: 'Trilight: Turn Your Hardware Ideas Into Real-world Products. Up to ₹5 Lakh grant per team, ₹3 Cr grant pool, 8 stages, Demo Day April 2027.',
   /** Bump ?v= when og.jpg changes, so LinkedIn, WhatsApp and X fetch the new image. */
-  ogImage: '/og.jpg?v=2',
+  ogImage: '/og.jpg?v=3',
   keywords: 'TRILIGHT, NIAT, hardware program, Physical AI, robotics, IoT, student grant, Technology Readiness Level, TRL, prototype, NxtWave',
 };
 
@@ -97,8 +97,8 @@ export function headTags(url: string, ids: { ga?: string; gtm?: string }) {
     `<meta property="og:url" content="${url}/">`,
     `<meta property="og:image" content="${url}${seo.ogImage}">`,
     `<meta property="og:image:type" content="image/jpeg">`,
-    `<meta property="og:image:width" content="1200">`,
-    `<meta property="og:image:height" content="630">`,
+    `<meta property="og:image:width" content="1730">`,
+    `<meta property="og:image:height" content="909">`,
     `<meta property="og:image:alt" content="${esc(seo.ogImageAlt)}">`,
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta name="twitter:title" content="${esc(seo.title)}">`,

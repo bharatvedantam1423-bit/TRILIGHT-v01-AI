@@ -81,7 +81,7 @@ In GA4, mark `trl8_cta_click` as a **key event** (conversion) and register
 Generated at build time from `src/seo.ts`:
 
 - Title, description, canonical URL, robots, Open Graph and X cards with the
-  share image `public/og.jpg` (1200×630).
+  share image `public/og.jpg` (1730×909).
 - Structured data (JSON-LD): Organization (NIAT), WebSite, WebPage,
   EducationalOccupationalProgram (TRILIGHT) and FAQPage (from the FAQ).
 - `robots.txt`, `sitemap.xml` and `site.webmanifest`; a `404.html` page.
