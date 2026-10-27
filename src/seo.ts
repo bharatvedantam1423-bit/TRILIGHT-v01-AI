@@ -18,7 +18,9 @@ export const seo = {
   title: 'TRILIGHT by NIAT | Turn Your Hardware Ideas Into Real-world Products',
   description:
     'TRILIGHT is NIAT’s funded journey for students to take a hardware, robotics or Physical AI idea from concept to a real product. Grants up to ₹5 Lakh per team.',
-  ogImageAlt: 'TRILIGHT: Turn Your Hardware Ideas Into Real-world Products, over a blueprint drawing of a circuit board.',
+  ogImageAlt: 'Trilight: Turn Your Hardware Ideas Into Real-world Products. Up to ₹5 Lakh grant per team, ₹3 Cr grant pool, 8 stages, Demo Day April 2027.',
+  /** Bump ?v= when og.jpg changes, so LinkedIn, WhatsApp and X fetch the new image. */
+  ogImage: '/og.jpg?v=2',
   keywords: 'TRILIGHT, NIAT, hardware program, Physical AI, robotics, IoT, student grant, Technology Readiness Level, TRL, prototype, NxtWave',
 };
 
@@ -93,7 +95,7 @@ export function headTags(url: string, ids: { ga?: string; gtm?: string }) {
     `<meta property="og:title" content="${esc(seo.title)}">`,
     `<meta property="og:description" content="${esc(seo.description)}">`,
     `<meta property="og:url" content="${url}/">`,
-    `<meta property="og:image" content="${url}/og.jpg">`,
+    `<meta property="og:image" content="${url}${seo.ogImage}">`,
     `<meta property="og:image:type" content="image/jpeg">`,
     `<meta property="og:image:width" content="1200">`,
     `<meta property="og:image:height" content="630">`,
@@ -101,7 +103,7 @@ export function headTags(url: string, ids: { ga?: string; gtm?: string }) {
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta name="twitter:title" content="${esc(seo.title)}">`,
     `<meta name="twitter:description" content="${esc(seo.description)}">`,
-    `<meta name="twitter:image" content="${url}/og.jpg">`,
+    `<meta name="twitter:image" content="${url}${seo.ogImage}">`,
     `<meta name="twitter:image:alt" content="${esc(seo.ogImageAlt)}">`,
     `<link rel="manifest" href="/site.webmanifest">`,
     `<script type="application/ld+json">${jsonLd(url)}</script>`,
